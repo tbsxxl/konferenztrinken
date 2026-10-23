@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)" />
   <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
   <meta name="darkreader-lock" />
+  <meta name="color-scheme" content="light dark" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Konferenz" />
@@ -133,6 +134,8 @@
     .pat2 { background-image: linear-gradient(135deg, rgba(0, 0, 0, 0.1) 25%, transparent 25%), linear-gradient(45deg, rgba(0, 0, 0, 0.1) 25%, transparent 25%); background-size: 34px 34px; }
     .pat3 { background-image: repeating-linear-gradient(65deg, transparent 0 20px, rgba(255, 255, 255, 0.09) 20px 24px); }
     .half img, .crest { flex: none; width: 58px; height: 58px; object-fit: contain; filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.35)); }
+    /* Heller Rand, damit z. B. das blaue Schalke-Logo auf Blau sichtbar bleibt. */
+    .half img { filter: drop-shadow(0 0 1px #fff) drop-shadow(0 0 1px #fff) drop-shadow(0 0 4px rgba(255, 255, 255, 0.55)) drop-shadow(0 3px 6px rgba(0, 0, 0, 0.35)); }
     .crest { border-radius: 50%; background: rgba(255, 255, 255, 0.92); color: #111; display: grid; place-items: center; font: 800 15px/1 var(--rounded); letter-spacing: 0.02em; }
     .own { display: flex; flex-direction: column; gap: 3px; margin-left: auto; align-items: flex-end; min-width: 0; }
     .half.away .own { margin-left: 0; margin-right: auto; align-items: flex-start; }
