@@ -118,17 +118,42 @@
     .btn { display: block; width: 100%; margin-top: 22px; min-height: 52px; border: 0; border-radius: 999px; background: var(--accent); color: #fff; font-weight: 600; font-size: 17px; box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 35%, transparent); }
     .btn.small { width: auto; min-height: 36px; margin: 0; padding: 0 16px; font-size: 15px; box-shadow: none; }
 
-    /* Anzeigetafel */
-    .row { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 72px minmax(0, 1fr); align-items: center; gap: 8px; padding: 12px 18px; }
-    .row .t { font-size: 15px; font-weight: 600; line-height: 1.2; overflow-wrap: anywhere; min-width: 0; }
-    .row .t.away { text-align: right; }
-    .row .t small { display: block; font-size: 12px; font-weight: 400; color: var(--secondary); margin-top: 1px; }
-    .row .s { text-align: center; }
-    .row .s b { display: block; font: 700 26px/1 var(--rounded); font-variant-numeric: tabular-nums; letter-spacing: 0; }
-    .row .s span { font-size: 11px; font-weight: 600; color: var(--secondary); }
-    .row.live .s span { color: var(--red); }
-    .row.flash { animation: rowflash 2s; }
-    @keyframes rowflash { 0%, 40% { background: color-mix(in srgb, var(--accent) 22%, transparent); } }
+    /* Anzeigetafel im TV-Stil: Vereinsfarbe links/rechts, Logos, dunkler Spielstand in der Mitte */
+    .board { background: none; border-radius: 0; overflow: visible; display: grid; gap: 8px; }
+    .row { position: relative; display: grid; grid-template-columns: 1fr 1fr; height: 92px; border-radius: 20px; overflow: hidden; isolation: isolate; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18); }
+    .row + .row::before { display: none; }
+    .game .row { border-radius: 0; box-shadow: none; }
+    .half { position: relative; display: flex; align-items: center; gap: 8px; padding: 0 56px 0 14px; background-color: var(--tc); min-width: 0; }
+    .half.away { flex-direction: row-reverse; padding: 0 14px 0 56px; }
+    .half::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(0, 0, 0, 0.18), transparent 70%); }
+    .half.away::after { background: linear-gradient(270deg, rgba(0, 0, 0, 0.18), transparent 70%); }
+    .pat0 { background-image: repeating-radial-gradient(circle at 16% 50%, transparent 0 15px, rgba(0, 0, 0, 0.11) 15px 18px); }
+    .away.pat0 { background-image: repeating-radial-gradient(circle at 84% 50%, transparent 0 15px, rgba(0, 0, 0, 0.11) 15px 18px); }
+    .pat1 { background-image: repeating-linear-gradient(115deg, transparent 0 13px, rgba(0, 0, 0, 0.1) 13px 16px); }
+    .pat2 { background-image: linear-gradient(135deg, rgba(0, 0, 0, 0.1) 25%, transparent 25%), linear-gradient(45deg, rgba(0, 0, 0, 0.1) 25%, transparent 25%); background-size: 34px 34px; }
+    .pat3 { background-image: repeating-linear-gradient(65deg, transparent 0 20px, rgba(255, 255, 255, 0.09) 20px 24px); }
+    .half img, .crest { flex: none; width: 58px; height: 58px; object-fit: contain; filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.35)); }
+    .crest { border-radius: 50%; background: rgba(255, 255, 255, 0.92); color: #111; display: grid; place-items: center; font: 800 15px/1 var(--rounded); letter-spacing: 0.02em; }
+    .own { display: flex; flex-direction: column; gap: 3px; margin-left: auto; align-items: flex-end; min-width: 0; }
+    .half.away .own { margin-left: 0; margin-right: auto; align-items: flex-start; }
+    .own .who { margin: 0; color: #fff; background: rgba(0, 0, 0, 0.5); padding: 2px 8px 2px 6px; border-radius: 999px; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .mid { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 4px; z-index: 1; }
+    .cells { display: grid; grid-template-columns: 46px 46px; gap: 1px; background: #1d3542; border-radius: 4px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35); }
+    .cells > * { background: #0b1f2a; color: #fff; text-align: center; }
+    .cells span { font-size: 12px; font-weight: 800; letter-spacing: 0.03em; padding-top: 5px; }
+    .cells b { font: 800 27px/1.1 var(--rounded); font-variant-numeric: tabular-nums; padding-bottom: 4px; }
+    .cells b.dim { color: rgba(255, 255, 255, 0.35); }
+    .st { font-size: 11px; font-weight: 700; color: #fff; background: rgba(11, 31, 42, 0.85); border-radius: 999px; padding: 1px 9px; white-space: nowrap; }
+    .row.live .st { background: var(--red); }
+    .row.flash::after { content: ""; position: absolute; inset: 0; background: #fff; animation: goalflash 1.6s ease-out forwards; pointer-events: none; z-index: 2; }
+    @keyframes goalflash { 0% { opacity: 0.7; } 100% { opacity: 0; } }
+    @media (max-width: 440px) {
+      .half { padding: 0 52px 0 10px; gap: 6px; }
+      .half.away { padding: 0 10px 0 52px; }
+      .half img, .crest { width: 48px; height: 48px; }
+      .crest { font-size: 13px; }
+      .own .who { font-size: 11px; padding: 2px 7px 2px 5px; }
+    }
 
     /* Personenfarben */
     .who { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: var(--c); margin-top: 3px; }
@@ -508,6 +533,9 @@
         kickoff: new Date(ev.date),
         home: home.team?.displayName || home.team?.name || '?',
         away: away.team?.displayName || away.team?.name || '?',
+        homeAbbr: home.team?.abbreviation, awayAbbr: away.team?.abbreviation,
+        homeColor: home.team?.color, awayColor: away.team?.color,
+        homeLogo: home.team?.logo, awayLogo: away.team?.logo,
         homeScore: home.score ?? '',
         awayScore: away.score ?? '',
         state: status.type?.state || 'pre',
@@ -532,6 +560,8 @@
         kickoff,
         home: m.team1?.teamName || '?',
         away: m.team2?.teamName || '?',
+        homeAbbr: m.team1?.shortName, awayAbbr: m.team2?.shortName,
+        homeLogo: m.team1?.teamIconUrl, awayLogo: m.team2?.teamIconUrl,
         homeScore: String(last?.scoreTeam1 ?? final?.pointsTeam1 ?? (started ? 0 : '')),
         awayScore: String(last?.scoreTeam2 ?? final?.pointsTeam2 ?? (started ? 0 : '')),
         state: m.matchIsFinished ? 'post' : started ? 'in' : 'pre',
@@ -548,6 +578,21 @@
   const clubTokens = (name) => norm(name).replace(/[^a-z0-9 ]/g, ' ').split(' ').filter((t) => t && !GENERIC.has(t)).map((t) => ALIAS[t] || t);
   // "FC Cologne" (ESPN) und "1. FC Köln" (OpenLigaDB) → beide "koln".
   const clubKey = (name) => clubTokens(name).at(-1) || norm(name);
+  // Kürzel und Vereinsfarben wie in der TV-Grafik; ESPN-Werte nur als Ersatz.
+  const CLUBS = {
+    frankfurt: ['SGE', '#2a2a2a'], koln: ['KOE', '#ed1c24'], berlin: ['FCU', '#e2001a'], dortmund: ['BVB', '#fde100'],
+    bremen: ['SVW', '#1d9053'], paderborn: ['SCP', '#1fb5ea'], augsburg: ['FCA', '#ba3733'], schalke: ['S04', '#004d9d'],
+    mainz: ['M05', '#c3141e'], leipzig: ['RBL', '#0c2043'], elversberg: ['SVE', '#1a1a1a'], hamburg: ['HSV', '#0a3f86'],
+    stuttgart: ['VFB', '#e32219'], bayern: ['FCB', '#dc052d'], leverkusen: ['B04', '#e32221'], gladbach: ['BMG', '#1f1f1f'],
+    freiburg: ['SCF', '#1a1a1a'], wolfsburg: ['WOB', '#65b32e'], hoffenheim: ['TSG', '#1c63b7'], heidenheim: ['FCH', '#c8102e'],
+    pauli: ['STP', '#5c4033'], bochum: ['BOC', '#005ca9'], kiel: ['KSV', '#004c9b'], darmstadt: ['D98', '#004e9e'],
+    dusseldorf: ['F95', '#da251d'], hannover: ['H96', '#00873e'], nurnberg: ['FCN', '#a41d21'], karlsruher: ['KSC', '#00519e'],
+    'hertha bsc': ['BSC', '#005ca9'], kaiserslautern: ['FCK', '#c8102e'], magdeburg: ['FCM', '#004c97'], munster: ['SCM', '#00843d'],
+  };
+  const club = (name) => CLUBS[clubKey(name)] || [];
+  const teamAbbr = (g, side) => club(g[side])[0] || (g[side + 'Abbr'] || clubKey(g[side]).slice(0, 3)).toUpperCase();
+  const teamColor = (g, side) => club(g[side])[1] || (g[side + 'Color'] ? `#${g[side + 'Color'].replace('#', '')}` : '#3a3a3c');
+  const teamPattern = (name) => [...clubKey(name)].reduce((a, c) => a + c.charCodeAt(0), 0) % 4;
   const sameClub = (a, b) => clubKey(a) === clubKey(b);
   const sameMatch = (g, o) => Math.abs(g.kickoff - o.kickoff) < 10 * 60e3 && (sameClub(g.home, o.home) || sameClub(g.away, o.away));
   // Quellenunabhängiger Schlüssel, damit ein Ereignis nie doppelt zählt, auch wenn die Quelle wechselt.
@@ -651,13 +696,33 @@
     const key = `${g.homeScore}:${g.awayScore}`;
     const changed = lastScores[g.id] !== undefined && lastScores[g.id] !== key;
     lastScores[g.id] = key;
-    const owner = (team) => el('div', { className: 'owners-line' }, ...ownersOf(team).map(whoBadge));
     const pre = g.state === 'pre';
-    const status = pre ? 'Anpfiff' : g.state === 'in' ? (g.halftime ? 'Halbzeit' : g.detail || 'LIVE') : 'Ende';
-    return el('div', { className: 'row' + (g.state === 'in' ? ' live' : '') + (changed ? ' flash' : '') },
-      el('div', { className: 't' }, g.home, owner(g.home)),
-      el('div', { className: 's' }, el('b', { className: pre ? 'time' : '', textContent: pre ? berlinTime.format(g.kickoff) : key }), el('span', { textContent: status })),
-      el('div', { className: 't away' }, g.away, owner(g.away)));
+    const status = pre ? `Anpfiff ${berlinTime.format(g.kickoff)}` : g.state === 'in' ? (g.halftime ? 'Halbzeit' : g.detail || 'LIVE') : 'Ende';
+    const half = (side) => {
+      const name = g[side];
+      const box = el('div', { className: `half ${side} pat${teamPattern(name)}`, title: name });
+      box.style.setProperty('--tc', teamColor(g, side));
+      const crest = () => el('div', { className: 'crest', textContent: teamAbbr(g, side) });
+      if (g[side + 'Logo']) {
+        const img = el('img', { src: g[side + 'Logo'], alt: name, loading: 'lazy', referrerPolicy: 'no-referrer' });
+        img.onerror = () => img.replaceWith(crest());
+        box.append(img);
+      } else {
+        box.append(crest());
+      }
+      const owners = ownersOf(name);
+      if (owners.length) box.append(el('div', { className: 'own' }, ...owners.map(whoBadge)));
+      return box;
+    };
+    const row = el('div', { className: 'row' + (g.state === 'in' ? ' live' : '') + (changed ? ' flash' : '') },
+      half('home'), half('away'),
+      el('div', { className: 'mid' },
+        el('div', { className: 'cells' },
+          el('span', { textContent: teamAbbr(g, 'home') }), el('span', { textContent: teamAbbr(g, 'away') }),
+          el('b', { className: pre ? 'dim' : '', textContent: pre ? '–' : g.homeScore }), el('b', { className: pre ? 'dim' : '', textContent: pre ? '–' : g.awayScore })),
+        el('div', { className: 'st', textContent: status })));
+    row.setAttribute('aria-label', `${g.home} ${pre ? 'gegen' : key} ${g.away}, ${status}`);
+    return row;
   }
 
   function renderBoard() {
