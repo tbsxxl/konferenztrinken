@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)" />
   <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+  <meta name="darkreader-lock" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Konferenz" />
@@ -129,6 +130,21 @@
     .row.flash { animation: rowflash 2s; }
     @keyframes rowflash { 0%, 40% { background: color-mix(in srgb, var(--accent) 22%, transparent); } }
 
+    /* Personenfarben */
+    .who { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: var(--c); margin-top: 3px; }
+    .who::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+    .row .t.away .who { flex-direction: row-reverse; }
+    .row .owners-line { display: flex; flex-wrap: wrap; gap: 0 8px; }
+    .row .t.away .owners-line { justify-content: flex-end; }
+    .row .s b.time { font-size: 19px; color: var(--secondary); }
+    .avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--c); color: #fff; display: grid; place-items: center; font: 700 20px/1 var(--rounded); text-transform: uppercase; }
+    .team-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+    .team-chips span { font-size: 12px; font-weight: 500; padding: 3px 9px; border-radius: 999px; background: var(--fill); color: var(--label); }
+    .team-chips span.off { color: var(--tertiary); text-decoration: line-through; }
+    .warn { margin-top: 12px; border-radius: var(--r); padding: 14px 18px; background: color-mix(in srgb, var(--red) 14%, var(--cell)); border: 0.5px solid color-mix(in srgb, var(--red) 40%, transparent); font-size: 15px; }
+    .warn b { display: block; margin-bottom: 2px; }
+    .warn button { margin-top: 10px; border: 0; border-radius: 999px; padding: 8px 16px; background: var(--red); color: #fff; font-weight: 600; font-size: 15px; }
+
     /* Zu verteilen */
     .todo {
       margin-top: 10px; border-radius: var(--r); padding: 16px 18px;
@@ -144,7 +160,7 @@
     /* Spielerkarten */
     .players { display: grid; gap: 10px; }
     .p { background: var(--cell); border-radius: var(--r); padding: 16px 16px 14px 18px; }
-    .p .top-line { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: start; }
+    .p .top-line { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 12px; align-items: start; }
     .p .name { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.15; overflow-wrap: anywhere; }
     .p .teams { color: var(--secondary); font-size: 13px; margin-top: 2px; }
     .p .ex { display: inline-block; margin-top: 8px; font-size: 12px; font-weight: 600; color: var(--red); background: color-mix(in srgb, var(--red) 13%, transparent); border-radius: 999px; padding: 3px 9px; }
@@ -252,6 +268,7 @@
     <h2 class="sec">Konferenz</h2>
     <div class="board" id="board"></div>
 
+    <div id="mismatch"></div>
     <div id="todos"></div>
 
     <h2 class="sec">Spieler <small>Name gefallen? Antippen</small></h2>
@@ -598,9 +615,10 @@
         const twin = oldbGames.find((o) => sameMatch(g, o));
         if (twin) g.events = [...g.events, ...twin.events];
       }));
-      if (games.length && !lines($('teams').value).length) {
+      if (games.length && (store.get('kt-teams-auto', true) || !lines($('teams').value).length)) {
         $('teams').value = games.flatMap((g) => [g.home, g.away]).join('\n');
         store.set('kt-teams', $('teams').value);
+        store.set('kt-teams-auto', true);
       }
       const live = games.some((g) => g.state === 'in');
       const now = berlinTime.format(new Date());
@@ -620,12 +638,12 @@
     }
   }
 
-  // Während der Spiele jede Minute neu laden, vorher alle 10 Minuten (Aufstellungen).
+  // Während der Spiele alle 30 Sekunden neu laden, vorher alle 10 Minuten (Aufstellungen).
   function scheduleRefresh() {
     clearTimeout(refreshTimer);
     if (!games.length || games.every((g) => g.state === 'post')) return;
     const hot = games.some((g) => g.state === 'in' || g.kickoff - Date.now() < 30 * 60e3);
-    refreshTimer = setTimeout(() => loadGames({ quiet: true }), hot ? 60e3 : 10 * 60e3);
+    refreshTimer = setTimeout(() => loadGames({ quiet: true }), hot ? 30e3 : 10 * 60e3);
   }
 
   // Eine Zeile der Anzeigetafel: Heim | Stand | Gast, darunter die Besitzer.
@@ -633,12 +651,13 @@
     const key = `${g.homeScore}:${g.awayScore}`;
     const changed = lastScores[g.id] !== undefined && lastScores[g.id] !== key;
     lastScores[g.id] = key;
-    const owner = (team) => ownersOf(team).map((p) => p.name).join(', ');
-    const status = g.state === 'pre' ? berlinTime.format(g.kickoff) : g.state === 'in' ? (g.halftime ? 'HZ' : g.detail || 'LIVE') : 'Ende';
+    const owner = (team) => el('div', { className: 'owners-line' }, ...ownersOf(team).map(whoBadge));
+    const pre = g.state === 'pre';
+    const status = pre ? 'Anpfiff' : g.state === 'in' ? (g.halftime ? 'Halbzeit' : g.detail || 'LIVE') : 'Ende';
     return el('div', { className: 'row' + (g.state === 'in' ? ' live' : '') + (changed ? ' flash' : '') },
-      el('div', { className: 't' }, g.home, el('small', { textContent: owner(g.home) })),
-      el('div', { className: 's' }, el('b', { textContent: g.state === 'pre' ? '–:–' : key }), el('span', { textContent: status })),
-      el('div', { className: 't away' }, g.away, el('small', { textContent: owner(g.away) })));
+      el('div', { className: 't' }, g.home, owner(g.home)),
+      el('div', { className: 's' }, el('b', { className: pre ? 'time' : '', textContent: pre ? berlinTime.format(g.kickoff) : key }), el('span', { textContent: status })),
+      el('div', { className: 't away' }, g.away, owner(g.away)));
   }
 
   function renderBoard() {
@@ -703,6 +722,13 @@
   let feed = store.get('kt-feed', []);
   let processed = new Set(store.get('kt-processed', []));
 
+  const PALETTE = ['#0a84ff', '#30d158', '#ff375f', '#bf5af2', '#ff9f0a', '#5ac8fa', '#5e5ce6', '#ffcc00', '#ff6482', '#a2845e'];
+  const colorOf = (p) => PALETTE[Math.max(0, players.indexOf(p)) % PALETTE.length];
+  function whoBadge(p) {
+    const b = el('span', { className: 'who', textContent: p.name });
+    b.style.setProperty('--c', colorOf(p));
+    return b;
+  }
   const ownersOf = (team) => players.filter((p) => (p.teams || []).some((t) => sameClub(t, team)));
   const pickNames = (pick) => [pick.orig, ...(pick.history || []), pick.name];
   const pickersOf = (name) => players.filter((p) => p.picks.some((k) => pickNames(k).some((n) => norm(n) === norm(name))));
@@ -947,9 +973,14 @@
     }
     for (const p of players) {
       const info = el('div', {}, el('div', { className: 'name', textContent: p.name }));
-      if (p.teams?.length) info.append(el('div', { className: 'teams', textContent: p.teams.join(' · ') }));
+      if (p.teams?.length) {
+        info.append(el('div', { className: 'team-chips' }, ...p.teams.map((t) =>
+          el('span', { className: games.length && !games.some((g) => sameClub(g.home, t) || sameClub(g.away, t)) ? 'off' : '', textContent: t }))));
+      }
       if (p.ex) info.append(el('span', { className: 'ex', textContent: `🍺 ${p.ex}× Ex` }));
-      const top = el('div', { className: 'top-line' }, info,
+      const avatar = el('div', { className: 'avatar', textContent: [...p.name][0] || '?' });
+      avatar.style.setProperty('--c', colorOf(p));
+      const top = el('div', { className: 'top-line' }, avatar, info,
         el('div', { className: 'score' }, el('b', { textContent: p.count }), el('span', { textContent: 'Schlucke' })));
 
       const pickInput = el('div', { className: 'pick-input' });
@@ -999,8 +1030,24 @@
     }
   }
 
+  // Warnung, wenn die ausgelosten Teams nicht zu den geladenen Spielen passen (z. B. anderes Datum).
+  function renderMismatch() {
+    const box = $('mismatch');
+    box.innerHTML = '';
+    if (!games.length || !players.length) return;
+    const playing = (t) => games.some((g) => sameClub(g.home, t) || sameClub(g.away, t));
+    const stray = players.flatMap((p) => p.teams || []).filter((t) => !playing(t));
+    const unowned = games.flatMap((g) => [g.home, g.away]).filter((t) => !ownersOf(t).length);
+    if (!stray.length) return;
+    box.append(el('div', { className: 'warn' },
+      el('b', { textContent: 'Teams passen nicht zum Spieltag' }),
+      `${stray.join(', ')} ${stray.length === 1 ? 'spielt' : 'spielen'} hier nicht mit${unowned.length ? `, dafür gehören ${unowned.join(', ')} niemandem` : ''}.`,
+      el('div', {}, el('button', { textContent: 'Neu auslosen', onclick: () => showTab('auslosung') }))));
+  }
+
   function renderAll(flash) {
     save();
+    renderMismatch();
     renderBoard();
     renderTodos();
     renderPlayers(flash);
@@ -1013,6 +1060,7 @@
   $('names').value = store.get('kt-names', '');
   $('teams').value = store.get('kt-teams', '');
   $('autoPicks').checked = store.get('kt-autopicks', true);
+  $('teams').addEventListener('input', () => store.set('kt-teams-auto', false));
 
   $('draw').addEventListener('click', () => {
     const names = lines($('names').value);
@@ -1035,7 +1083,14 @@
     }
     if (players.some((p) => p.count || p.ex) && !confirm('Neue Runde starten? Zähler und Ticker werden zurückgesetzt.')) return;
 
-    const pool = shuffle(teams);
+    // Paarungen zusammen halten und reihum verteilen: Heim und Gast eines Spiels landen so bei verschiedenen Personen.
+    const pairs = [];
+    for (const t of teams) {
+      const g = games.find((x) => sameClub(x.home, t) || sameClub(x.away, t));
+      const pair = g && pairs.find((pr) => pr.game === g);
+      if (pair) pair.teams.push(t); else pairs.push({ game: g || null, teams: [t] });
+    }
+    const pool = shuffle(pairs).flatMap((pr) => shuffle(pr.teams));
     const take = perPlayer === Infinity ? pool.length : perPlayer * names.length;
     players = shuffle(names).map((name) => ({ name, teams: [], count: 0, ex: 0, picks: [] }));
     pool.slice(0, take).forEach((team, i) => players[i % players.length].teams.push(team));
@@ -1066,9 +1121,15 @@
   });
 
   // Start: ohne Runde zuerst zur Einrichtung, sonst Live.
+  // Zurück in der App (Handy entsperrt, Tab gewechselt): sofort den neuesten Stand holen.
+  let lastLoad = 0;
+  const loadNow = () => { lastLoad = Date.now(); loadGames({ quiet: true }); };
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && Date.now() - lastLoad > 10e3) loadNow(); });
+  window.addEventListener('focus', () => { if (Date.now() - lastLoad > 10e3) loadNow(); });
+
   showTab(players.length ? store.get('kt-tab', 'zaehler') : 'auslosung');
   renderAll();
-  loadGames({ quiet: true });
+  loadNow();
 </script>
 </body>
 </html>
