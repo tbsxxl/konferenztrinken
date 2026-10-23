@@ -1,8 +1,13 @@
 # Konferenztrinken 🍺⚽
 
-Das Trinkspiel zur Bundesliga-Konferenz am Samstag um 15:30 Uhr – als kleine Website mit Regeln, Team-Auslosung und Schluck-Zähler.
+Das Trinkspiel zur Bundesliga-Konferenz am Samstag um 15:30 Uhr – als kleine Website mit:
 
-Reines HTML/CSS/JS, kein Build-Schritt. Alles liegt in `public/`.
+- **Regeln**
+- **Spieltag**: die 15:30-Spiele mit Live-Stand und Aufstellungen
+- **Auslosung**: Teams zufällig auf die Mitspieler verteilen
+- **Zähler**: Schlucke pro Person und Spieler-Picks. Fällt der Name, Pick antippen. Wird ein Spieler ausgewechselt, springt der Pick automatisch auf den eingewechselten Spieler.
+
+Kein Build-Schritt. Die Seite liegt in `public/`. `src/worker.js` liefert sie aus und reicht die Abfragen an die Datenquellen (ESPN für Spiele/Aufstellungen/Wechsel, OpenLigaDB für die Spieltagsnummer) durch, damit es im Browser keine CORS-Probleme gibt. Fallen die Daten aus, lässt sich alles von Hand eintragen.
 
 ## Lokal ansehen
 

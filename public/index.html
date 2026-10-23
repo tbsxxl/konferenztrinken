@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Konferenztrinken</title>
-  <meta name="description" content="Das Trinkspiel zur Bundesliga-Konferenz am Samstag um 15:30 Uhr: Regeln, Team-Auslosung und Schluck-Zähler." />
+  <meta name="description" content="Das Trinkspiel zur Bundesliga-Konferenz am Samstag um 15:30 Uhr: Regeln, Spieltag mit Aufstellungen, Team-Auslosung und Schluck-Zähler." />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍺</text></svg>" />
   <style>
     :root {
@@ -16,6 +16,7 @@
       --accent: #1f8a4c;
       --accent-soft: #e3f3e9;
       --warn: #b4500f;
+      --live: #d1342f;
       --radius: 14px;
     }
     @media (prefers-color-scheme: dark) {
@@ -28,6 +29,7 @@
         --accent: #43c477;
         --accent-soft: #1b2e21;
         --warn: #f0a060;
+        --live: #ff6b62;
       }
     }
     * { box-sizing: border-box; }
@@ -40,9 +42,9 @@
     main { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
     header h1 { font-size: clamp(2rem, 7vw, 3rem); margin: 0 0 4px; letter-spacing: -0.02em; }
     header p { margin: 0; color: var(--muted); }
-    nav { display: flex; gap: 8px; margin: 24px 0; flex-wrap: wrap; }
+    nav { display: flex; gap: 6px; margin: 24px 0; }
     nav button {
-      flex: 1 1 0; min-width: 100px; padding: 10px 14px; border-radius: 999px;
+      flex: 1 1 0; min-width: 0; padding: 10px 4px; border-radius: 999px; font-size: 0.95rem;
       border: 1px solid var(--border); background: var(--surface); color: var(--text);
       font: inherit; font-weight: 600; cursor: pointer;
     }
@@ -58,14 +60,16 @@
     ul.rules li:first-child { border-top: 0; padding-top: 0; }
     .ico { font-size: 1.3rem; width: 1.6rem; flex: none; text-align: center; }
     .note { background: var(--accent-soft); border-color: transparent; }
-    textarea, input[type="text"] {
+    textarea, input[type="text"], input[type="date"] {
       width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border);
       background: var(--bg); color: var(--text); font: inherit;
     }
     textarea { min-height: 130px; resize: vertical; }
     label { display: block; font-weight: 600; margin: 12px 0 6px; }
     label:first-of-type { margin-top: 0; }
+    label.inline { display: flex; align-items: center; gap: 8px; font-weight: 400; margin: 10px 0 0; }
     .hint { color: var(--muted); font-size: 0.9rem; margin: 4px 0 0; }
+    .hint:empty { display: none; }
     .btn {
       display: inline-block; margin-top: 16px; padding: 12px 20px; border-radius: 10px; border: 0;
       background: var(--accent); color: #fff; font: inherit; font-weight: 700; cursor: pointer;
@@ -75,18 +79,52 @@
     .result div { padding: 12px 14px; border-radius: 10px; background: var(--accent-soft); }
     .result strong { display: block; }
     .error { color: var(--warn); margin-top: 12px; }
+    .error:empty { display: none; }
+
+    /* Spieltag */
+    .matchday-label { color: var(--muted); font-weight: 600; margin: -6px 0 12px; }
+    .matchday-label:empty { display: none; }
+    .games { display: grid; gap: 10px; margin-top: 16px; }
+    .game { border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+    .game .score { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; }
+    .game .score span:first-child { text-align: right; }
+    .game .score b { font-variant-numeric: tabular-nums; font-size: 1.15rem; min-width: 3.2ch; text-align: center; }
+    .game .status { text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 2px; }
+    .game .status.live { color: var(--live); font-weight: 700; }
+    .game details { margin-top: 8px; }
+    .game summary { cursor: pointer; color: var(--accent); font-weight: 600; font-size: 0.9rem; }
+    .lineups { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; font-size: 0.9rem; }
+    .lineups h3 { font-size: 0.9rem; margin: 0 0 4px; }
+    .lineups ul { list-style: none; margin: 0; padding: 0; }
+    .lineups li { padding: 2px 0; overflow-wrap: anywhere; }
+    .lineups .out { color: var(--muted); text-decoration: line-through; }
+    .lineups .in { color: var(--accent); font-weight: 600; }
+    .lineups .bench { color: var(--muted); }
+
+    /* Zähler */
     .players { display: grid; gap: 10px; }
-    .player {
-      display: grid; grid-template-columns: 1fr auto auto auto; align-items: center; gap: 8px;
-      padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border);
-    }
+    .player { padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); }
+    .player .head { display: grid; grid-template-columns: 1fr auto auto auto; align-items: center; gap: 8px; }
     .player .name { font-weight: 600; overflow-wrap: anywhere; }
     .player .teams { display: block; font-weight: 400; color: var(--muted); font-size: 0.85rem; }
     .player .count { font-variant-numeric: tabular-nums; font-size: 1.4rem; font-weight: 700; min-width: 2.2ch; text-align: center; }
-    .player button {
+    .round {
       width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border);
       background: var(--bg); color: var(--text); font-size: 1.2rem; cursor: pointer;
     }
+    .picks { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .picks:empty { display: none; }
+    .pick { display: inline-flex; align-items: stretch; border-radius: 999px; background: var(--accent-soft); overflow: hidden; max-width: 100%; }
+    .pick button { border: 0; background: transparent; color: var(--text); font: inherit; cursor: pointer; padding: 6px 10px; }
+    .pick .say { font-weight: 600; padding-left: 12px; text-align: left; }
+    .pick .say small { font-weight: 400; color: var(--muted); }
+    .pick .swap, .pick .del { color: var(--muted); padding: 6px 8px; }
+    .pick.flash { animation: flash 0.6s; }
+    .pick.unknown { outline: 2px dashed var(--warn); outline-offset: -2px; }
+    @keyframes flash { 0% { background: var(--accent); } 100% { background: var(--accent-soft); } }
+    .add-pick { display: flex; gap: 6px; margin-top: 10px; }
+    .add-pick input { padding: 6px 10px; font-size: 0.9rem; min-width: 0; }
+    .add-pick button { border-radius: 10px; border: 1px solid var(--accent); background: transparent; color: var(--accent); font: inherit; font-weight: 600; padding: 0 12px; cursor: pointer; white-space: nowrap; }
     footer { color: var(--muted); font-size: 0.85rem; text-align: center; margin-top: 32px; }
   </style>
 </head>
@@ -99,6 +137,7 @@
 
   <nav role="tablist">
     <button role="tab" data-tab="regeln" aria-selected="true">Regeln</button>
+    <button role="tab" data-tab="spieltag" aria-selected="false">Spieltag</button>
     <button role="tab" data-tab="auslosung" aria-selected="false">Auslosung</button>
     <button role="tab" data-tab="zaehler" aria-selected="false">Zähler</button>
   </nav>
@@ -111,7 +150,8 @@
     <div class="card">
       <h2>Vorbereitung</h2>
       <ul class="rules">
-        <li><span class="ico">🎲</span><span>Vor Anpfiff werden die Teams der Konferenzspiele per Los verteilt. Jede Person bekommt ein oder zwei Teams. Dafür gibt es den Tab <em>Auslosung</em>.</span></li>
+        <li><span class="ico">🎲</span><span>Vor Anpfiff werden die Teams der Konferenzspiele per Los verteilt. Jede Person bekommt ein oder zwei Teams. Dafür gibt es die Tabs <em>Spieltag</em> und <em>Auslosung</em>.</span></li>
+        <li><span class="ico">🧑‍🤝‍🧑</span><span>Außerdem picken die anderen für jede Person einen oder mehrere Spieler aus den Aufstellungen. Die Picks trägst du im <em>Zähler</em> ein.</span></li>
       </ul>
     </div>
 
@@ -124,6 +164,8 @@
         <li><span class="ico">🟥</span><span><strong>Elfmeter, Rote Karte, VAR-Check:</strong> Ein Extraschluck für die Person, deren Team betroffen ist.</span></li>
         <li><span class="ico">⏸️</span><span><strong>Halbzeit:</strong> Wer gerade hinten liegt, trinkt.</span></li>
         <li><span class="ico">🏁</span><span><strong>Abpfiff:</strong> Wer verliert, trinkt aus; bei Unentschieden trinken beide einen Schluck.</span></li>
+        <li><span class="ico">🗣️</span><span><strong>Spielername:</strong> Sagt der Kommentator den Namen deines gepickten Spielers, trinkst du einen Schluck.</span></li>
+        <li><span class="ico">🔁</span><span><strong>Auswechslung:</strong> Wird dein Spieler ausgewechselt, zählt ab dann der eingewechselte Spieler.</span></li>
       </ul>
     </div>
 
@@ -140,6 +182,21 @@
     </div>
   </section>
 
+  <section id="spieltag" hidden>
+    <div class="card">
+      <h2>Spieltag</h2>
+      <div class="matchday-label" id="matchdayLabel"></div>
+      <label for="gameDate">Datum</label>
+      <input type="date" id="gameDate" />
+      <label class="inline"><input type="checkbox" id="only1530" checked /> Nur die 15:30-Spiele (Konferenz)</label>
+      <button class="btn" id="loadGames">Spiele laden</button>
+      <button class="btn secondary" id="gamesToDraw" hidden>Teams in die Auslosung übernehmen →</button>
+      <div class="error" id="gamesError" role="alert"></div>
+      <p class="hint" id="gamesInfo"></p>
+      <div class="games" id="games" aria-live="polite"></div>
+    </div>
+  </section>
+
   <section id="auslosung" hidden>
     <div class="card">
       <h2>Teams auslosen</h2>
@@ -148,7 +205,7 @@
 
       <label for="teams">Teams der 15:30-Spiele (ein Team pro Zeile)</label>
       <textarea id="teams" placeholder="Werder Bremen&#10;VfB Stuttgart&#10;…"></textarea>
-      <p class="hint">Trag die Teams des aktuellen Spieltags ein, meist sind es 5 Spiele, also 10 Teams.</p>
+      <p class="hint">Am einfachsten über den Tab <em>Spieltag</em> laden. Meist sind es 5 Spiele, also 10 Teams.</p>
 
       <label for="perPlayer">Teams pro Person</label>
       <input type="text" id="perPlayer" inputmode="numeric" value="auto" />
@@ -164,7 +221,9 @@
   <section id="zaehler" hidden>
     <div class="card">
       <h2>Schluck-Zähler</h2>
+      <p class="hint" style="margin:-4px 0 12px">Spieler-Pick antippen, wenn der Name fällt: Die Person bekommt einen Schluck. Wird der Spieler ausgewechselt, springt der Pick automatisch auf den Neuen, sobald die Live-Daten es melden. Sonst per ⇄ von Hand.</p>
       <div class="players" id="players"></div>
+      <datalist id="playerOptions"></datalist>
       <label for="newPlayer" style="margin-top:16px">Person hinzufügen</label>
       <input type="text" id="newPlayer" placeholder="Name" />
       <button class="btn" id="addPlayer">Hinzufügen</button>
@@ -172,7 +231,7 @@
     </div>
   </section>
 
-  <footer>Trinkt verantwortungsvoll · Wasser zwischendurch · Alkoholfrei zählt auch.</footer>
+  <footer>Trinkt verantwortungsvoll · Wasser zwischendurch · Alkoholfrei zählt auch.<br />Spieldaten: ESPN &amp; OpenLigaDB, ohne Gewähr.</footer>
 </main>
 
 <script>
@@ -196,7 +255,181 @@
   tabs.forEach((t) => t.addEventListener('click', () => showTab(t.dataset.tab)));
   showTab(store.get('kt-tab', 'regeln'));
 
-  // Auslosung
+  // ---------- Spieltag (Live-Daten) ----------
+  // Über den eigenen Worker (/api/…), lokal als Datei geöffnet direkt bei der Quelle.
+  const DIRECT = {
+    scoreboard: 'https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/scoreboard',
+    summary: 'https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/summary',
+    spieltag: 'https://api.openligadb.de/getcurrentgroup/bl1',
+  };
+  async function api(endpoint, params = {}) {
+    const qs = new URLSearchParams(params).toString();
+    const suffix = qs ? `?${qs}` : '';
+    const urls = location.protocol.startsWith('http') ? [`/api/${endpoint}${suffix}`, DIRECT[endpoint] + suffix] : [DIRECT[endpoint] + suffix];
+    for (const url of urls) {
+      try {
+        const res = await fetch(url);
+        if (res.ok && (res.headers.get('content-type') || '').includes('json')) return await res.json();
+      } catch {}
+    }
+    throw new Error(`Keine Daten von ${endpoint}`);
+  }
+
+  const berlinTime = new Intl.DateTimeFormat('de-DE', { timeZone: 'Europe/Berlin', hour: '2-digit', minute: '2-digit' });
+  const norm = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+  const didSub = (v) => (v && typeof v === 'object' ? v.didSub !== false : !!v);
+
+  function nextSaturday() {
+    const d = new Date();
+    d.setDate(d.getDate() + ((6 - d.getDay() + 7) % 7));
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+  $('gameDate').value = nextSaturday();
+
+  let games = [];          // [{id, home, away, homeScore, awayScore, state, detail, kickoff}]
+  const lineups = {};      // eventId -> {teams: [{name, players}], subs: Map(norm(raus) -> rein), out: Set(norm(raus))}
+  const openDetails = new Set();
+  let refreshTimer = null;
+
+  function parseScoreboard(data) {
+    return (data.events || []).map((ev) => {
+      const comp = ev.competitions?.[0] || {};
+      const side = (where) => (comp.competitors || []).find((c) => c.homeAway === where) || {};
+      const home = side('home'), away = side('away');
+      const status = comp.status || ev.status || {};
+      return {
+        id: ev.id,
+        kickoff: new Date(ev.date),
+        home: home.team?.displayName || home.team?.name || '?',
+        away: away.team?.displayName || away.team?.name || '?',
+        homeScore: home.score ?? '',
+        awayScore: away.score ?? '',
+        state: status.type?.state || 'pre',
+        detail: status.type?.shortDetail || status.type?.detail || '',
+      };
+    });
+  }
+
+  // Auswechslungen aus Kader-Flags und Spielereignissen ("Substitution, Team. A replaces B.") lesen.
+  function parseSummary(data) {
+    const subs = new Map();
+    const out = new Set();
+    const teams = (data.rosters || []).map((r) => {
+      const players = (r.roster || []).map((p) => {
+        const name = p.athlete?.displayName || p.athlete?.fullName || '';
+        const player = {
+          name,
+          jersey: p.jersey || '',
+          starter: !!p.starter,
+          subbedIn: didSub(p.subbedIn),
+          subbedOut: didSub(p.subbedOut),
+        };
+        if (player.subbedOut) out.add(norm(name));
+        const replacement = p.subbedOutFor?.athlete?.displayName;
+        if (player.subbedOut && replacement) subs.set(norm(name), replacement);
+        const replaced = p.subbedInFor?.athlete?.displayName;
+        if (player.subbedIn && replaced) subs.set(norm(replaced), name);
+        return player;
+      }).filter((p) => p.name);
+      return { name: r.team?.displayName || '', players };
+    });
+    const texts = [...(data.keyEvents || []), ...(data.commentary || []), ...(data.plays || [])].map((e) => e?.text || '');
+    for (const text of texts) {
+      const m = text.match(/^Substitution,.*\.\s+(.+?) replaces (.+?)(?: because of an injury)?\.?\s*$/);
+      if (m) { subs.set(norm(m[2]), m[1]); out.add(norm(m[2])); }
+    }
+    return { teams, subs, out };
+  }
+
+  async function loadGames({ quiet = false } = {}) {
+    if (!quiet) { $('gamesError').textContent = ''; $('gamesInfo').textContent = 'Lade …'; }
+    api('spieltag').then((g) => { if (g?.groupName) $('matchdayLabel').textContent = `Bundesliga · ${g.groupName}`; }).catch(() => {});
+    try {
+      const date = $('gameDate').value.replaceAll('-', '');
+      const all = parseScoreboard(await api('scoreboard', { dates: date }));
+      games = $('only1530').checked ? all.filter((g) => berlinTime.format(g.kickoff) === '15:30') : all;
+      $('gamesInfo').textContent = !all.length
+        ? 'An diesem Tag gibt es keine Bundesliga-Spiele.'
+        : !games.length ? 'Keine Spiele um 15:30 Uhr. Haken bei „Nur 15:30“ entfernen, um alle zu sehen.'
+        : `Aktualisiert um ${berlinTime.format(new Date())} Uhr. Aufstellungen gibt es meist ca. 1 Stunde vor Anpfiff.`;
+      await Promise.all(games.map(async (g) => {
+        try { lineups[g.id] = parseSummary(await api('summary', { event: g.id })); } catch {}
+      }));
+      renderGames();
+      updatePlayerOptions();
+      applySubstitutions();
+      scheduleRefresh();
+    } catch {
+      if (!quiet) {
+        $('gamesInfo').textContent = '';
+        $('gamesError').textContent = 'Spieldaten konnten nicht geladen werden. Teams und Spieler lassen sich trotzdem von Hand eintragen.';
+      }
+    }
+  }
+
+  // Während der Spiele jede Minute neu laden, damit Stand und Wechsel aktuell bleiben.
+  function scheduleRefresh() {
+    clearInterval(refreshTimer);
+    const soon = games.some((g) => g.state === 'in' || (g.state === 'pre' && g.kickoff - Date.now() < 2 * 3600e3));
+    if (soon) refreshTimer = setInterval(() => loadGames({ quiet: true }), 60e3);
+  }
+
+  const el = (tag, props = {}) => Object.assign(document.createElement(tag), props);
+
+  function renderGames() {
+    const box = $('games');
+    box.innerHTML = '';
+    $('gamesToDraw').hidden = !games.length;
+    for (const g of games) {
+      const card = el('div', { className: 'game' });
+      const score = el('div', { className: 'score' });
+      const result = g.state === 'pre' ? '–:–' : `${g.homeScore}:${g.awayScore}`;
+      score.append(el('span', { textContent: g.home }), el('b', { textContent: result }), el('span', { textContent: g.away }));
+      const status = el('div', { className: 'status' + (g.state === 'in' ? ' live' : '') });
+      status.textContent = g.state === 'pre' ? `Anpfiff ${berlinTime.format(g.kickoff)} Uhr` : g.state === 'in' ? `LIVE · ${g.detail}` : g.detail || 'Beendet';
+      card.append(score, status);
+
+      const lu = lineups[g.id];
+      if (lu?.teams.some((t) => t.players.length)) {
+        const det = el('details', { open: openDetails.has(g.id) });
+        det.addEventListener('toggle', () => (det.open ? openDetails.add(g.id) : openDetails.delete(g.id)));
+        det.append(el('summary', { textContent: 'Aufstellungen' }));
+        const grid = el('div', { className: 'lineups' });
+        for (const t of lu.teams) {
+          const col = el('div');
+          col.append(el('h3', { textContent: t.name }));
+          const ul = el('ul');
+          const ordered = [
+            ...t.players.filter((p) => p.starter),
+            ...t.players.filter((p) => !p.starter && p.subbedIn),
+            ...t.players.filter((p) => !p.starter && !p.subbedIn),
+          ];
+          for (const p of ordered) {
+            const isOut = p.subbedOut || lu.out.has(norm(p.name));
+            ul.append(el('li', {
+              className: isOut ? 'out' : p.subbedIn ? 'in' : p.starter ? '' : 'bench',
+              textContent: `${p.jersey ? p.jersey + ' ' : ''}${p.name}${p.subbedIn ? ' ↑' : ''}${isOut ? ' ↓' : ''}`,
+            }));
+          }
+          col.append(ul);
+          grid.append(col);
+        }
+        det.append(grid);
+        card.append(det);
+      }
+      box.append(card);
+    }
+  }
+
+  $('loadGames').addEventListener('click', () => loadGames());
+  $('only1530').addEventListener('change', () => loadGames());
+  $('gamesToDraw').addEventListener('click', () => {
+    $('teams').value = games.flatMap((g) => [g.home, g.away]).join('\n');
+    store.set('kt-teams', $('teams').value);
+    showTab('auslosung');
+  });
+
+  // ---------- Auslosung ----------
   const lines = (text) => text.split('\n').map((s) => s.trim()).filter(Boolean);
   const shuffle = (arr) => {
     const a = arr.slice();
@@ -224,8 +457,8 @@
     if (teams.length < names.length) return ($('drawError').textContent = 'Es braucht mindestens so viele Teams wie Mitspieler.');
 
     const raw = $('perPlayer').value.trim().toLowerCase();
-    let perPlayer = raw === 'auto' || raw === '' ? Infinity : parseInt(raw, 10);
-    if (!Number.isFinite(perPlayer) && perPlayer !== Infinity || perPlayer < 1) {
+    const perPlayer = raw === 'auto' || raw === '' ? Infinity : parseInt(raw, 10);
+    if (Number.isNaN(perPlayer) || perPlayer < 1) {
       return ($('drawError').textContent = 'Teams pro Person: „auto“ oder eine Zahl ab 1.');
     }
     if (perPlayer !== Infinity && perPlayer * names.length > teams.length) {
@@ -240,69 +473,127 @@
 
     lastDraw = result;
     for (const r of result) {
-      const div = document.createElement('div');
-      const strong = document.createElement('strong');
-      strong.textContent = r.name;
-      div.append(strong, r.teams.join(' · '));
+      const div = el('div');
+      div.append(el('strong', { textContent: r.name }), r.teams.join(' · '));
       $('drawResult').append(div);
     }
     $('toCounter').hidden = false;
   });
 
-  // Zähler
-  let players = store.get('kt-players', []);
-  function render() {
+  // ---------- Zähler & Spieler-Picks ----------
+  // pick = { name: aktuell zählender Spieler, orig: ursprünglich gepickt }
+  let players = store.get('kt-players', []).map((p) => ({ picks: [], ...p }));
+
+  const allLineupPlayers = () =>
+    Object.values(lineups).flatMap((lu) => lu.teams.flatMap((t) => t.players.map((p) => ({ name: p.name, team: t.name }))));
+
+  function updatePlayerOptions() {
+    const dl = $('playerOptions');
+    dl.innerHTML = '';
+    for (const p of allLineupPlayers()) dl.append(el('option', { value: p.name, label: p.team }));
+  }
+
+  // Folgt Wechselketten: A raus für B, später B raus für C → C.
+  function resolveSub(name) {
+    let current = name;
+    const seen = new Set();
+    for (;;) {
+      const key = norm(current);
+      if (seen.has(key)) return current;
+      seen.add(key);
+      const next = Object.values(lineups).map((lu) => lu.subs.get(key)).find(Boolean);
+      if (!next) return current;
+      current = next;
+    }
+  }
+  const isOutWithoutReplacement = (name) =>
+    Object.values(lineups).some((lu) => lu.out.has(norm(name)) && !lu.subs.has(norm(name)));
+
+  function applySubstitutions() {
+    for (const p of players) for (const pick of p.picks) pick.name = resolveSub(pick.name);
+    render();
+  }
+
+  function render(flash) {
     store.set('kt-players', players);
     const list = $('players');
     list.innerHTML = '';
     if (!players.length) {
-      list.innerHTML = '<p class="hint">Noch niemand dabei. Lose Teams aus oder füge Personen hinzu.</p>';
+      list.append(el('p', { className: 'hint', textContent: 'Noch niemand dabei. Lose Teams aus oder füge Personen hinzu.' }));
       return;
     }
-    players.forEach((p, i) => {
-      const row = document.createElement('div');
-      row.className = 'player';
-      const name = document.createElement('span');
-      name.className = 'name';
-      name.textContent = p.name;
-      if (p.teams?.length) {
-        const t = document.createElement('span');
-        t.className = 'teams';
-        t.textContent = p.teams.join(' · ');
-        name.append(t);
-      }
-      const minus = document.createElement('button');
-      minus.textContent = '−';
-      minus.setAttribute('aria-label', `Einen Schluck weniger für ${p.name}`);
-      minus.onclick = () => { p.count = Math.max(0, p.count - 1); render(); };
-      const count = document.createElement('span');
-      count.className = 'count';
-      count.textContent = p.count;
-      const plus = document.createElement('button');
-      plus.textContent = '+';
-      plus.setAttribute('aria-label', `Ein Schluck mehr für ${p.name}`);
-      plus.onclick = () => { p.count++; render(); };
-      row.append(name, minus, count, plus);
+    players.forEach((p) => {
+      const row = el('div', { className: 'player' });
+      const head = el('div', { className: 'head' });
+      const name = el('span', { className: 'name', textContent: p.name });
+      if (p.teams?.length) name.append(el('span', { className: 'teams', textContent: p.teams.join(' · ') }));
+      const minus = roundButton('−', `Einen Schluck weniger für ${p.name}`, () => { p.count = Math.max(0, p.count - 1); render(); });
+      const plus = roundButton('+', `Ein Schluck mehr für ${p.name}`, () => { p.count++; render(); });
+      head.append(name, minus, el('span', { className: 'count', textContent: p.count }), plus);
+
+      const picks = el('div', { className: 'picks' });
+      p.picks.forEach((pick, i) => {
+        const unknown = isOutWithoutReplacement(pick.name);
+        const chip = el('span', { className: 'pick' + (unknown ? ' unknown' : '') + (flash === pick ? ' flash' : '') });
+        const say = el('button', { className: 'say', textContent: `🗣️ ${pick.name}` });
+        if (pick.orig && norm(pick.orig) !== norm(pick.name)) say.append(' ', el('small', { textContent: `(für ${pick.orig})` }));
+        if (unknown) say.title = 'Ausgewechselt, Ersatz unbekannt: per ⇄ eintragen';
+        say.setAttribute('aria-label', `${pick.name} wurde genannt: ein Schluck für ${p.name}`);
+        say.onclick = () => { p.count++; render(pick); };
+        const swap = el('button', { className: 'swap', textContent: '⇄' });
+        swap.setAttribute('aria-label', `${pick.name} auswechseln`);
+        swap.onclick = () => {
+          const next = prompt(`Wer kommt für ${pick.name}?`);
+          if (next && next.trim()) { pick.name = next.trim(); render(); }
+        };
+        const del = el('button', { className: 'del', textContent: '✕' });
+        del.setAttribute('aria-label', `Pick ${pick.name} entfernen`);
+        del.onclick = () => { p.picks.splice(i, 1); render(); };
+        chip.append(say, swap, del);
+        picks.append(chip);
+      });
+
+      const add = el('div', { className: 'add-pick' });
+      const input = el('input', { type: 'text', placeholder: 'Spieler picken …' });
+      input.setAttribute('list', 'playerOptions');
+      input.setAttribute('aria-label', `Spieler für ${p.name} picken`);
+      const addBtn = el('button', { textContent: '+ Pick' });
+      addBtn.onclick = () => {
+        const n = input.value.trim();
+        if (!n) return;
+        p.picks.push({ name: resolveSub(n), orig: n });
+        render();
+      };
+      input.addEventListener('keydown', (e) => { if (e.key === 'Enter') addBtn.click(); });
+      add.append(input, addBtn);
+
+      row.append(head, picks, add);
       list.append(row);
     });
+  }
+  function roundButton(text, label, onclick) {
+    const b = el('button', { className: 'round', textContent: text, onclick });
+    b.setAttribute('aria-label', label);
+    return b;
   }
 
   $('toCounter').addEventListener('click', () => {
     if (!lastDraw) return;
-    players = lastDraw.map((r) => ({ name: r.name, teams: r.teams, count: 0 }));
+    players = lastDraw.map((r) => ({ name: r.name, teams: r.teams, count: 0, picks: [] }));
     render();
     showTab('zaehler');
   });
   $('addPlayer').addEventListener('click', () => {
     const name = $('newPlayer').value.trim();
     if (!name) return;
-    players.push({ name, teams: [], count: 0 });
+    players.push({ name, teams: [], count: 0, picks: [] });
     $('newPlayer').value = '';
     render();
   });
   $('newPlayer').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('addPlayer').click(); });
   $('resetCounts').addEventListener('click', () => { players.forEach((p) => (p.count = 0)); render(); });
   render();
+  loadGames({ quiet: true });
 </script>
 </body>
 </html>
