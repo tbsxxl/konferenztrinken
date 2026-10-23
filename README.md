@@ -2,10 +2,15 @@
 
 Das Trinkspiel zur Bundesliga-Konferenz am Samstag um 15:30 Uhr – als kleine Website mit:
 
-- **Regeln**
-- **Spieltag**: die 15:30-Spiele mit Live-Stand und Aufstellungen
-- **Auslosung**: Teams zufällig auf die Mitspieler verteilen
-- **Zähler**: Schlucke pro Person und Spieler-Picks. Fällt der Name, Pick antippen. Wird ein Spieler ausgewechselt, springt der Pick automatisch auf den eingewechselten Spieler.
+- **Regeln** (Werte wie „3 Schlucke verteilen“ lassen sich anpassen)
+- **Spieltag**: lädt automatisch die 15:30-Spiele mit Live-Stand und Aufstellungen
+- **Auslosung**: verteilt die Teams und lost auf Wunsch gleich die Spieler-Picks aus
+- **Live**: erkennt Tore, Rote Karten, Halbzeit, Abpfiff und Auswechslungen selbst und verbucht sie:
+  - Tor fürs eigene Team → Schlucke verteilen, Gegentor → trinken
+  - gepickter Spieler trifft → Schlucke verteilen
+  - Rot für den Pick oder jemanden aus dem eigenen Team → exen
+  - Niederlage → exen, Sieg → ein Ex verteilen, Unentschieden → beide trinken
+  - Verteilen per Antippen, wer trinken soll. Spielernamen weiter von Hand antippen.
 
 Kein Build-Schritt. Die Seite liegt in `public/`. `src/worker.js` liefert sie aus und reicht die Abfragen an die Datenquellen (ESPN für Spiele/Aufstellungen/Wechsel, OpenLigaDB für die Spieltagsnummer) durch, damit es im Browser keine CORS-Probleme gibt. Fallen die Daten aus, lässt sich alles von Hand eintragen.
 
