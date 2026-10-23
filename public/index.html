@@ -194,37 +194,49 @@
     .todo .targets button.person { background: var(--c); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); }
     .todo .targets button.done { background: var(--fill); color: var(--label); }
 
-    /* Spielerkarten */
-    .players { display: grid; gap: 10px; }
-    .p { background: var(--cell); border-radius: var(--r); padding: 16px 16px 14px 18px; }
-    .p .top-line { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 12px; align-items: start; }
-    .p { box-shadow: inset 4px 0 0 var(--c, transparent); }
-    .crests { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
-    .p .name { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.15; overflow-wrap: anywhere; }
-    .p .teams { color: var(--secondary); font-size: 13px; margin-top: 2px; }
-    .p .ex { display: inline-block; margin-top: 8px; font-size: 12px; font-weight: 600; color: var(--red); background: color-mix(in srgb, var(--red) 13%, transparent); border-radius: 999px; padding: 3px 9px; }
-    .p .score { text-align: right; }
-    .p .score b { display: block; font: 700 44px/0.95 var(--rounded); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
-    .p .score span { font-size: 12px; color: var(--secondary); font-weight: 500; }
-    .p .actions { display: grid; grid-template-columns: minmax(0, 1fr) 46px 46px; gap: 8px; margin-top: 14px; align-items: center; }
-    .p .say { border: 0; border-radius: 16px; background: var(--fill); padding: 9px 14px; text-align: left; font-weight: 600; font-size: 16px; min-height: 52px; overflow: hidden; display: flex; align-items: center; gap: 10px; }
-    .say-name { min-width: 0; }
-    .p .say small { display: block; font-weight: 400; color: var(--secondary); font-size: 12px; margin-top: 1px; }
-    .p .say.unknown { box-shadow: inset 0 0 0 2px var(--red); }
-    .p .say.flash { animation: sayflash 0.6s; }
-    @keyframes sayflash { 0% { background: var(--accent); color: #fff; } }
-    .p .say.add { color: var(--accent); }
-    .sq { width: 46px; height: 46px; border: 0; border-radius: 50%; background: var(--fill); font-size: 24px; font-weight: 500; line-height: 1; display: grid; place-items: center; padding: 0; }
-    .sq.plus { background: var(--accent); color: #fff; }
-    .p .more { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
-    .p .more:empty { display: none; }
+    /* Tabelle im TV-Stil */
+    .players { display: grid; gap: 6px; }
+    .table-head { display: grid; grid-template-columns: 30px minmax(0, 1fr) 46px 46px; gap: 0; padding: 0 0 2px 10px; font-size: 11px; font-weight: 700; color: var(--secondary); letter-spacing: 0.04em; }
+    .table-head span:nth-child(n+3) { text-align: center; }
+    .p { position: relative; border-radius: 14px; overflow: hidden; background: linear-gradient(180deg, #13303f, #0b1f2a); color: #fff; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2); }
+    .p::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--c); }
+    .p .row-main { display: grid; grid-template-columns: 30px minmax(0, 1fr) 46px 46px; align-items: center; padding: 10px 0 10px 10px; }
+    .p .rank { font: 800 18px/1 var(--rounded); color: rgba(255, 255, 255, 0.55); text-align: center; }
+    .p .who-line { display: flex; align-items: center; gap: 8px; min-width: 0; }
+    .p .name { font-size: 17px; font-weight: 800; letter-spacing: 0.01em; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background: none; border: 0; padding: 0; color: inherit; text-align: left; }
+    .p .name::after { content: " ›"; color: rgba(255, 255, 255, 0.35); font-weight: 600; }
+    .p.open .name::after { content: " ⌄"; }
+    .p .sub { display: flex; align-items: center; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+    .p .crests { display: flex; gap: 3px; margin: 0; }
+    .p .stat { text-align: center; font: 800 24px/1 var(--rounded); font-variant-numeric: tabular-nums; border-left: 1px solid rgba(255, 255, 255, 0.08); padding: 6px 0; }
+    .p .stat.ex { color: #ff6b5e; }
+    .p .stat.zero { color: rgba(255, 255, 255, 0.3); }
+    .pick-btn { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; border: 0; border-radius: 999px; padding: 4px 10px 4px 4px; background: rgba(255, 255, 255, 0.1); color: #fff; font-size: 13px; font-weight: 600; }
+    .pick-btn .crest-sm { --sz: 20px; }
+    .pick-btn span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pick-btn.add { padding: 4px 10px; color: rgba(255, 255, 255, 0.6); }
+    .pick-btn.unknown { box-shadow: inset 0 0 0 1.5px var(--red); }
+    .pick-btn.flash { animation: pickflash 0.7s; }
+    @keyframes pickflash { 0% { background: var(--accent); color: #fff; } }
+    .p .panel { display: none; padding: 10px 12px 12px 15px; background: rgba(0, 0, 0, 0.25); border-top: 1px solid rgba(255, 255, 255, 0.06); }
+    .p.open .panel { display: grid; gap: 10px; }
+    .stepper { display: flex; align-items: center; gap: 8px; font-size: 14px; color: rgba(255, 255, 255, 0.75); }
+    .stepper span { flex: 1; }
+    .stepper button { width: 38px; height: 34px; border: 0; border-radius: 10px; background: rgba(255, 255, 255, 0.12); color: #fff; font-size: 20px; font-weight: 600; line-height: 1; }
+    .stepper button.plus { background: var(--accent); }
+    .panel .more { display: flex; flex-wrap: wrap; gap: 6px; }
+    .panel .chip { background: rgba(255, 255, 255, 0.1); color: #fff; }
+    .pick-input { display: flex; gap: 8px; }
+    .pick-input input { flex: 1; min-width: 0; border: 0; border-radius: 10px; background: rgba(255, 255, 255, 0.1); padding: 9px 12px; font: inherit; font-size: 15px; color: #fff; }
+    .pick-input input::placeholder { color: rgba(255, 255, 255, 0.4); }
+    .pick-input button { border: 0; border-radius: 10px; padding: 0 16px; background: var(--accent); color: #fff; font-weight: 700; }
     .chip { border: 0; background: var(--fill); border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 500; color: var(--accent); }
-    .p .pick-input { display: none; gap: 8px; margin-top: 10px; }
-    .p .pick-input.open { display: flex; }
-    .p .pick-input input { flex: 1; min-width: 0; border: 0; border-radius: 12px; background: var(--fill); padding: 10px 12px; font: inherit; color: var(--label); }
-    .p .pick-input button { border: 0; border-radius: 999px; padding: 0 18px; background: var(--accent); color: #fff; font-weight: 600; }
 
     /* Ticker */
+    .ticker { background: linear-gradient(180deg, #13303f, #0b1f2a); color: #fff; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2); }
+    .ticker .entry + .entry::before { border-top-color: rgba(255, 255, 255, 0.08); }
+    .ticker .entry ul, .ticker .feed > .muted { color: rgba(255, 255, 255, 0.6); }
+    .ticker .min { background: rgba(255, 255, 255, 0.1); }
     .entry { position: relative; display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 8px; padding: 12px 18px; }
     .entry .title { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
     .entry .time { color: var(--secondary); font-size: 13px; font-variant-numeric: tabular-nums; padding-top: 2px; }
@@ -312,11 +324,11 @@
     <div id="mismatch"></div>
     <div id="todos"></div>
 
-    <h2 class="sec">Spieler <small>Name gefallen? Antippen</small></h2>
+    <h2 class="sec">Tabelle <small>Spieler antippen, wenn der Name fällt</small></h2>
     <div class="players" id="players"></div>
 
     <h2 class="sec">Ticker</h2>
-    <div class="list"><div class="feed" id="feed"></div></div>
+    <div class="list ticker"><div class="feed" id="feed"></div></div>
 
     <h2 class="sec">Runde</h2>
     <div class="list">
@@ -1184,6 +1196,8 @@
     }
   }
 
+  // Tabelle wie eine TV-Einblendung: sortiert nach Schlucken, Details per Antippen aufklappbar.
+  const openRows = new Set();
   function renderPlayers(flash) {
     const list = $('players');
     list.innerHTML = '';
@@ -1192,24 +1206,47 @@
         el('a', { href: '#', textContent: 'Jetzt Mitspieler eintragen →', style: 'color:var(--accent)', onclick: (e) => { e.preventDefault(); showTab('auslosung'); } })));
       return;
     }
-    for (const p of players) {
-      const info = el('div', {}, el('div', { className: 'name', textContent: p.name }));
-      if (p.teams?.length) {
-        info.append(el('div', { className: 'crests' }, ...p.teams.map((t) => {
-          const c = crest(t, 30);
-          if (games.length && !games.some((g) => sameClub(g.home, t) || sameClub(g.away, t))) c.classList.add('off');
-          return c;
-        })));
-      }
-      const avatar = el('div', { className: 'avatar', textContent: [...p.name][0] || '?' });
-      avatar.style.setProperty('--c', colorOf(p));
-      const tally = el('div', { className: 'cells tally' },
-        el('span', { textContent: 'SCHL.' }), el('span', { textContent: 'EX' }),
-        el('b', { textContent: p.count }), el('b', { className: p.ex ? 'hot' : 'dim', textContent: p.ex || 0 }));
-      const top = el('div', { className: 'top-line' }, avatar, info, tally);
+    list.append(el('div', { className: 'table-head' }, el('span', { textContent: '#' }), el('span', { textContent: 'SPIELER' }), el('span', { textContent: 'SCHL.' }), el('span', { textContent: 'EX' })));
+    const ranked = [...players].sort((a, b) => b.count - a.count || (b.ex || 0) - (a.ex || 0));
+    ranked.forEach((p, idx) => {
+      const isOpen = openRows.has(p.name);
+      const toggle = () => { isOpen ? openRows.delete(p.name) : openRows.add(p.name); renderAll(); };
 
-      const pickInput = el('div', { className: 'pick-input' });
-      const input = el('input', { type: 'text', placeholder: 'Spielername' });
+      // Picks als kleine Knöpfe: antippen = Name gefallen = ein Schluck.
+      const pickButtons = p.picks.map((pick) => {
+        const unknown = isOutWithoutReplacement(pick.name);
+        const team = allLineupPlayers().find((x) => norm(x.name) === norm(pick.name))?.team;
+        const btn = el('button', { className: 'pick-btn' + (unknown ? ' unknown' : '') + (flash === pick ? ' flash' : ''), onclick: () => { p.count++; renderAll(pick); } },
+          ...(team ? [crest(team, 20)] : []), el('span', { textContent: `🗣 ${pick.name}${norm(pick.orig) !== norm(pick.name) ? ` (für ${pick.orig})` : ''}` }));
+        btn.title = unknown ? 'Ausgewechselt, Ersatz unbekannt: aufklappen → Wechsel' : 'Antippen, wenn der Name fällt';
+        btn.setAttribute('aria-label', `${pick.name} wurde genannt: ein Schluck für ${p.name}`);
+        return btn;
+      });
+      if (!p.picks.length) pickButtons.push(el('button', { className: 'pick-btn add', textContent: '+ Spieler picken', onclick: () => { openRows.add(p.name); renderAll(); setTimeout(() => list.querySelector(`[data-pick-for="${CSS.escape(p.name)}"]`)?.focus(), 0); } }));
+
+      const crests = el('div', { className: 'crests' }, ...(p.teams || []).map((t) => {
+        const c = crest(t, 22);
+        if (games.length && !games.some((g) => sameClub(g.home, t) || sameClub(g.away, t))) c.classList.add('off');
+        return c;
+      }));
+      const nameBtn = el('button', { className: 'name', textContent: p.name, onclick: toggle });
+      nameBtn.setAttribute('aria-expanded', String(isOpen));
+      const main = el('div', { className: 'row-main' },
+        el('div', { className: 'rank', textContent: idx + 1 }),
+        el('div', {}, el('div', { className: 'who-line' }, nameBtn), el('div', { className: 'sub' }, crests, ...pickButtons)),
+        el('div', { className: 'stat' + (p.count ? '' : ' zero'), textContent: p.count }),
+        el('div', { className: 'stat ex' + (p.ex ? '' : ' zero'), textContent: p.ex || 0 }));
+
+      // Aufklappbereich: Zähler von Hand, Picks verwalten.
+      const stepper = (label, get, set) => {
+        const minus = el('button', { textContent: '−', onclick: () => { set(Math.max(0, get() - 1)); renderAll(); } });
+        const plus = el('button', { className: 'plus', textContent: '+', onclick: () => { set(get() + 1); renderAll(); } });
+        minus.setAttribute('aria-label', `${label} für ${p.name} −1`);
+        plus.setAttribute('aria-label', `${label} für ${p.name} +1`);
+        return el('div', { className: 'stepper' }, el('span', { textContent: label }), minus, plus);
+      };
+      const input = el('input', { type: 'text', placeholder: 'Spieler picken …' });
+      input.dataset.pickFor = p.name;
       input.setAttribute('list', 'playerOptions');
       input.setAttribute('aria-label', `Spieler für ${p.name} picken`);
       const addPick = () => {
@@ -1220,41 +1257,22 @@
         renderAll();
       };
       input.addEventListener('keydown', (e) => { if (e.key === 'Enter') addPick(); });
-      pickInput.append(input, el('button', { textContent: 'OK', onclick: addPick }));
-      const openInput = () => { pickInput.classList.add('open'); input.focus(); };
-
-      const pick = p.picks[0];
-      let say;
-      if (pick) {
-        const unknown = isOutWithoutReplacement(pick.name);
-        say = el('button', { className: 'say' + (unknown ? ' unknown' : '') + (flash === pick ? ' flash' : '') });
-        const pickTeam = allLineupPlayers().find((x) => norm(x.name) === norm(pick.name))?.team;
-        say.append(...(pickTeam ? [crest(pickTeam, 30)] : []), el('span', { className: 'say-name', textContent: pick.name }));
-        say.querySelector('.say-name').append(el('small', { textContent: unknown ? 'ausgewechselt – Ersatz per ⇄' : norm(pick.orig) !== norm(pick.name) ? `für ${pick.orig}` : 'Antippen, wenn der Name fällt' }));
-        say.onclick = () => { p.count++; renderAll(pick); };
-      } else {
-        say = el('button', { className: 'say add', textContent: '+ Spieler picken', onclick: openInput });
-      }
-      const minus = el('button', { className: 'sq', textContent: '−', onclick: () => { p.count = Math.max(0, p.count - 1); renderAll(); } });
-      minus.setAttribute('aria-label', `Einen Schluck weniger für ${p.name}`);
-      const plus = el('button', { className: 'sq plus', textContent: '+', onclick: () => { p.count++; renderAll(); } });
-      plus.setAttribute('aria-label', `Ein Schluck mehr für ${p.name}`);
-
       const more = el('div', { className: 'more' });
-      p.picks.slice(1).forEach((extra) => {
-        more.append(el('button', { className: 'chip' + (flash === extra ? ' flash' : ''), textContent: extra.name, onclick: () => { p.count++; renderAll(extra); } }));
-      });
-      if (pick) {
-        more.append(el('button', { className: 'chip', textContent: '⇄ Wechsel', onclick: () => {
+      for (const pick of p.picks) {
+        more.append(el('button', { className: 'chip', textContent: `⇄ ${pick.name}`, onclick: () => {
           const next = prompt(`Wer kommt für ${pick.name}?`);
           if (next && next.trim()) { pick.history = [...(pick.history || []), pick.name]; pick.name = next.trim(); renderAll(); }
         } }));
-        more.append(el('button', { className: 'chip', textContent: '+ Spieler', onclick: openInput }));
-        more.append(el('button', { className: 'chip', textContent: '✕ Picks löschen', onclick: () => { if (confirm(`Alle Picks von ${p.name} löschen?`)) { p.picks = []; renderAll(); } } }));
       }
+      if (p.picks.length) more.append(el('button', { className: 'chip', textContent: '✕ Picks löschen', onclick: () => { if (confirm(`Alle Picks von ${p.name} löschen?`)) { p.picks = []; renderAll(); } } }));
+      const panel = el('div', { className: 'panel' },
+        stepper('Schlucke', () => p.count, (v) => { p.count = v; }),
+        stepper('Ex', () => p.ex || 0, (v) => { p.ex = v; }),
+        el('div', { className: 'pick-input' }, input, el('button', { textContent: 'OK', onclick: addPick })),
+        more);
 
-      list.append(el('div', { className: 'p', style: `--c: ${colorOf(p)}` }, top, el('div', { className: 'actions' }, say, minus, plus), more, pickInput));
-    }
+      list.append(el('div', { className: 'p' + (isOpen ? ' open' : ''), style: `--c: ${colorOf(p)}` }, main, panel));
+    });
   }
 
   // Warnung, wenn die ausgelosten Teams nicht zu den geladenen Spielen passen (z. B. anderes Datum).
