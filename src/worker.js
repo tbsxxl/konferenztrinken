@@ -4,6 +4,7 @@ const UPSTREAM = {
   scoreboard: 'https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/scoreboard',
   summary: 'https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/summary',
   spieltag: 'https://api.openligadb.de/getcurrentgroup/bl1',
+  spiele: 'https://api.openligadb.de/getmatchdata/bl1',
 };
 const ALLOWED_PARAMS = ['dates', 'event'];
 

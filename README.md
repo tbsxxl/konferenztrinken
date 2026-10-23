@@ -14,7 +14,7 @@ Das Trinkspiel zur Bundesliga-Konferenz am Samstag um 15:30 Uhr – als kleine W
 
 Design im Apple-Stil (Liquid Glass, große Titel, gruppierte Listen), passt sich hellem und dunklem Modus an. Lässt sich auf dem iPhone über „Zum Home-Bildschirm“ wie eine App ablegen.
 
-Kein Build-Schritt. Die Seite liegt in `public/`. `src/worker.js` liefert sie aus und reicht die Abfragen an die Datenquellen (ESPN für Spiele/Aufstellungen/Wechsel, OpenLigaDB für die Spieltagsnummer) durch, damit es im Browser keine CORS-Probleme gibt. Fallen die Daten aus, lässt sich alles von Hand eintragen.
+Kein Build-Schritt. Die Seite liegt in `public/`. `src/worker.js` liefert sie aus und reicht die Abfragen an die Datenquellen (ESPN für Spiele/Aufstellungen/Wechsel/Torschützen, OpenLigaDB als zweite Quelle für Torschützen und als Ersatz, falls ESPN ausfällt) durch, damit es im Browser keine CORS-Probleme gibt. Fallen die Daten aus, lässt sich alles von Hand eintragen.
 
 ## Lokal ansehen
 

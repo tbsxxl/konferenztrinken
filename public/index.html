@@ -427,6 +427,7 @@
     scoreboard: 'https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/scoreboard',
     summary: 'https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/summary',
     spieltag: 'https://api.openligadb.de/getcurrentgroup/bl1',
+    spiele: 'https://api.openligadb.de/getmatchdata/bl1',
   };
   async function api(endpoint, params = {}) {
     const qs = new URLSearchParams(params).toString();
@@ -441,6 +442,7 @@
     throw new Error(`Keine Daten von ${endpoint}`);
   }
 
+  const berlinDate = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Berlin' });
   const berlinTime = new Intl.DateTimeFormat('de-DE', { timeZone: 'Europe/Berlin', hour: '2-digit', minute: '2-digit' });
   const didSub = (v) => (v && typeof v === 'object' ? v.didSub !== false : !!v);
 
@@ -449,7 +451,11 @@
     d.setDate(d.getDate() + ((6 - d.getDay() + 7) % 7));
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   }
-  $('gameDate').value = nextSaturday();
+  // Gewähltes Datum und Filter merken; ein vergangenes Datum springt auf den nächsten Samstag.
+  const today = berlinDate.format(new Date());
+  const savedDate = store.get('kt-date', '');
+  $('gameDate').value = savedDate && savedDate >= today ? savedDate : nextSaturday();
+  $('only1530').checked = store.get('kt-only1530', true);
 
   let games = [];          // [{id, home, away, homeScore, awayScore, state, halftime, detail, kickoff, events}]
   const lineups = {};      // eventId -> {teams: [{name, players}], subs: Map(norm(raus) -> rein), out: Set(norm(raus))}
@@ -476,7 +482,8 @@
       const detail = status.type?.shortDetail || status.type?.detail || '';
       const events = (comp.details || []).map((d) => {
         const kind = eventKind(d.type?.text || '', d);
-        const player = d.athletesInvolved?.[0]?.displayName || '';
+        const a = d.athletesInvolved?.[0] || d.participants?.[0]?.athlete || {};
+        const player = a.displayName || a.fullName || a.shortName || '';
         return kind && player ? { kind, player, team: teamById[d.team?.id] || '', minute: d.clock?.displayValue || '' } : null;
       }).filter(Boolean);
       return {
@@ -493,6 +500,41 @@
       };
     });
   }
+
+  // OpenLigaDB: zweite Quelle für Torschützen, und Ersatz für Spiele/Stände, falls ESPN ausfällt.
+  function parseOpenLigaDB(matches) {
+    return matches.map((m) => {
+      const goals = [...(m.goals || [])].sort((a, b) => (a.goalID || 0) - (b.goalID || 0));
+      const last = goals.at(-1);
+      const final = (m.matchResults || []).find((r) => r.resultTypeID === 2);
+      const kickoff = new Date(m.matchDateTimeUTC || m.matchDateTime);
+      const started = Date.now() >= kickoff.getTime();
+      return {
+        id: `oldb-${m.matchID}`,
+        source: 'oldb',
+        kickoff,
+        home: m.team1?.teamName || '?',
+        away: m.team2?.teamName || '?',
+        homeScore: String(last?.scoreTeam1 ?? final?.pointsTeam1 ?? (started ? 0 : '')),
+        awayScore: String(last?.scoreTeam2 ?? final?.pointsTeam2 ?? (started ? 0 : '')),
+        state: m.matchIsFinished ? 'post' : started ? 'in' : 'pre',
+        halftime: false,
+        detail: m.matchIsFinished ? 'Ende' : '',
+        events: goals.filter((x) => x.goalGetterName && !x.isOwnGoal)
+          .map((x) => ({ kind: 'goal', player: x.goalGetterName, team: '', minute: x.matchMinute != null ? `${x.matchMinute}'` : '' })),
+      };
+    });
+  }
+  // Gleiches Spiel in beiden Quellen: gleiche Anstoßzeit und ein gemeinsamer Vereinsname-Bestandteil.
+  const GENERIC = new Set(['fc', 'sv', 'vfb', 'vfl', 'tsg', 'fsv', 'sc', 'rb', 'sg', 'bsc', 'borussia', 'bayer', 'eintracht', 'hertha', 'union', 'st', '1', '04', '05', '07', '09', '1846', '1899', '1900', '1910', 'munich', 'munchen']);
+  const ALIAS = { cologne: 'koln', hamburger: 'hamburg', nuremberg: 'nurnberg', monchengladbach: 'gladbach', dusseldorf: 'dusseldorf', hanover: 'hannover' };
+  const clubTokens = (name) => norm(name).replace(/[^a-z0-9 ]/g, ' ').split(' ').filter((t) => t && !GENERIC.has(t)).map((t) => ALIAS[t] || t);
+  // "FC Cologne" (ESPN) und "1. FC Köln" (OpenLigaDB) → beide "koln".
+  const clubKey = (name) => clubTokens(name).at(-1) || norm(name);
+  const sameClub = (a, b) => clubKey(a) === clubKey(b);
+  const sameMatch = (g, o) => Math.abs(g.kickoff - o.kickoff) < 10 * 60e3 && (sameClub(g.home, o.home) || sameClub(g.away, o.away));
+  // Quellenunabhängiger Schlüssel, damit ein Ereignis nie doppelt zählt, auch wenn die Quelle wechselt.
+  const gameKey = (g) => `${berlinDate.format(g.kickoff)}-${clubKey(g.home)}-${clubKey(g.away)}`;
 
   // Auswechslungen aus Kader-Flags und Spielereignissen ("Substitution, Team. A replaces B.") lesen.
   function parseSummary(data) {
@@ -519,7 +561,8 @@
     // Ersatzquelle für Tore/Karten, falls das Scoreboard keine Details liefert.
     const events = (data.keyEvents || []).map((e) => {
       const kind = eventKind(e.type?.text || '', e);
-      const player = e.participants?.[0]?.athlete?.displayName || '';
+      const a = e.participants?.[0]?.athlete || e.athletesInvolved?.[0] || {};
+      const player = a.displayName || a.fullName || a.shortName || '';
       return kind && player ? { kind, player, team: e.team?.displayName || '', minute: e.clock?.displayValue || '' } : null;
     }).filter(Boolean);
     return { teams, subs, out, events };
@@ -536,12 +579,24 @@
       if (g?.groupName) { $('matchday').textContent = g.groupName; $('matchday2').textContent = g.groupName; }
     }).catch(() => {});
     try {
-      const date = $('gameDate').value.replaceAll('-', '');
-      const all = parseScoreboard(await api('scoreboard', { dates: date }));
+      const date = $('gameDate').value;
+      const [espn, oldb] = await Promise.allSettled([api('scoreboard', { dates: date.replaceAll('-', '') }), api('spiele')]);
+      const oldbGames = oldb.status === 'fulfilled' && Array.isArray(oldb.value) ? parseOpenLigaDB(oldb.value) : [];
+      let all;
+      if (espn.status === 'fulfilled') {
+        all = parseScoreboard(espn.value);
+      } else if (oldbGames.length) {
+        all = oldbGames.filter((g) => berlinDate.format(g.kickoff) === date);
+      } else {
+        throw new Error('Keine Spieldaten');
+      }
       games = $('only1530').checked ? all.filter((g) => berlinTime.format(g.kickoff) === '15:30') : all;
       await Promise.all(games.map(async (g) => {
+        if (g.source === 'oldb') return;
         try { lineups[g.id] = parseSummary(await api('summary', { event: g.id })); } catch {}
         if (!g.events.length && lineups[g.id]) g.events = lineups[g.id].events;
+        const twin = oldbGames.find((o) => sameMatch(g, o));
+        if (twin) g.events = [...g.events, ...twin.events];
       }));
       if (games.length && !lines($('teams').value).length) {
         $('teams').value = games.flatMap((g) => [g.home, g.away]).join('\n');
@@ -639,8 +694,8 @@
   }
 
   $('loadGames').addEventListener('click', () => loadGames());
-  $('gameDate').addEventListener('change', () => loadGames());
-  $('only1530').addEventListener('change', () => loadGames());
+  $('gameDate').addEventListener('change', () => { store.set('kt-date', $('gameDate').value); loadGames(); });
+  $('only1530').addEventListener('change', () => { store.set('kt-only1530', $('only1530').checked); loadGames(); });
 
   // ---------- Spieler & Picks ----------
   // player = { name, teams, count, ex, picks: [{ name: aktuell, orig: gepickt, history: [frühere] }] }
@@ -648,9 +703,19 @@
   let feed = store.get('kt-feed', []);
   let processed = new Set(store.get('kt-processed', []));
 
-  const ownersOf = (team) => players.filter((p) => (p.teams || []).some((t) => norm(t) === norm(team)));
+  const ownersOf = (team) => players.filter((p) => (p.teams || []).some((t) => sameClub(t, team)));
   const pickNames = (pick) => [pick.orig, ...(pick.history || []), pick.name];
   const pickersOf = (name) => players.filter((p) => p.picks.some((k) => pickNames(k).some((n) => norm(n) === norm(name))));
+
+  // OpenLigaDB schreibt Torschützen oft nur mit Nachnamen ("Thielmann"), ESPN mit vollem Namen.
+  const lastName = (name) => norm(name).replace(/[^a-z0-9 -]/g, '').split(' ').filter(Boolean).at(-1) || '';
+  function scorerPickers(g, scorer) {
+    const exact = pickersOf(scorer);
+    if (exact.length) return exact;
+    const ln = lastName(scorer);
+    const inGame = (n) => !lineups[g.id] || lineups[g.id].teams.some((t) => t.players.some((x) => norm(x.name) === norm(n)));
+    return players.filter((p) => p.picks.some((k) => pickNames(k).some((n) => lastName(n) === ln && inGame(n))));
+  }
 
   const allLineupPlayers = () =>
     Object.values(lineups).flatMap((lu) => lu.teams.flatMap((t) => t.players.map((p) => ({ ...p, team: t.name }))));
@@ -709,10 +774,13 @@
 
   // ---------- Regel-Engine ----------
   // Jedes Ereignis bekommt einen festen Schlüssel und wird nur einmal verbucht, auch nach Neuladen.
-  function emit(key, icon, title, effects) {
+  function emit(key, icon, title, effects, { always = false } = {}) {
     if (processed.has(key)) return null;
     processed.add(key);
-    if (!effects.length) return null;
+    return record(key, icon, title, effects, always);
+  }
+  function record(key, icon, title, effects, always = false) {
+    if (!effects.length && !always) return null;
     const entry = { id: key, time: berlinTime.format(new Date()), icon, title, lines: [], gives: [] };
     for (const e of effects) {
       const p = e.person;
@@ -726,42 +794,72 @@
     return entry;
   }
 
+  // Runden aus älteren Versionen speicherten Ereignisse unter der ESPN-Spiel-ID.
+  // Einmal übernehmen, damit nach dem Update nichts doppelt verbucht wird.
+  function migrateKeys(g, gk) {
+    if (processed.has(`${gk}:v2`)) return;
+    processed.add(`${gk}:v2`);
+    const had = (k) => processed.has(`${g.id}:${k}`);
+    for (const side of ['home', 'away']) for (let n = 1; n <= 30; n++) if (had(`goal:${side}:${n}`)) processed.add(`${gk}:goal:${side}:${n}`);
+    for (const k of ['ht', 'ft']) if (had(k)) processed.add(`${gk}:${k}`);
+    for (const ev of g.events) {
+      if (!had(`${ev.kind}:${norm(ev.player)}:${ev.minute}`)) continue;
+      const base = `${gk}:${ev.kind === 'goal' ? 'scorer' : 'red'}:${lastName(ev.player)}:${parseInt(ev.minute, 10) || 0}`;
+      processed.add(base);
+      // Rote Karten wurden damals schon an Team-Besitzer verbucht.
+      if (ev.kind === 'red') ownersOf(ev.team).forEach((p) => processed.add(`${base}:${norm(p.name)}`));
+    }
+  }
+
   function processEvents() {
     if (!players.length) return;
     const fresh = [];
     const add = (entry) => entry && fresh.push(entry);
     for (const g of games) {
       if (g.state === 'pre') continue;
+      const gk = gameKey(g);
+      migrateKeys(g, gk);
       const score = { home: parseInt(g.homeScore, 10) || 0, away: parseInt(g.awayScore, 10) || 0 };
       for (const side of ['home', 'away']) {
         const team = g[side], opp = g[side === 'home' ? 'away' : 'home'];
         for (let n = 1; n <= score[side]; n++) {
-          add(emit(`${g.id}:goal:${side}:${n}`, '⚽', `Tor für ${team}`, [
+          add(emit(`${gk}:goal:${side}:${n}`, '⚽', `Tor für ${team}`, [
             ...ownersOf(team).map((person) => ({ person, kind: 'give', amount: values.teamGoal })),
             ...ownersOf(opp).map((person) => ({ person, kind: 'drink', amount: values.conceded })),
           ]));
         }
       }
+      // Tore und Karten erscheinen immer im Ticker. Wer den Spieler erst später pickt,
+      // bekommt sein Ex trotzdem, pro Person aber nur einmal.
       for (const ev of g.events) {
-        const key = `${g.id}:${ev.kind}:${norm(ev.player)}:${ev.minute}`;
-        if (ev.kind === 'goal') {
-          add(emit(key, '🎯', `${ev.player} trifft ${ev.minute}`, pickersOf(ev.player).map((person) => ({ person, kind: 'giveEx' }))));
-        } else {
-          const hit = new Set([...pickersOf(ev.player), ...ownersOf(ev.team)]);
-          add(emit(key, '🟥', `Rot für ${ev.player} ${ev.minute}`, [...hit].map((person) => ({ person, kind: 'ex' }))));
+        const m = parseInt(ev.minute, 10) || 0, ln = lastName(ev.player);
+        const kind = ev.kind === 'goal' ? 'scorer' : 'red';
+        const near = [0, -1, 1, -2, 2, -3, 3].find((d) => processed.has(`${gk}:${kind}:${ln}:${m + d}`));
+        const base = `${gk}:${kind}:${ln}:${near === undefined ? m : m + near}`;
+        const hit = ev.kind === 'goal' ? scorerPickers(g, ev.player) : [...new Set([...scorerPickers(g, ev.player), ...ownersOf(ev.team)])];
+        const due = hit.filter((p) => !processed.has(`${base}:${norm(p.name)}`));
+        due.forEach((p) => processed.add(`${base}:${norm(p.name)}`));
+        const effects = due.map((person) => ({ person, kind: ev.kind === 'goal' ? 'giveEx' : 'ex' }));
+        const title = ev.kind === 'goal' ? `${ev.player} trifft ${ev.minute}` : `Rot für ${ev.player} ${ev.minute}`;
+        const icon = ev.kind === 'goal' ? '🎯' : '🟥';
+        if (near === undefined) {
+          processed.add(base);
+          add(record(base, icon, title, effects, true));
+        } else if (effects.length) {
+          add(record(base, icon, `${title} (nachträglich)`, effects));
         }
       }
       const behind = score.home === score.away ? null : score.home < score.away ? g.home : g.away;
       if (g.halftime && behind) {
-        add(emit(`${g.id}:ht`, '⏸️', `Halbzeit ${g.home} ${score.home}:${score.away} ${g.away}`, ownersOf(behind).map((person) => ({ person, kind: 'drink', amount: values.halftime }))));
+        add(emit(`${gk}:ht`, '⏸️', `Halbzeit ${g.home} ${score.home}:${score.away} ${g.away}`, ownersOf(behind).map((person) => ({ person, kind: 'drink', amount: values.halftime }))));
       }
       if (g.state === 'post') {
         const title = `Abpfiff ${g.home} ${score.home}:${score.away} ${g.away}`;
         if (!behind) {
-          add(emit(`${g.id}:ft`, '🤝', title, [...ownersOf(g.home), ...ownersOf(g.away)].map((person) => ({ person, kind: 'drink', amount: values.draw }))));
+          add(emit(`${gk}:ft`, '🤝', title, [...ownersOf(g.home), ...ownersOf(g.away)].map((person) => ({ person, kind: 'drink', amount: values.draw }))));
         } else {
           const winner = behind === g.home ? g.away : g.home;
-          add(emit(`${g.id}:ft`, '🏁', title, [
+          add(emit(`${gk}:ft`, '🏁', title, [
             ...ownersOf(behind).map((person) => ({ person, kind: 'ex' })),
             ...ownersOf(winner).map((person) => ({ person, kind: 'giveEx' })),
           ]));
