@@ -2,298 +2,346 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0f0c" />
   <title>Konferenztrinken</title>
-  <meta name="description" content="Das Trinkspiel zur Bundesliga-Konferenz am Samstag um 15:30 Uhr: Regeln, Live-Spieltag, Auslosung und automatischer Schluck-Zähler." />
+  <meta name="description" content="Das Trinkspiel zur Bundesliga-Konferenz am Samstag um 15:30 Uhr: Live-Spieltag, Auslosung und automatischer Schluck-Zähler." />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍺</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #f4f6f2;
-      --surface: #ffffff;
-      --text: #1b1f1a;
-      --muted: #5c665a;
-      --border: #dfe4dc;
-      --accent: #1f8a4c;
-      --accent-soft: #e3f3e9;
-      --warn: #b4500f;
-      --live: #d1342f;
-      --radius: 14px;
+      color-scheme: dark;
+      --bg: #0b0f0c;
+      --surface: #141a16;
+      --surface-2: #1d2520;
+      --line: #273029;
+      --text: #f2f5f0;
+      --muted: #8d998f;
+      --accent: #c8ff3d;
+      --accent-ink: #0b0f0c;
+      --live: #ff4d4d;
+      --warn: #ffb02e;
+      --radius: 18px;
+      --display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
+      --nav-h: 68px;
     }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #0f1410;
-        --surface: #171e18;
-        --text: #eef3ec;
-        --muted: #9aa797;
-        --border: #2a352b;
-        --accent: #43c477;
-        --accent-soft: #1b2e21;
-        --warn: #f0a060;
-        --live: #ff6b62;
-      }
-    }
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--text);
-      font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      margin: 0; background: var(--bg); color: var(--text);
+      font: 15px/1.45 Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     }
-    main { max-width: 760px; margin: 0 auto; padding: 32px 16px 96px; }
-    header h1 { font-size: clamp(2rem, 7vw, 3rem); margin: 0 0 4px; letter-spacing: -0.02em; }
-    header p { margin: 0; color: var(--muted); }
-    nav { display: flex; gap: 6px; margin: 24px 0; }
-    nav button {
-      flex: 1 1 0; min-width: 0; padding: 10px 4px; border-radius: 999px; font-size: 0.95rem;
-      border: 1px solid var(--border); background: var(--surface); color: var(--text);
-      font-family: inherit; font-weight: 600; cursor: pointer;
+    button { font: inherit; color: inherit; cursor: pointer; }
+    main { max-width: 640px; margin: 0 auto; padding: 0 16px calc(var(--nav-h) + 32px + env(safe-area-inset-bottom)); }
+
+    /* Kopf */
+    .top {
+      position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 88%, transparent);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 14px 16px; max-width: 640px; margin: 0 auto;
     }
-    nav button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .brand { font-family: var(--display); font-weight: 800; font-size: clamp(1.2rem, 6vw, 1.6rem); min-width: 0; letter-spacing: 0.01em; text-transform: uppercase; line-height: 1; }
+    .brand span { color: var(--accent); }
+    .pill { flex: none; font-size: 0.75rem; font-weight: 600; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; white-space: nowrap; }
+    .pill.live { color: var(--live); border-color: color-mix(in srgb, var(--live) 50%, transparent); }
+    .pill.live::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--live); margin-right: 6px; vertical-align: 1px; animation: pulse 1.4s infinite; }
+    @keyframes pulse { 50% { opacity: 0.25; } }
+
+    /* Navigation unten */
+    nav {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+      background: var(--surface); border-top: 1px solid var(--line);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    nav .inner { display: grid; grid-template-columns: repeat(4, 1fr); max-width: 640px; margin: 0 auto; height: var(--nav-h); }
+    nav button { background: none; border: 0; display: grid; place-items: center; align-content: center; gap: 2px; color: var(--muted); font-size: 0.72rem; font-weight: 600; }
+    nav button .i { font-size: 1.35rem; line-height: 1; filter: grayscale(1); opacity: 0.7; }
+    nav button[aria-selected="true"] { color: var(--accent); }
+    nav button[aria-selected="true"] .i { filter: none; opacity: 1; }
     section[hidden] { display: none; }
-    .card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 20px; margin-bottom: 16px;
-    }
-    .card h2 { margin: 0 0 12px; font-size: 1.15rem; }
-    ul.rules { list-style: none; margin: 0; padding: 0; }
-    ul.rules li { display: flex; gap: 12px; padding: 10px 0; border-top: 1px solid var(--border); }
-    ul.rules li:first-child { border-top: 0; padding-top: 0; }
-    .ico { font-size: 1.3rem; width: 1.6rem; flex: none; text-align: center; }
-    .auto { display: inline-block; font-size: 0.72rem; font-weight: 700; color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 0 6px; margin-left: 4px; vertical-align: 1px; }
-    .note { background: var(--accent-soft); border-color: transparent; }
-    textarea, input[type="text"], input[type="date"], input[type="number"] {
-      width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border);
-      background: var(--bg); color: var(--text); font: inherit;
-    }
-    textarea { min-height: 130px; resize: vertical; }
-    label { display: block; font-weight: 600; margin: 12px 0 6px; }
-    label:first-of-type { margin-top: 0; }
-    label.inline { display: flex; align-items: center; gap: 8px; font-weight: 400; margin: 10px 0 0; }
-    .values { display: grid; grid-template-columns: 1fr 80px; gap: 8px 12px; align-items: center; }
-    .values label { margin: 0; font-weight: 400; }
-    .hint { color: var(--muted); font-size: 0.9rem; margin: 4px 0 0; }
-    .hint:empty { display: none; }
-    .btn {
-      display: inline-block; margin-top: 16px; padding: 12px 20px; border-radius: 10px; border: 0;
-      background: var(--accent); color: #fff; font: inherit; font-weight: 700; cursor: pointer;
-    }
-    .btn.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
-    .result { display: grid; gap: 10px; margin-top: 16px; }
-    .result div { padding: 12px 14px; border-radius: 10px; background: var(--accent-soft); }
-    .result strong { display: block; }
-    .error { color: var(--warn); margin-top: 12px; }
+
+    h2.sec { font-family: var(--display); text-transform: uppercase; letter-spacing: 0.04em; font-size: 1.05rem; color: var(--muted); margin: 26px 0 10px; display: flex; justify-content: space-between; align-items: baseline; }
+    h2.sec:first-child { margin-top: 8px; }
+    h2.sec small { font-family: Inter, system-ui, sans-serif; text-transform: none; letter-spacing: 0; font-weight: 500; font-size: 0.8rem; }
+    .card { background: var(--surface); border-radius: var(--radius); padding: 16px; }
+    .card + .card { margin-top: 10px; }
+    .muted { color: var(--muted); }
+    .small { font-size: 0.85rem; }
+    .empty { color: var(--muted); font-size: 0.9rem; padding: 14px 16px; border: 1px dashed var(--line); border-radius: var(--radius); }
+
+    .btn { display: block; width: 100%; margin-top: 12px; padding: 15px 18px; border-radius: 14px; border: 0; background: var(--accent); color: var(--accent-ink); font-weight: 700; font-size: 1rem; }
+    .btn.ghost { background: var(--surface-2); color: var(--text); font-weight: 600; }
+    .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .btn-row .btn { margin-top: 0; }
+    .error { color: var(--warn); margin-top: 10px; font-size: 0.9rem; }
     .error:empty { display: none; }
+    input[type="text"], input[type="date"], input[type="number"], textarea {
+      width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line);
+      background: var(--surface-2); color: var(--text); font: inherit;
+    }
+    textarea { min-height: 110px; resize: vertical; }
+    input:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+    label.field { display: block; font-weight: 600; margin: 0 0 8px; }
+    .check { display: flex; gap: 10px; align-items: center; margin-top: 12px; font-size: 0.92rem; }
+    .check input { width: 20px; height: 20px; accent-color: var(--accent); }
+
+    /* Anzeigetafel */
+    .board { background: var(--surface); border-radius: var(--radius); overflow: hidden; }
+    .row { display: grid; grid-template-columns: minmax(0, 1fr) 64px minmax(0, 1fr); align-items: center; padding: 10px 14px; gap: 8px; }
+    .row + .row { border-top: 1px solid var(--line); }
+    .row .t { font-family: var(--display); font-weight: 700; font-size: 1.15rem; text-transform: uppercase; line-height: 1.05; overflow-wrap: anywhere; min-width: 0; }
+    .row .t.away { text-align: right; }
+    .row .t small { display: block; font-family: Inter, system-ui, sans-serif; text-transform: none; font-weight: 500; font-size: 0.75rem; color: var(--muted); }
+    .row .s { text-align: center; }
+    .row .s b { display: block; font-family: var(--display); font-weight: 800; font-size: 1.7rem; line-height: 1; font-variant-numeric: tabular-nums; }
+    .row .s span { font-size: 0.7rem; font-weight: 700; color: var(--muted); }
+    .row.live .s span { color: var(--live); }
+    .row.flash { animation: rowflash 2s; }
+    @keyframes rowflash { 0%, 40% { background: color-mix(in srgb, var(--accent) 25%, transparent); } }
+
+    /* Offene Aufgaben */
+    .todo { background: var(--accent); color: var(--accent-ink); border-radius: var(--radius); padding: 14px 16px; }
+    .todo + .todo { margin-top: 10px; }
+    .todo .what { font-family: var(--display); font-weight: 800; font-size: 1.3rem; text-transform: uppercase; line-height: 1.05; }
+    .todo .why { font-size: 0.85rem; opacity: 0.75; margin-top: 2px; }
+    .todo .targets { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .todo .targets button { border: 0; border-radius: 12px; padding: 10px 16px; background: var(--accent-ink); color: var(--accent); font-weight: 700; font-size: 1rem; }
+    .todo .targets button.done { background: transparent; color: var(--accent-ink); border: 2px solid var(--accent-ink); }
+
+    /* Spielerkacheln */
+    .players { display: grid; gap: 10px; }
+    .p { background: var(--surface); border-radius: var(--radius); padding: 14px 14px 12px; }
+    .p .top-line { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: start; }
+    .p .name { font-family: var(--display); font-weight: 800; font-size: 1.6rem; text-transform: uppercase; line-height: 1; overflow-wrap: anywhere; }
+    .p .teams { color: var(--muted); font-size: 0.82rem; margin-top: 4px; }
+    .p .ex { display: inline-block; margin-top: 6px; font-size: 0.78rem; font-weight: 700; color: var(--warn); border: 1px solid color-mix(in srgb, var(--warn) 50%, transparent); border-radius: 999px; padding: 1px 8px; }
+    .p .score { text-align: right; }
+    .p .score b { display: block; font-family: var(--display); font-weight: 800; font-size: 2.6rem; line-height: 0.9; font-variant-numeric: tabular-nums; }
+    .p .score span { font-size: 0.7rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .p .actions { display: grid; grid-template-columns: 1fr 52px 52px; gap: 8px; margin-top: 12px; }
+    .p .say { border: 0; border-radius: 12px; background: var(--surface-2); padding: 10px 12px; text-align: left; font-weight: 700; min-height: 52px; overflow: hidden; }
+    .p .say small { display: block; font-weight: 500; color: var(--muted); font-size: 0.75rem; }
+    .p .say.unknown { outline: 2px dashed var(--warn); outline-offset: -2px; }
+    .p .say.flash { animation: sayflash 0.6s; }
+    @keyframes sayflash { 0% { background: var(--accent); color: var(--accent-ink); } }
+    .p .say.add { color: var(--muted); font-weight: 600; }
+    .sq { border: 0; border-radius: 12px; background: var(--surface-2); font-size: 1.4rem; font-weight: 700; }
+    .sq.plus { background: var(--accent); color: var(--accent-ink); }
+    .p .more { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+    .chip { border: 1px solid var(--line); background: none; border-radius: 999px; padding: 5px 11px; font-size: 0.8rem; color: var(--muted); }
+    .p .pick-input { display: none; gap: 8px; margin-top: 8px; }
+    .p .pick-input.open { display: flex; }
+    .p .pick-input input { min-width: 0; }
+    .p .pick-input button { border: 0; border-radius: 12px; padding: 0 16px; background: var(--accent); color: var(--accent-ink); font-weight: 700; }
+
+    /* Ticker */
+    .feed { display: grid; }
+    .entry { display: grid; grid-template-columns: 44px 1fr; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
+    .entry:first-child { border-top: 0; }
+    .entry .time { color: var(--muted); font-size: 0.78rem; font-variant-numeric: tabular-nums; padding-top: 2px; }
+    .entry .title { font-weight: 600; }
+    .entry ul { list-style: none; margin: 2px 0 0; padding: 0; color: var(--muted); font-size: 0.85rem; }
+
+    details.manage { margin-top: 26px; }
+    details.manage summary { color: var(--muted); font-weight: 600; cursor: pointer; padding: 6px 0; }
 
     /* Spieltag */
-    .matchday-label { color: var(--muted); font-weight: 600; margin: -6px 0 12px; }
-    .matchday-label:empty { display: none; }
-    .games { display: grid; gap: 10px; margin-top: 16px; }
-    .game { border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
-    .game .score { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; }
-    .game .score span:first-child { text-align: right; }
-    .game .score b { font-variant-numeric: tabular-nums; font-size: 1.15rem; min-width: 3.2ch; text-align: center; }
-    .game .status { text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 2px; }
-    .game .status.live { color: var(--live); font-weight: 700; }
-    .game .owners { text-align: center; font-size: 0.85rem; margin-top: 4px; }
-    .game details { margin-top: 8px; }
-    .game summary { cursor: pointer; color: var(--accent); font-weight: 600; font-size: 0.9rem; }
-    .lineups { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; font-size: 0.9rem; }
-    .lineups h3 { font-size: 0.9rem; margin: 0 0 4px; }
+    .game { background: var(--surface); border-radius: var(--radius); overflow: hidden; }
+    .game + .game { margin-top: 10px; }
+    .game .owners { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 14px 10px; font-size: 0.8rem; color: var(--muted); }
+    .game .owners span:last-child { text-align: right; }
+    .game details { border-top: 1px solid var(--line); }
+    .game summary { padding: 10px 14px; color: var(--accent); font-weight: 600; font-size: 0.88rem; cursor: pointer; }
+    .lineups { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 0 14px 14px; font-size: 0.85rem; }
+    .lineups h3 { font-size: 0.8rem; margin: 0 0 6px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
     .lineups ul { list-style: none; margin: 0; padding: 0; }
-    .lineups li { padding: 2px 0; overflow-wrap: anywhere; }
+    .lineups li { padding: 3px 0; overflow-wrap: anywhere; }
     .lineups .out { color: var(--muted); text-decoration: line-through; }
     .lineups .in { color: var(--accent); font-weight: 600; }
     .lineups .bench { color: var(--muted); }
+    .lineups .picked { font-weight: 700; }
+    .lineups .picked em { font-style: normal; color: var(--accent); font-weight: 600; font-size: 0.75rem; }
+    .date-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
+    .date-row .btn { margin: 0; width: auto; padding: 0 18px; }
 
-    /* Live-Ticker */
-    .feed { display: grid; gap: 8px; }
-    .feed:empty::before { content: "Noch nichts passiert. Tore, Karten, Halbzeit und Abpfiff erscheinen hier automatisch."; color: var(--muted); font-size: 0.9rem; }
-    .entry { border-radius: 10px; background: var(--accent-soft); padding: 10px 12px; }
-    .entry.open { outline: 2px solid var(--accent); }
-    .entry .title { font-weight: 700; }
-    .entry .title small { font-weight: 400; color: var(--muted); }
-    .entry ul { margin: 2px 0 0; padding-left: 18px; }
-    .give { margin-top: 8px; font-size: 0.9rem; }
-    .give .targets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
-    .give button { border-radius: 999px; border: 1px solid var(--accent); background: var(--surface); color: var(--text); font: inherit; padding: 4px 12px; cursor: pointer; }
-    .give button.done { border-color: var(--border); color: var(--muted); }
+    /* Setup */
+    .step { display: grid; grid-template-columns: 34px 1fr; gap: 12px; }
+    .step .n { width: 34px; height: 34px; border-radius: 50%; background: var(--surface-2); display: grid; place-items: center; font-family: var(--display); font-weight: 800; font-size: 1.2rem; color: var(--accent); }
 
-    /* Zähler */
-    .players { display: grid; gap: 10px; }
-    .player { padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); }
-    .player .head { display: grid; grid-template-columns: 1fr auto auto auto; align-items: center; gap: 8px; }
-    .player .name { font-weight: 600; overflow-wrap: anywhere; }
-    .player .teams { display: block; font-weight: 400; color: var(--muted); font-size: 0.85rem; }
-    .player .count { font-variant-numeric: tabular-nums; font-size: 1.4rem; font-weight: 700; min-width: 2.2ch; text-align: center; }
-    .round {
-      width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border);
-      background: var(--bg); color: var(--text); font-size: 1.2rem; cursor: pointer;
-    }
-    .picks { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-    .picks:empty { display: none; }
-    .pick { display: inline-flex; align-items: stretch; border-radius: 999px; background: var(--accent-soft); overflow: hidden; max-width: 100%; }
-    .pick button { border: 0; background: transparent; color: var(--text); font: inherit; cursor: pointer; padding: 6px 10px; }
-    .pick .say { font-weight: 600; padding-left: 12px; text-align: left; }
-    .pick .say small { font-weight: 400; color: var(--muted); }
-    .pick .swap, .pick .del { color: var(--muted); padding: 6px 8px; }
-    .pick.flash { animation: flash 0.6s; }
-    .pick.unknown { outline: 2px dashed var(--warn); outline-offset: -2px; }
-    @keyframes flash { 0% { background: var(--accent); } 100% { background: var(--accent-soft); } }
-    .add-pick { display: flex; gap: 6px; margin-top: 10px; }
-    .add-pick input { padding: 6px 10px; font-size: 0.9rem; min-width: 0; }
-    .add-pick button { border-radius: 10px; border: 1px solid var(--accent); background: transparent; color: var(--accent); font: inherit; font-weight: 600; padding: 0 12px; cursor: pointer; white-space: nowrap; }
+    /* Regeln */
+    .rules { list-style: none; margin: 0; padding: 0; }
+    .rules li { display: grid; grid-template-columns: 30px 1fr auto; gap: 10px; align-items: center; padding: 11px 0; border-top: 1px solid var(--line); }
+    .rules li:first-child { border-top: 0; padding-top: 2px; }
+    .rules .ico { font-size: 1.2rem; text-align: center; }
+    .rules .what { font-weight: 600; }
+    .rules .what small { display: block; font-weight: 400; color: var(--muted); font-size: 0.83rem; }
+    .tag { font-size: 0.78rem; font-weight: 700; border-radius: 999px; padding: 3px 10px; white-space: nowrap; background: var(--surface-2); }
+    .tag.give { background: var(--accent); color: var(--accent-ink); }
+    .tag.ex { background: var(--warn); color: var(--accent-ink); }
+    .tag.drink { background: var(--surface-2); color: var(--text); }
+    .auto-note { display: inline-flex; gap: 6px; align-items: center; font-size: 0.8rem; color: var(--muted); }
+    .auto-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+    .rules .auto-dot { margin-left: 6px; vertical-align: 1px; }
+    .values { display: grid; grid-template-columns: 1fr 76px; gap: 10px 12px; align-items: center; font-size: 0.9rem; }
+    .values input { text-align: center; padding: 8px; }
 
     .toast {
-      position: fixed; left: 16px; right: 16px; bottom: 16px; max-width: 520px; margin: 0 auto;
-      background: var(--text); color: var(--bg); border-radius: var(--radius); padding: 14px 16px;
-      box-shadow: 0 8px 30px rgba(0,0,0,.25); cursor: pointer;
+      position: fixed; left: 12px; right: 12px; top: 12px; z-index: 20; max-width: 560px; margin: 0 auto;
+      background: var(--accent); color: var(--accent-ink); border-radius: var(--radius); padding: 14px 16px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5); cursor: pointer; animation: drop 0.25s ease-out;
     }
     .toast[hidden] { display: none; }
-    .toast ul { margin: 4px 0 0; padding-left: 18px; }
-    footer { color: var(--muted); font-size: 0.85rem; text-align: center; margin-top: 32px; }
+    .toast strong { display: block; font-family: var(--display); font-size: 1.3rem; text-transform: uppercase; line-height: 1.1; }
+    .toast ul { margin: 2px 0 6px; padding-left: 18px; font-weight: 500; }
+    @keyframes drop { from { transform: translateY(-20px); opacity: 0; } }
+    footer { color: var(--muted); font-size: 0.78rem; text-align: center; margin-top: 30px; }
   </style>
 </head>
 <body>
+<div class="top">
+  <div class="brand">Konferenz<span>trinken</span></div>
+  <div class="pill" id="status">Lade Spieltag …</div>
+</div>
+
 <main>
-  <header>
-    <h1>🍺 Konferenztrinken</h1>
-    <p>Das Trinkspiel zur Bundesliga-Konferenz, samstags um 15:30 Uhr.</p>
-  </header>
+  <!-- LIVE -->
+  <section id="zaehler" hidden>
+    <h2 class="sec">Konferenz <small id="matchday"></small></h2>
+    <div class="board" id="board"></div>
 
-  <nav role="tablist">
-    <button role="tab" data-tab="regeln" aria-selected="true">Regeln</button>
-    <button role="tab" data-tab="spieltag" aria-selected="false">Spieltag</button>
-    <button role="tab" data-tab="auslosung" aria-selected="false">Auslosung</button>
-    <button role="tab" data-tab="zaehler" aria-selected="false">Live</button>
-  </nav>
+    <div id="todos"></div>
 
-  <section id="regeln">
-    <div class="card note">
-      Ein festes Regelwerk gibt es nicht, jede Runde spielt es etwas anders. Regeln mit <span class="auto">auto</span> erkennt die Seite selbst aus den Live-Daten und verbucht sie im Tab <em>Live</em>.
-    </div>
+    <h2 class="sec">Spieler <small>Name gefallen? Spieler antippen</small></h2>
+    <div class="players" id="players"></div>
 
+    <h2 class="sec">Ticker</h2>
+    <div class="card"><div class="feed" id="feed"></div></div>
+
+    <details class="manage">
+      <summary>Runde verwalten</summary>
+      <div class="card" style="margin-top:8px">
+        <label class="field" for="newPlayer">Person nachträglich hinzufügen</label>
+        <div class="date-row">
+          <input type="text" id="newPlayer" placeholder="Name" />
+          <button class="btn" id="addPlayer">Hinzufügen</button>
+        </div>
+        <div class="btn-row" style="margin-top:12px">
+          <button class="btn ghost" id="autoPickNow">🎲 Picks auslosen</button>
+          <button class="btn ghost" id="resetCounts">Zähler auf 0</button>
+        </div>
+        <div class="error" id="pickError" role="alert"></div>
+      </div>
+    </details>
+  </section>
+
+  <!-- SPIELTAG -->
+  <section id="spieltag" hidden>
+    <h2 class="sec">Spieltag <small id="matchday2"></small></h2>
     <div class="card">
-      <h2>Vorbereitung</h2>
-      <ul class="rules">
-        <li><span class="ico">🎲</span><span>Vor Anpfiff werden die Teams der Konferenzspiele per Los verteilt. Jede Person bekommt ein oder zwei Teams. Die Spiele lädt die Seite selbst.</span></li>
-        <li><span class="ico">🧑‍🤝‍🧑</span><span>Außerdem picken die anderen für jede Person einen Spieler aus den Aufstellungen, oder die Seite lost ihn aus.</span></li>
-      </ul>
+      <div class="date-row">
+        <input type="date" id="gameDate" aria-label="Datum" />
+        <button class="btn" id="loadGames">Laden</button>
+      </div>
+      <label class="check"><input type="checkbox" id="only1530" checked /> Nur die 15:30-Konferenz</label>
+      <div class="error" id="gamesError" role="alert"></div>
     </div>
+    <h2 class="sec">Spiele <small id="gamesInfo"></small></h2>
+    <div id="games"></div>
+  </section>
 
-    <div class="card">
-      <h2>Tore &amp; Karten</h2>
-      <ul class="rules">
-        <li><span class="ico">⚽</span><span><strong>Tor für dein Team:</strong> Du verteilst <b data-v="teamGoal">3</b> Schlucke. <span class="auto">auto</span></span></li>
-        <li><span class="ico">🥅</span><span><strong>Gegentor:</strong> Du trinkst <b data-v="conceded">2</b> Schlucke. <span class="auto">auto</span></span></li>
-        <li><span class="ico">🎯</span><span><strong>Dein gepickter Spieler trifft:</strong> Du verteilst <b data-v="pickGoal">3</b> Schlucke. <span class="auto">auto</span></span></li>
-        <li><span class="ico">🟥</span><span><strong>Rote Karte</strong> für deinen gepickten Spieler oder irgendjemanden aus deinem Team: Du musst <strong>exen</strong>. <span class="auto">auto</span></span></li>
-        <li><span class="ico">🎯</span><span><strong>Elfmeter, VAR-Check:</strong> Ein Extraschluck für die Person, deren Team betroffen ist.</span></li>
-      </ul>
-    </div>
-
-    <div class="card">
-      <h2>Halbzeit &amp; Abpfiff</h2>
-      <ul class="rules">
-        <li><span class="ico">⏸️</span><span><strong>Halbzeit:</strong> Wer gerade hinten liegt, trinkt <b data-v="halftime">1</b>. <span class="auto">auto</span></span></li>
-        <li><span class="ico">💀</span><span><strong>Niederlage:</strong> Du musst <strong>exen</strong>. <span class="auto">auto</span></span></li>
-        <li><span class="ico">🏆</span><span><strong>Sieg:</strong> Du darfst ein <strong>Ex verteilen</strong>. <span class="auto">auto</span></span></li>
-        <li><span class="ico">🤝</span><span><strong>Unentschieden:</strong> Beide trinken <b data-v="draw">1</b>. <span class="auto">auto</span></span></li>
-      </ul>
-    </div>
-
-    <div class="card">
-      <h2>Während des Spiels</h2>
-      <ul class="rules">
-        <li><span class="ico">📺</span><span><strong>Schalte:</strong> Bei jedem Wechsel ins Stadion deines Teams trinkst du einen Schluck.</span></li>
-        <li><span class="ico">🗣️</span><span><strong>Spielername:</strong> Sagt der Kommentator den Namen deines gepickten Spielers, trinkst du einen Schluck. Im Tab <em>Live</em> den Spieler antippen.</span></li>
-        <li><span class="ico">🔁</span><span><strong>Auswechslung:</strong> Wird dein Spieler ausgewechselt, zählt ab dann der eingewechselte Spieler. <span class="auto">auto</span></span></li>
-        <li><span class="ico">🎙️</span><span>Der Kommentator sagt „Tor in …“: Alle trinken, bevor klar ist, wo.</span></li>
-        <li><span class="ico">🙈</span><span>Ein Spiel ohne eine einzige Schalte in einer Halbzeit: Der Besitzer des Teams trinkt doppelt.</span></li>
-      </ul>
-    </div>
-
-    <div class="card">
-      <h2>Werte anpassen</h2>
-      <div class="values">
-        <label for="v-teamGoal">Tor fürs Team: Schlucke verteilen</label><input type="number" min="0" id="v-teamGoal" data-key="teamGoal" />
-        <label for="v-conceded">Gegentor: Schlucke trinken</label><input type="number" min="0" id="v-conceded" data-key="conceded" />
-        <label for="v-pickGoal">Pick trifft: Schlucke verteilen</label><input type="number" min="0" id="v-pickGoal" data-key="pickGoal" />
-        <label for="v-halftime">Halbzeit hinten: Schlucke trinken</label><input type="number" min="0" id="v-halftime" data-key="halftime" />
-        <label for="v-draw">Unentschieden: Schlucke trinken</label><input type="number" min="0" id="v-draw" data-key="draw" />
+  <!-- SETUP -->
+  <section id="auslosung" hidden>
+    <h2 class="sec">Neue Runde</h2>
+    <div class="card step">
+      <div class="n">1</div>
+      <div>
+        <label class="field" for="names">Wer spielt mit?</label>
+        <textarea id="names" placeholder="Ein Name pro Zeile&#10;Anna&#10;Ben&#10;Chris"></textarea>
       </div>
     </div>
-
-    <div class="card note">
-      <strong>Tipp:</strong> Die Konferenz hat oft viele Tore und Schalten. Mit kleinen Schlucken oder einem Bier mit wenig Alkohol (bzw. einem alkoholfreien) kommt man gut durch die 90 Minuten.
+    <div class="card step">
+      <div class="n">2</div>
+      <div>
+        <label class="field" for="teams">Teams</label>
+        <textarea id="teams" placeholder="Werden automatisch aus dem Spieltag geladen"></textarea>
+        <p class="muted small" style="margin:6px 0 0">Kommt automatisch aus der 15:30-Konferenz.</p>
+      </div>
     </div>
+    <div class="card step">
+      <div class="n">3</div>
+      <div>
+        <label class="field" for="perPlayer">Teams pro Person</label>
+        <input type="text" id="perPlayer" inputmode="numeric" value="auto" />
+        <p class="muted small" style="margin:6px 0 0">„auto“ verteilt alle Teams gleichmäßig.</p>
+        <label class="check"><input type="checkbox" id="autoPicks" checked /> Spieler-Picks mit auslosen</label>
+      </div>
+    </div>
+    <button class="btn" id="draw">🎲 Auslosen &amp; los</button>
+    <div class="error" id="drawError" role="alert"></div>
   </section>
 
-  <section id="spieltag" hidden>
-    <div class="card">
-      <h2>Spieltag</h2>
-      <div class="matchday-label" id="matchdayLabel"></div>
-      <label for="gameDate">Datum</label>
-      <input type="date" id="gameDate" />
-      <label class="inline"><input type="checkbox" id="only1530" checked /> Nur die 15:30-Spiele (Konferenz)</label>
-      <button class="btn" id="loadGames">Neu laden</button>
-      <button class="btn secondary" id="gamesToDraw" hidden>Teams in die Auslosung übernehmen →</button>
-      <div class="error" id="gamesError" role="alert"></div>
-      <p class="hint" id="gamesInfo"></p>
-      <div class="games" id="games" aria-live="polite"></div>
+  <!-- REGELN -->
+  <section id="regeln" hidden>
+    <h2 class="sec">So geht’s <span class="auto-note"><span class="auto-dot"></span>läuft automatisch</span></h2>
+    <div class="card small muted">
+      Vor Anpfiff werden die Teams der 15:30-Spiele verlost, und jede Person bekommt von den anderen einen Spieler gepickt. Danach rechnet der Live-Tab mit.
     </div>
+
+    <h2 class="sec">Tore &amp; Karten</h2>
+    <div class="card"><ul class="rules">
+      <li><span class="ico">⚽</span><span class="what">Tor für dein Team<span class="auto-dot"></span></span><span class="tag give"><b data-v="teamGoal">3</b> verteilen</span></li>
+      <li><span class="ico">🥅</span><span class="what">Gegentor<span class="auto-dot"></span></span><span class="tag drink"><b data-v="conceded">2</b> trinken</span></li>
+      <li><span class="ico">🎯</span><span class="what">Dein Spieler trifft<span class="auto-dot"></span></span><span class="tag give"><b data-v="pickGoal">3</b> verteilen</span></li>
+      <li><span class="ico">🟥</span><span class="what">Rote Karte<span class="auto-dot"></span><small>für deinen Spieler oder jemanden aus deinem Team</small></span><span class="tag ex">Exen</span></li>
+      <li><span class="ico">📹</span><span class="what">Elfmeter, VAR-Check<small>für dein Team</small></span><span class="tag drink">1 trinken</span></li>
+    </ul></div>
+
+    <h2 class="sec">Halbzeit &amp; Abpfiff</h2>
+    <div class="card"><ul class="rules">
+      <li><span class="ico">⏸️</span><span class="what">Halbzeit, du liegst hinten<span class="auto-dot"></span></span><span class="tag drink"><b data-v="halftime">1</b> trinken</span></li>
+      <li><span class="ico">💀</span><span class="what">Niederlage<span class="auto-dot"></span></span><span class="tag ex">Exen</span></li>
+      <li><span class="ico">🏆</span><span class="what">Sieg<span class="auto-dot"></span></span><span class="tag give">Ex verteilen</span></li>
+      <li><span class="ico">🤝</span><span class="what">Unentschieden<span class="auto-dot"></span><small>beide</small></span><span class="tag drink"><b data-v="draw">1</b> trinken</span></li>
+    </ul></div>
+
+    <h2 class="sec">Während des Spiels</h2>
+    <div class="card"><ul class="rules">
+      <li><span class="ico">📺</span><span class="what">Schalte zu deinem Spiel</span><span class="tag drink">1 trinken</span></li>
+      <li><span class="ico">🗣️</span><span class="what">Name deines Spielers fällt<small>Spieler im Live-Tab antippen</small></span><span class="tag drink">1 trinken</span></li>
+      <li><span class="ico">🔁</span><span class="what">Dein Spieler wird ausgewechselt<span class="auto-dot"></span><small>ab dann zählt der Eingewechselte</small></span><span></span></li>
+      <li><span class="ico">🎙️</span><span class="what">„Tor in …“<small>bevor klar ist, wo</small></span><span class="tag drink">alle trinken</span></li>
+      <li><span class="ico">🙈</span><span class="what">Keine Schalte in einer Halbzeit<small>für den Besitzer des Teams</small></span><span class="tag drink">doppelt</span></li>
+    </ul></div>
+
+    <h2 class="sec">Werte anpassen</h2>
+    <div class="card values">
+      <label for="v-teamGoal">Tor fürs Team (verteilen)</label><input type="number" min="0" id="v-teamGoal" data-key="teamGoal" />
+      <label for="v-conceded">Gegentor (trinken)</label><input type="number" min="0" id="v-conceded" data-key="conceded" />
+      <label for="v-pickGoal">Spieler trifft (verteilen)</label><input type="number" min="0" id="v-pickGoal" data-key="pickGoal" />
+      <label for="v-halftime">Halbzeit hinten (trinken)</label><input type="number" min="0" id="v-halftime" data-key="halftime" />
+      <label for="v-draw">Unentschieden (trinken)</label><input type="number" min="0" id="v-draw" data-key="draw" />
+    </div>
+
+    <footer>Trinkt verantwortungsvoll · Wasser zwischendurch · Alkoholfrei zählt auch.<br />Spieldaten: ESPN &amp; OpenLigaDB, ohne Gewähr.</footer>
   </section>
-
-  <section id="auslosung" hidden>
-    <div class="card">
-      <h2>Teams auslosen</h2>
-      <label for="names">Mitspieler (eine Person pro Zeile)</label>
-      <textarea id="names" placeholder="Anna&#10;Ben&#10;Chris"></textarea>
-
-      <label for="teams">Teams der 15:30-Spiele (ein Team pro Zeile)</label>
-      <textarea id="teams" placeholder="Werden automatisch aus dem Spieltag geladen …"></textarea>
-      <p class="hint">Wird automatisch mit den Teams der 15:30-Spiele gefüllt.</p>
-
-      <label for="perPlayer">Teams pro Person</label>
-      <input type="text" id="perPlayer" inputmode="numeric" value="auto" />
-      <p class="hint">„auto“ verteilt alle Teams möglichst gleichmäßig. Oder eine Zahl wie 1 oder 2 eintragen.</p>
-
-      <label class="inline"><input type="checkbox" id="autoPicks" checked /> Spieler-Picks gleich mit auslosen (aus fremden Teams, sobald Aufstellungen da sind)</label>
-
-      <button class="btn" id="draw">Auslosen &amp; loslegen 🎲</button>
-      <div class="error" id="drawError" role="alert"></div>
-      <div class="result" id="drawResult" aria-live="polite"></div>
-    </div>
-  </section>
-
-  <section id="zaehler" hidden>
-    <div class="card">
-      <h2>Live-Ticker</h2>
-      <p class="hint" id="liveInfo" style="margin:-4px 0 12px"></p>
-      <div class="feed" id="feed"></div>
-    </div>
-
-    <div class="card">
-      <h2>Schluck-Zähler</h2>
-      <p class="hint" style="margin:-4px 0 12px">Spieler antippen, wenn der Kommentator den Namen sagt. Auswechslungen übernimmt die Seite automatisch, sonst per ⇄.</p>
-      <div class="players" id="players"></div>
-      <datalist id="playerOptions"></datalist>
-      <button class="btn secondary" id="autoPickNow">🎲 Fehlende Spieler-Picks auslosen</button>
-      <div class="error" id="pickError" role="alert"></div>
-      <label for="newPlayer" style="margin-top:16px">Person hinzufügen</label>
-      <input type="text" id="newPlayer" placeholder="Name" />
-      <button class="btn" id="addPlayer">Hinzufügen</button>
-      <button class="btn secondary" id="resetCounts">Zähler auf 0</button>
-    </div>
-  </section>
-
-  <footer>Trinkt verantwortungsvoll · Wasser zwischendurch · Alkoholfrei zählt auch.<br />Spieldaten: ESPN &amp; OpenLigaDB, ohne Gewähr.</footer>
 </main>
+
+<nav>
+  <div class="inner" role="tablist">
+    <button role="tab" data-tab="zaehler" aria-selected="true"><span class="i">🔴</span>Live</button>
+    <button role="tab" data-tab="spieltag" aria-selected="false"><span class="i">📅</span>Spieltag</button>
+    <button role="tab" data-tab="auslosung" aria-selected="false"><span class="i">🎲</span>Runde</button>
+    <button role="tab" data-tab="regeln" aria-selected="false"><span class="i">📖</span>Regeln</button>
+  </div>
+</nav>
 
 <div class="toast" id="toast" hidden role="status" aria-live="assertive"></div>
 
 <script>
   const $ = (id) => document.getElementById(id);
-  const el = (tag, props = {}) => Object.assign(document.createElement(tag), props);
+  const el = (tag, props = {}, ...children) => { const n = Object.assign(document.createElement(tag), props); n.append(...children); return n; };
   const store = {
     get(key, fallback) {
       try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; }
@@ -311,6 +359,7 @@
     }
     return a;
   };
+  const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
 
   // Tabs
   const tabs = document.querySelectorAll('nav [data-tab]');
@@ -318,9 +367,9 @@
     tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.tab === name)));
     document.querySelectorAll('main > section').forEach((s) => { s.hidden = s.id !== name; });
     store.set('kt-tab', name);
+    window.scrollTo(0, 0);
   }
   tabs.forEach((t) => t.addEventListener('click', () => showTab(t.dataset.tab)));
-  showTab(store.get('kt-tab', 'regeln'));
 
   // ---------- Werte ----------
   const DEFAULT_VALUES = { teamGoal: 3, conceded: 2, pickGoal: 3, halftime: 1, draw: 1 };
@@ -374,6 +423,7 @@
   const lineups = {};      // eventId -> {teams: [{name, players}], subs: Map(norm(raus) -> rein), out: Set(norm(raus))}
   const openDetails = new Set();
   let refreshTimer = null;
+  let lastScores = {};
 
   // Tor/Rot eines Spielers: {kind: 'goal' | 'red', player, team, minute}
   function eventKind(text, { scoringPlay, ownGoal, redCard, shootout } = {}) {
@@ -443,19 +493,20 @@
     return { teams, subs, out, events };
   }
 
+  function setStatus(text, live = false) {
+    $('status').textContent = text;
+    $('status').classList.toggle('live', live);
+  }
+
   async function loadGames({ quiet = false } = {}) {
-    if (!quiet) { $('gamesError').textContent = ''; $('gamesInfo').textContent = 'Lade …'; }
-    api('spieltag').then((g) => { if (g?.groupName) $('matchdayLabel').textContent = `Bundesliga · ${g.groupName}`; }).catch(() => {});
+    if (!quiet) { $('gamesError').textContent = ''; setStatus('Lade …'); }
+    api('spieltag').then((g) => {
+      if (g?.groupName) { $('matchday').textContent = g.groupName; $('matchday2').textContent = g.groupName; }
+    }).catch(() => {});
     try {
       const date = $('gameDate').value.replaceAll('-', '');
       const all = parseScoreboard(await api('scoreboard', { dates: date }));
       games = $('only1530').checked ? all.filter((g) => berlinTime.format(g.kickoff) === '15:30') : all;
-      const info = !all.length
-        ? 'An diesem Tag gibt es keine Bundesliga-Spiele.'
-        : !games.length ? 'Keine Spiele um 15:30 Uhr. Haken bei „Nur 15:30“ entfernen, um alle zu sehen.'
-        : `Aktualisiert um ${berlinTime.format(new Date())} Uhr, lädt während der Spiele jede Minute neu.`;
-      $('gamesInfo').textContent = info;
-      $('liveInfo').textContent = games.length ? info : 'Noch keine Spiele geladen (Tab Spieltag).';
       await Promise.all(games.map(async (g) => {
         try { lineups[g.id] = parseSummary(await api('summary', { event: g.id })); } catch {}
         if (!g.events.length && lineups[g.id]) g.events = lineups[g.id].events;
@@ -464,19 +515,19 @@
         $('teams').value = games.flatMap((g) => [g.home, g.away]).join('\n');
         store.set('kt-teams', $('teams').value);
       }
+      const live = games.some((g) => g.state === 'in');
+      const now = berlinTime.format(new Date());
+      setStatus(!games.length ? 'Keine Spiele' : live ? `Live · ${now}` : games.every((g) => g.state === 'post') ? 'Abgepfiffen' : `Anpfiff ${berlinTime.format(games[0].kickoff)}`, live);
+      $('gamesInfo').textContent = !all.length ? 'keine Spiele an dem Tag' : !games.length ? 'keine um 15:30' : `Stand ${now}`;
       updatePlayerOptions();
       applySubstitutions();
       if (store.get('kt-autopick-pending', false)) autoPick({ quiet: true });
       processEvents();
-      renderGames();
-      render();
+      renderAll();
       scheduleRefresh();
     } catch {
-      if (!quiet) {
-        $('gamesInfo').textContent = '';
-        $('gamesError').textContent = 'Spieldaten konnten nicht geladen werden. Teams und Spieler lassen sich trotzdem von Hand eintragen.';
-      }
-      $('liveInfo').textContent = 'Live-Daten gerade nicht erreichbar. Neuer Versuch in einer Minute.';
+      setStatus('Offline');
+      if (!quiet) $('gamesError').textContent = 'Spieldaten gerade nicht erreichbar. Neuer Versuch in einer Minute, Teams und Spieler gehen auch von Hand.';
       clearTimeout(refreshTimer);
       refreshTimer = setTimeout(() => loadGames({ quiet: true }), 60e3);
     }
@@ -490,30 +541,44 @@
     refreshTimer = setTimeout(() => loadGames({ quiet: true }), hot ? 60e3 : 10 * 60e3);
   }
 
+  // Eine Zeile der Anzeigetafel: Heim | Stand | Gast, darunter die Besitzer.
+  function scoreRow(g) {
+    const key = `${g.homeScore}:${g.awayScore}`;
+    const changed = lastScores[g.id] !== undefined && lastScores[g.id] !== key;
+    lastScores[g.id] = key;
+    const owner = (team) => ownersOf(team).map((p) => p.name).join(', ');
+    const status = g.state === 'pre' ? berlinTime.format(g.kickoff) : g.state === 'in' ? (g.halftime ? 'HZ' : g.detail || 'LIVE') : 'Ende';
+    return el('div', { className: 'row' + (g.state === 'in' ? ' live' : '') + (changed ? ' flash' : '') },
+      el('div', { className: 't' }, g.home, el('small', { textContent: owner(g.home) })),
+      el('div', { className: 's' }, el('b', { textContent: g.state === 'pre' ? '–:–' : key }), el('span', { textContent: status })),
+      el('div', { className: 't away' }, g.away, el('small', { textContent: owner(g.away) })));
+  }
+
+  function renderBoard() {
+    const board = $('board');
+    board.innerHTML = '';
+    if (!games.length) {
+      board.className = '';
+      board.append(el('div', { className: 'empty', textContent: 'Noch keine Spiele geladen. Sie kommen automatisch, sonst im Tab Spieltag.' }));
+      return;
+    }
+    board.className = 'board';
+    games.forEach((g) => board.append(scoreRow(g)));
+  }
+
   function renderGames() {
     const box = $('games');
     box.innerHTML = '';
-    $('gamesToDraw').hidden = !games.length;
+    if (!games.length) { box.append(el('div', { className: 'empty', textContent: 'Keine Spiele für diese Auswahl.' })); return; }
     for (const g of games) {
       const card = el('div', { className: 'game' });
-      const score = el('div', { className: 'score' });
-      const result = g.state === 'pre' ? '–:–' : `${g.homeScore}:${g.awayScore}`;
-      score.append(el('span', { textContent: g.home }), el('b', { textContent: result }), el('span', { textContent: g.away }));
-      const status = el('div', { className: 'status' + (g.state === 'in' ? ' live' : '') });
-      status.textContent = g.state === 'pre' ? `Anpfiff ${berlinTime.format(g.kickoff)} Uhr` : g.state === 'in' ? `LIVE · ${g.detail}` : g.detail || 'Beendet';
-      card.append(score, status);
-      const owners = [g.home, g.away].map((t) => ownersOf(t).map((p) => p.name).join(', ') || '–');
-      if (players.length) card.append(el('div', { className: 'owners', textContent: `${owners[0]}  vs.  ${owners[1]}` }));
-
+      card.append(scoreRow(g));
       const lu = lineups[g.id];
       if (lu?.teams.some((t) => t.players.length)) {
-        const det = el('details', { open: openDetails.has(g.id) });
+        const det = el('details', { open: openDetails.has(g.id) }, el('summary', { textContent: 'Aufstellungen' }));
         det.addEventListener('toggle', () => (det.open ? openDetails.add(g.id) : openDetails.delete(g.id)));
-        det.append(el('summary', { textContent: 'Aufstellungen' }));
         const grid = el('div', { className: 'lineups' });
         for (const t of lu.teams) {
-          const col = el('div');
-          col.append(el('h3', { textContent: t.name }));
           const ul = el('ul');
           const ordered = [
             ...t.players.filter((p) => p.starter),
@@ -523,16 +588,19 @@
           for (const p of ordered) {
             const isOut = p.subbedOut || lu.out.has(norm(p.name));
             const pickedBy = pickersOf(p.name).map((x) => x.name);
-            ul.append(el('li', {
-              className: isOut ? 'out' : p.subbedIn ? 'in' : p.starter ? '' : 'bench',
-              textContent: `${p.jersey ? p.jersey + ' ' : ''}${p.name}${p.subbedIn ? ' ↑' : ''}${isOut ? ' ↓' : ''}${pickedBy.length ? ` (${pickedBy.join(', ')})` : ''}`,
-            }));
+            const li = el('li', {
+              className: [isOut ? 'out' : p.subbedIn ? 'in' : p.starter ? '' : 'bench', pickedBy.length ? 'picked' : ''].join(' '),
+              textContent: `${p.jersey ? p.jersey + ' ' : ''}${p.name}${p.subbedIn ? ' ↑' : ''}${isOut ? ' ↓' : ''} `,
+            });
+            if (pickedBy.length) li.append(el('em', { textContent: pickedBy.join(', ') }));
+            ul.append(li);
           }
-          col.append(ul);
-          grid.append(col);
+          grid.append(el('div', {}, el('h3', { textContent: t.name }), ul));
         }
         det.append(grid);
         card.append(det);
+      } else if (g.state === 'pre') {
+        card.append(el('div', { className: 'owners', textContent: 'Aufstellungen kommen ca. 1 Std. vor Anpfiff' }));
       }
       box.append(card);
     }
@@ -541,11 +609,6 @@
   $('loadGames').addEventListener('click', () => loadGames());
   $('gameDate').addEventListener('change', () => loadGames());
   $('only1530').addEventListener('change', () => loadGames());
-  $('gamesToDraw').addEventListener('click', () => {
-    $('teams').value = games.flatMap((g) => [g.home, g.away]).join('\n');
-    store.set('kt-teams', $('teams').value);
-    showTab('auslosung');
-  });
 
   // ---------- Spieler & Picks ----------
   // player = { name, teams, count, ex, picks: [{ name: aktuell, orig: gepickt, history: [frühere] }] }
@@ -561,7 +624,8 @@
     Object.values(lineups).flatMap((lu) => lu.teams.flatMap((t) => t.players.map((p) => ({ ...p, team: t.name }))));
 
   function updatePlayerOptions() {
-    const dl = $('playerOptions');
+    let dl = $('playerOptions');
+    if (!dl) { dl = el('datalist', { id: 'playerOptions' }); document.body.append(dl); }
     dl.innerHTML = '';
     for (const p of allLineupPlayers()) dl.append(el('option', { value: p.name, label: p.team }));
   }
@@ -595,7 +659,7 @@
     $('pickError').textContent = '';
     const pool = allLineupPlayers().filter((p) => p.starter && !p.subbedOut);
     if (!pool.length) {
-      if (!quiet) $('pickError').textContent = 'Noch keine Aufstellungen da (meist ca. 1 Stunde vor Anpfiff). Die Picks werden automatisch ausgelost, sobald sie kommen.';
+      if (!quiet) $('pickError').textContent = 'Noch keine Aufstellungen da. Die Picks werden automatisch ausgelost, sobald sie kommen.';
       store.set('kt-autopick-pending', true);
       return;
     }
@@ -608,7 +672,7 @@
       p.picks.push({ name: choice.name, orig: choice.name, history: [] });
     }
     store.set('kt-autopick-pending', false);
-    render();
+    renderAll();
   }
 
   // ---------- Regel-Engine ----------
@@ -622,7 +686,7 @@
       const p = e.person;
       if (e.kind === 'drink') { p.count += e.amount; entry.lines.push(`${p.name} trinkt ${e.amount}`); }
       if (e.kind === 'ex') { p.ex = (p.ex || 0) + 1; entry.lines.push(`${p.name} muss exen 🍺`); }
-      if (e.kind === 'give') { entry.lines.push(`${p.name} verteilt ${e.amount} Schluck${e.amount === 1 ? '' : 'e'}`); entry.gives.push({ from: p.name, kind: 'sip', left: e.amount }); }
+      if (e.kind === 'give') { entry.lines.push(`${p.name} verteilt ${e.amount}`); entry.gives.push({ from: p.name, kind: 'sip', left: e.amount }); }
       if (e.kind === 'giveEx') { entry.lines.push(`${p.name} verteilt ein Ex`); entry.gives.push({ from: p.name, kind: 'ex', left: 1 }); }
     }
     feed.unshift(entry);
@@ -652,15 +716,15 @@
           add(emit(key, '🎯', `${ev.player} trifft ${ev.minute}`, pickersOf(ev.player).map((person) => ({ person, kind: 'give', amount: values.pickGoal }))));
         } else {
           const hit = new Set([...pickersOf(ev.player), ...ownersOf(ev.team)]);
-          add(emit(key, '🟥', `Rot für ${ev.player}${ev.team ? ` (${ev.team})` : ''} ${ev.minute}`, [...hit].map((person) => ({ person, kind: 'ex' }))));
+          add(emit(key, '🟥', `Rot für ${ev.player} ${ev.minute}`, [...hit].map((person) => ({ person, kind: 'ex' }))));
         }
       }
       const behind = score.home === score.away ? null : score.home < score.away ? g.home : g.away;
       if (g.halftime && behind) {
-        add(emit(`${g.id}:ht`, '⏸️', `Halbzeit: ${g.home} ${score.home}:${score.away} ${g.away}`, ownersOf(behind).map((person) => ({ person, kind: 'drink', amount: values.halftime }))));
+        add(emit(`${g.id}:ht`, '⏸️', `Halbzeit ${g.home} ${score.home}:${score.away} ${g.away}`, ownersOf(behind).map((person) => ({ person, kind: 'drink', amount: values.halftime }))));
       }
       if (g.state === 'post') {
-        const title = `Abpfiff: ${g.home} ${score.home}:${score.away} ${g.away}`;
+        const title = `Abpfiff ${g.home} ${score.home}:${score.away} ${g.away}`;
         if (!behind) {
           add(emit(`${g.id}:ft`, '🤝', title, [...ownersOf(g.home), ...ownersOf(g.away)].map((person) => ({ person, kind: 'drink', amount: values.draw }))));
         } else {
@@ -687,12 +751,11 @@
     const t = $('toast');
     t.innerHTML = '';
     for (const e of entries.slice(0, 3)) {
-      t.append(el('strong', { textContent: `${e.icon} ${e.title}` }));
       const ul = el('ul');
       e.lines.forEach((line) => ul.append(el('li', { textContent: line })));
-      t.append(ul);
+      t.append(el('strong', { textContent: `${e.icon} ${e.title}` }), ul);
     }
-    if (entries.length > 3) t.append(el('div', { textContent: `… und ${entries.length - 3} weitere im Live-Ticker` }));
+    if (entries.length > 3) t.append(el('div', { textContent: `+ ${entries.length - 3} weitere im Ticker` }));
     t.hidden = false;
     try { navigator.vibrate?.([200, 100, 200]); } catch {}
     clearTimeout(toastTimer);
@@ -701,108 +764,121 @@
   $('toast').addEventListener('click', () => { $('toast').hidden = true; showTab('zaehler'); });
 
   // ---------- Darstellung Live ----------
-  function renderFeed() {
-    const box = $('feed');
+  function renderTodos() {
+    const box = $('todos');
     box.innerHTML = '';
-    for (const entry of feed) {
-      const open = entry.gives.some((g) => g.left > 0);
-      const div = el('div', { className: 'entry' + (open ? ' open' : '') });
-      const title = el('div', { className: 'title', textContent: `${entry.icon} ${entry.title} ` });
-      title.append(el('small', { textContent: entry.time }));
-      const ul = el('ul');
-      entry.lines.forEach((line) => ul.append(el('li', { textContent: line })));
-      div.append(title, ul);
-      for (const give of entry.gives) {
-        if (give.left <= 0) continue;
-        const box2 = el('div', { className: 'give' });
-        box2.append(el('div', { textContent: `${give.from}: ${give.kind === 'ex' ? 'Wer muss exen?' : `noch ${give.left} Schluck${give.left === 1 ? '' : 'e'} verteilen, antippen:`}` }));
-        const targets = el('div', { className: 'targets' });
-        for (const target of players.filter((p) => p.name !== give.from)) {
-          targets.append(el('button', {
-            textContent: target.name,
-            onclick: () => {
-              if (give.kind === 'ex') target.ex = (target.ex || 0) + 1; else target.count++;
-              give.left--;
-              entry.lines.push(`→ ${target.name} ${give.kind === 'ex' ? 'muss exen 🍺' : 'trinkt 1'}`);
-              render();
-            },
-          }));
-        }
-        targets.append(el('button', { className: 'done', textContent: 'erledigt', onclick: () => { give.left = 0; render(); } }));
-        box2.append(targets);
-        div.append(box2);
+    const open = feed.flatMap((entry) => entry.gives.filter((g) => g.left > 0).map((give) => ({ entry, give }))).reverse();
+    if (open.length) box.append(el('h2', { className: 'sec', textContent: 'Zu verteilen' }));
+    for (const { entry, give } of open) {
+      const what = give.kind === 'ex' ? `${give.from} verteilt ein Ex` : `${give.from} verteilt ${plural(give.left, 'Schluck', 'Schlucke')}`;
+      const targets = el('div', { className: 'targets' });
+      for (const target of players.filter((p) => p.name !== give.from)) {
+        targets.append(el('button', {
+          textContent: target.name,
+          onclick: () => {
+            if (give.kind === 'ex') target.ex = (target.ex || 0) + 1; else target.count++;
+            give.left--;
+            entry.lines.push(`→ ${target.name} ${give.kind === 'ex' ? 'muss exen 🍺' : 'trinkt 1'}`);
+            renderAll();
+          },
+        }));
       }
-      box.append(div);
+      targets.append(el('button', { className: 'done', textContent: 'Fertig', onclick: () => { give.left = 0; renderAll(); } }));
+      box.append(el('div', { className: 'todo' },
+        el('div', { className: 'what', textContent: what }),
+        el('div', { className: 'why', textContent: `${entry.icon} ${entry.title}` }),
+        targets));
     }
   }
 
-  function render(flash) {
-    save();
-    renderFeed();
+  function renderFeed() {
+    const box = $('feed');
+    box.innerHTML = '';
+    if (!feed.length) {
+      box.append(el('div', { className: 'muted small', textContent: 'Noch nichts passiert. Tore, Karten, Halbzeit und Abpfiff landen hier automatisch.' }));
+      return;
+    }
+    for (const entry of feed) {
+      const ul = el('ul');
+      entry.lines.forEach((line) => ul.append(el('li', { textContent: line })));
+      box.append(el('div', { className: 'entry' },
+        el('div', { className: 'time', textContent: entry.time }),
+        el('div', {}, el('div', { className: 'title', textContent: `${entry.icon} ${entry.title}` }), ul)));
+    }
+  }
+
+  function renderPlayers(flash) {
     const list = $('players');
     list.innerHTML = '';
     if (!players.length) {
-      list.append(el('p', { className: 'hint', textContent: 'Noch niemand dabei. Im Tab Auslosung Mitspieler eintragen und auslosen.' }));
+      list.append(el('div', { className: 'empty' }, 'Noch keine Runde. ',
+        el('a', { href: '#', textContent: 'Jetzt Mitspieler eintragen →', style: 'color:var(--accent)', onclick: (e) => { e.preventDefault(); showTab('auslosung'); } })));
       return;
     }
-    players.forEach((p) => {
-      const row = el('div', { className: 'player' });
-      const head = el('div', { className: 'head' });
-      const name = el('span', { className: 'name', textContent: p.name });
-      const meta = [(p.teams || []).join(' · '), p.ex ? `${p.ex}× Ex` : ''].filter(Boolean).join(' · ');
-      if (meta) name.append(el('span', { className: 'teams', textContent: meta }));
-      const minus = roundButton('−', `Einen Schluck weniger für ${p.name}`, () => { p.count = Math.max(0, p.count - 1); render(); });
-      const plus = roundButton('+', `Ein Schluck mehr für ${p.name}`, () => { p.count++; render(); });
-      head.append(name, minus, el('span', { className: 'count', textContent: p.count }), plus);
+    for (const p of players) {
+      const info = el('div', {}, el('div', { className: 'name', textContent: p.name }));
+      if (p.teams?.length) info.append(el('div', { className: 'teams', textContent: p.teams.join(' · ') }));
+      if (p.ex) info.append(el('span', { className: 'ex', textContent: `🍺 ${p.ex}× Ex` }));
+      const top = el('div', { className: 'top-line' }, info,
+        el('div', { className: 'score' }, el('b', { textContent: p.count }), el('span', { textContent: 'Schlucke' })));
 
-      const picks = el('div', { className: 'picks' });
-      p.picks.forEach((pick, i) => {
-        const unknown = isOutWithoutReplacement(pick.name);
-        const chip = el('span', { className: 'pick' + (unknown ? ' unknown' : '') + (flash === pick ? ' flash' : '') });
-        const say = el('button', { className: 'say', textContent: `🗣️ ${pick.name}` });
-        if (norm(pick.orig) !== norm(pick.name)) say.append(' ', el('small', { textContent: `(für ${pick.orig})` }));
-        if (unknown) say.title = 'Ausgewechselt, Ersatz unbekannt: per ⇄ eintragen';
-        say.setAttribute('aria-label', `${pick.name} wurde genannt: ein Schluck für ${p.name}`);
-        say.onclick = () => { p.count++; render(pick); };
-        const swap = el('button', { className: 'swap', textContent: '⇄' });
-        swap.setAttribute('aria-label', `${pick.name} auswechseln`);
-        swap.onclick = () => {
-          const next = prompt(`Wer kommt für ${pick.name}?`);
-          if (next && next.trim()) { pick.history = [...(pick.history || []), pick.name]; pick.name = next.trim(); render(); }
-        };
-        const del = el('button', { className: 'del', textContent: '✕' });
-        del.setAttribute('aria-label', `Pick ${pick.name} entfernen`);
-        del.onclick = () => { p.picks.splice(i, 1); render(); };
-        chip.append(say, swap, del);
-        picks.append(chip);
-      });
-
-      const add = el('div', { className: 'add-pick' });
-      const input = el('input', { type: 'text', placeholder: 'Spieler picken …' });
+      const pickInput = el('div', { className: 'pick-input' });
+      const input = el('input', { type: 'text', placeholder: 'Spielername' });
       input.setAttribute('list', 'playerOptions');
       input.setAttribute('aria-label', `Spieler für ${p.name} picken`);
-      const addBtn = el('button', { textContent: '+ Pick' });
-      addBtn.onclick = () => {
+      const addPick = () => {
         const n = input.value.trim();
         if (!n) return;
         const chain = subChain(n);
         p.picks.push({ name: chain.at(-1), orig: n, history: chain.slice(0, -1) });
-        render();
+        renderAll();
       };
-      input.addEventListener('keydown', (e) => { if (e.key === 'Enter') addBtn.click(); });
-      add.append(input, addBtn);
+      input.addEventListener('keydown', (e) => { if (e.key === 'Enter') addPick(); });
+      pickInput.append(input, el('button', { textContent: 'OK', onclick: addPick }));
+      const openInput = () => { pickInput.classList.add('open'); input.focus(); };
 
-      row.append(head, picks, add);
-      list.append(row);
-    });
-  }
-  function roundButton(text, label, onclick) {
-    const b = el('button', { className: 'round', textContent: text, onclick });
-    b.setAttribute('aria-label', label);
-    return b;
+      const pick = p.picks[0];
+      let say;
+      if (pick) {
+        const unknown = isOutWithoutReplacement(pick.name);
+        say = el('button', { className: 'say' + (unknown ? ' unknown' : '') + (flash === pick ? ' flash' : ''), textContent: `🗣️ ${pick.name}` });
+        say.append(el('small', { textContent: unknown ? 'ausgewechselt – Ersatz per ⇄' : norm(pick.orig) !== norm(pick.name) ? `für ${pick.orig}` : 'Name gefallen? Antippen' }));
+        say.onclick = () => { p.count++; renderAll(pick); };
+      } else {
+        say = el('button', { className: 'say add', textContent: '+ Spieler picken', onclick: openInput });
+      }
+      const minus = el('button', { className: 'sq', textContent: '−', onclick: () => { p.count = Math.max(0, p.count - 1); renderAll(); } });
+      minus.setAttribute('aria-label', `Einen Schluck weniger für ${p.name}`);
+      const plus = el('button', { className: 'sq plus', textContent: '+', onclick: () => { p.count++; renderAll(); } });
+      plus.setAttribute('aria-label', `Ein Schluck mehr für ${p.name}`);
+
+      const more = el('div', { className: 'more' });
+      p.picks.slice(1).forEach((extra) => {
+        more.append(el('button', { className: 'chip' + (flash === extra ? ' flash' : ''), textContent: `🗣️ ${extra.name}`, onclick: () => { p.count++; renderAll(extra); } }));
+      });
+      if (pick) {
+        more.append(el('button', { className: 'chip', textContent: '⇄ Wechsel', onclick: () => {
+          const next = prompt(`Wer kommt für ${pick.name}?`);
+          if (next && next.trim()) { pick.history = [...(pick.history || []), pick.name]; pick.name = next.trim(); renderAll(); }
+        } }));
+        more.append(el('button', { className: 'chip', textContent: '+ Spieler', onclick: openInput }));
+        more.append(el('button', { className: 'chip', textContent: '✕ Picks löschen', onclick: () => { if (confirm(`Alle Picks von ${p.name} löschen?`)) { p.picks = []; renderAll(); } } }));
+      }
+
+      list.append(el('div', { className: 'p' }, top, el('div', { className: 'actions' }, say, minus, plus), more, pickInput));
+    }
   }
 
-  // ---------- Auslosung ----------
+  function renderAll(flash) {
+    save();
+    renderBoard();
+    renderTodos();
+    renderPlayers(flash);
+    renderFeed();
+    renderGames();
+  }
+
+  // ---------- Runde ----------
   const lines = (text) => text.split('\n').map((s) => s.trim()).filter(Boolean);
   $('names').value = store.get('kt-names', '');
   $('teams').value = store.get('kt-teams', '');
@@ -815,7 +891,6 @@
     store.set('kt-teams', $('teams').value);
     store.set('kt-autopicks', $('autoPicks').checked);
     $('drawError').textContent = '';
-    $('drawResult').innerHTML = '';
 
     if (names.length < 2) return ($('drawError').textContent = 'Mindestens zwei Mitspieler eintragen.');
     if (teams.length < names.length) return ($('drawError').textContent = 'Es braucht mindestens so viele Teams wie Mitspieler.');
@@ -828,19 +903,19 @@
     if (perPlayer !== Infinity && perPlayer * names.length > teams.length) {
       return ($('drawError').textContent = `Für ${names.length} Personen mit je ${perPlayer} Teams braucht es ${perPlayer * names.length} Teams.`);
     }
+    if (players.some((p) => p.count || p.ex) && !confirm('Neue Runde starten? Zähler und Ticker werden zurückgesetzt.')) return;
 
     const pool = shuffle(teams);
     const take = perPlayer === Infinity ? pool.length : perPlayer * names.length;
     players = shuffle(names).map((name) => ({ name, teams: [], count: 0, ex: 0, picks: [] }));
     pool.slice(0, take).forEach((team, i) => players[i % players.length].teams.push(team));
 
-    // Neue Runde: Ticker leeren, bereits gefallene Tore usw. werden beim nächsten Laden nachgeholt.
+    // Neue Runde: Ticker leeren, bereits gefallene Tore usw. werden direkt nachgeholt.
     feed = [];
     processed = new Set();
     if ($('autoPicks').checked) autoPick({ quiet: true });
     processEvents();
-    renderGames();
-    render();
+    renderAll();
     showTab('zaehler');
   });
 
@@ -851,12 +926,18 @@
     if (!name) return;
     players.push({ name, teams: [], count: 0, ex: 0, picks: [] });
     $('newPlayer').value = '';
-    render();
+    renderAll();
   });
   $('newPlayer').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('addPlayer').click(); });
-  $('resetCounts').addEventListener('click', () => { players.forEach((p) => { p.count = 0; p.ex = 0; }); render(); });
+  $('resetCounts').addEventListener('click', () => {
+    if (!confirm('Alle Schlucke und Ex auf 0 setzen?')) return;
+    players.forEach((p) => { p.count = 0; p.ex = 0; });
+    renderAll();
+  });
 
-  render();
+  // Start: ohne Runde zuerst zur Einrichtung, sonst Live.
+  showTab(players.length ? store.get('kt-tab', 'zaehler') : 'auslosung');
+  renderAll();
   loadGames({ quiet: true });
 </script>
 </body>
