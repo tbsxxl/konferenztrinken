@@ -10,6 +10,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Konferenz" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <title>Konferenztrinken</title>
   <meta name="description" content="Das Trinkspiel zur Bundesliga-Konferenz am Samstag um 15:30 Uhr: Live-Spieltag, Auslosung und automatischer Schluck-Zähler." />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍺</text></svg>" />
@@ -97,6 +99,7 @@
     .cell { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 10px 18px; position: relative; width: 100%; background: none; border: 0; text-align: left; }
     .cell + .cell::before, .row + .row::before, .entry + .entry::before { content: ""; position: absolute; top: 0; right: 0; left: 18px; border-top: 0.5px solid var(--sep); }
     .cell.action { color: var(--accent); justify-content: center; font-weight: 500; }
+    .cell-sub { display: block; font-size: 13px; color: var(--secondary); margin-top: 1px; }
     .cell.danger { color: var(--red); justify-content: center; }
     .cell .inline-input { width: 96px; flex: none; }
     .cell input[type="date"], .cell .inline-input { max-width: 60%; border: 0; background: var(--fill); border-radius: 10px; padding: 6px 10px; font: inherit; color: var(--label); text-align: right; }
@@ -168,22 +171,35 @@
     .warn b { display: block; margin-bottom: 2px; }
     .warn button { margin-top: 10px; border: 0; border-radius: 999px; padding: 8px 16px; background: var(--red); color: #fff; font-weight: 600; font-size: 15px; }
 
+    /* Gemeinsame Bausteine im Stil der Anzeigetafel */
+    .crest-sm { flex: none; width: var(--sz, 30px); height: var(--sz, 30px); border-radius: 50%; background: var(--tc); display: inline-grid; place-items: center; overflow: hidden; color: #fff; font: 800 9px/1 var(--rounded); box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.25); }
+    .crest-sm img { width: 78%; height: 78%; object-fit: contain; filter: drop-shadow(0 0 1px #fff); }
+    .crest-sm.off { opacity: 0.3; filter: grayscale(1); }
+    .min { display: inline-block; background: #0b1f2a; color: #fff; font: 700 12px/1 var(--rounded); padding: 4px 7px; border-radius: 6px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .cells.tally { grid-template-columns: 44px 44px; align-self: start; }
+    .cells.tally span { font-size: 10px; padding-top: 5px; }
+    .cells.tally b { font-size: 26px; }
+    .cells b.hot { color: #ff6b5e; }
+
     /* Zu verteilen */
-    .todo {
-      margin-top: 10px; border-radius: var(--r); padding: 16px 18px;
-      background: color-mix(in srgb, var(--accent) 16%, var(--cell));
-      border: 0.5px solid color-mix(in srgb, var(--accent) 35%, transparent);
-    }
-    .todo .what { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
-    .todo .why { font-size: 13px; color: var(--secondary); margin-top: 2px; }
+    .todo { margin-top: 10px; border-radius: var(--r); overflow: hidden; background: var(--cell); box-shadow: inset 4px 0 0 var(--c, var(--accent)); }
+    .todo-head { display: flex; align-items: center; gap: 8px; padding: 10px 16px 10px 18px; background: #0b1f2a; color: #fff; font-size: 13px; font-weight: 600; }
+    .todo-head > span:not(.crest-sm):not(.min) { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .todo-head .min { background: rgba(255, 255, 255, 0.12); }
+    .todo .what { display: flex; align-items: center; gap: 8px; padding: 14px 18px 0; font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+    .todo .what .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c, var(--accent)); flex: none; }
+    .todo .targets { padding: 0 18px 16px; }
     .todo .targets { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
     .todo .targets button { border: 0; border-radius: 999px; padding: 9px 18px; background: var(--accent); color: #fff; font-weight: 600; font-size: 15px; }
+    .todo .targets button.person { background: var(--c); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); }
     .todo .targets button.done { background: var(--fill); color: var(--label); }
 
     /* Spielerkarten */
     .players { display: grid; gap: 10px; }
     .p { background: var(--cell); border-radius: var(--r); padding: 16px 16px 14px 18px; }
     .p .top-line { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 12px; align-items: start; }
+    .p { box-shadow: inset 4px 0 0 var(--c, transparent); }
+    .crests { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
     .p .name { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.15; overflow-wrap: anywhere; }
     .p .teams { color: var(--secondary); font-size: 13px; margin-top: 2px; }
     .p .ex { display: inline-block; margin-top: 8px; font-size: 12px; font-weight: 600; color: var(--red); background: color-mix(in srgb, var(--red) 13%, transparent); border-radius: 999px; padding: 3px 9px; }
@@ -191,7 +207,8 @@
     .p .score b { display: block; font: 700 44px/0.95 var(--rounded); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
     .p .score span { font-size: 12px; color: var(--secondary); font-weight: 500; }
     .p .actions { display: grid; grid-template-columns: minmax(0, 1fr) 46px 46px; gap: 8px; margin-top: 14px; align-items: center; }
-    .p .say { border: 0; border-radius: 16px; background: var(--fill); padding: 9px 14px; text-align: left; font-weight: 600; font-size: 16px; min-height: 52px; overflow: hidden; }
+    .p .say { border: 0; border-radius: 16px; background: var(--fill); padding: 9px 14px; text-align: left; font-weight: 600; font-size: 16px; min-height: 52px; overflow: hidden; display: flex; align-items: center; gap: 10px; }
+    .say-name { min-width: 0; }
     .p .say small { display: block; font-weight: 400; color: var(--secondary); font-size: 12px; margin-top: 1px; }
     .p .say.unknown { box-shadow: inset 0 0 0 2px var(--red); }
     .p .say.flash { animation: sayflash 0.6s; }
@@ -208,7 +225,8 @@
     .p .pick-input button { border: 0; border-radius: 999px; padding: 0 18px; background: var(--accent); color: #fff; font-weight: 600; }
 
     /* Ticker */
-    .entry { position: relative; display: grid; grid-template-columns: 46px minmax(0, 1fr); gap: 8px; padding: 12px 18px; }
+    .entry { position: relative; display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 8px; padding: 12px 18px; }
+    .entry .title { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
     .entry .time { color: var(--secondary); font-size: 13px; font-variant-numeric: tabular-nums; padding-top: 2px; }
     .entry .title { font-weight: 600; font-size: 15px; }
     .entry ul { list-style: none; margin: 2px 0 0; padding: 0; color: var(--secondary); font-size: 14px; }
@@ -306,6 +324,7 @@
         <input type="text" id="newPlayer" placeholder="Person hinzufügen" aria-label="Person hinzufügen" />
         <button class="btn small" id="addPlayer">Hinzufügen</button>
       </div>
+      <label class="cell"><span>Push-Nachrichten<small class="cell-sub" id="pushInfo">Tore, Karten, Halbzeit, Abpfiff aufs Handy</small></span><input type="checkbox" class="switch" id="pushToggle" /></label>
       <button class="cell action" id="autoPickNow">Fehlende Picks auslosen</button>
       <button class="cell danger" id="resetCounts">Zähler auf 0 setzen</button>
     </div>
@@ -539,6 +558,10 @@
         state: status.type?.state || 'pre',
         halftime: status.type?.name === 'STATUS_HALFTIME' || /^(HT|Halftime)$/i.test(detail),
         detail,
+        clock: typeof status.clock === 'number' ? status.clock : null,
+        displayClock: status.displayClock || '',
+        period: status.period || 0,
+        fetchedAt: Date.now(),
         events,
       };
     });
@@ -722,6 +745,7 @@
       processEvents();
       renderAll();
       scheduleRefresh();
+      syncPush().catch(() => {});
     } catch {
       setStatus('Offline');
       if (!quiet) $('gamesError').textContent = 'Spieldaten gerade nicht erreichbar. Neuer Versuch in einer Minute, Teams und Spieler gehen auch von Hand.';
@@ -739,12 +763,56 @@
   }
 
   // Eine Zeile der Anzeigetafel: Heim | Stand | Gast, darunter die Besitzer.
+  // Aktuelle Spielminute: zählt zwischen den Abrufen selbst weiter, Nachspielzeit als 45+2'.
+  function liveMinute(g) {
+    if (g.halftime) return 'Halbzeit';
+    const elapsed = (Date.now() - (g.fetchedAt || Date.now())) / 1000;
+    let minute, extra = 0;
+    if (g.clock != null && g.clock > 0) {
+      minute = Math.floor((g.clock + elapsed) / 60) + 1;
+    } else {
+      const m = String(g.displayClock || g.detail || '').match(/(\d+)'?\s*(?:\+\s*(\d+))?/);
+      if (!m) return g.detail || 'LIVE';
+      minute = Number(m[1]) + Math.floor(elapsed / 60);
+      extra = Number(m[2] || 0);
+    }
+    const cap = g.period === 1 ? 45 : g.period >= 2 ? 90 : minute <= 45 ? 45 : 90;
+    const total = minute + extra;
+    return total > cap ? `${cap}+${total - cap}'` : `${minute}'`;
+  }
+  setInterval(() => {
+    document.querySelectorAll('[data-live-minute]').forEach((node) => {
+      const g = games.find((x) => x.id === node.dataset.liveMinute);
+      if (g && g.state === 'in') node.textContent = liveMinute(g);
+    });
+  }, 5000);
+
+  // Wappen-Kreis in Vereinsfarbe; Logo aus den Spieldaten, sonst Kürzel.
+  function crest(team, size = 30) {
+    const g = games.find((x) => sameClub(x.home, team) || sameClub(x.away, team));
+    const side = g && (sameClub(g.home, team) ? 'home' : 'away');
+    const color = g ? teamColor(g, side) : club(team)[1] || '#3a3a3c';
+    const node = el('span', { className: 'crest-sm', title: team });
+    node.style.setProperty('--tc', color);
+    node.style.setProperty('--sz', `${size}px`);
+    const abbr = g ? teamAbbr(g, side) : (club(team)[0] || clubKey(team).slice(0, 3).toUpperCase());
+    const logo = g && g[side + 'Logo'];
+    if (logo) {
+      const img = el('img', { src: logo, alt: '', loading: 'lazy', referrerPolicy: 'no-referrer' });
+      img.onerror = () => img.replaceWith(abbr);
+      node.append(img);
+    } else {
+      node.append(abbr);
+    }
+    return node;
+  }
+
   function scoreRow(g) {
     const key = `${g.homeScore}:${g.awayScore}`;
     const changed = lastScores[g.id] !== undefined && lastScores[g.id] !== key;
     lastScores[g.id] = key;
     const pre = g.state === 'pre';
-    const status = pre ? `Anpfiff ${berlinTime.format(g.kickoff)}` : g.state === 'in' ? (g.halftime ? 'Halbzeit' : g.detail || 'LIVE') : 'Ende';
+    const status = pre ? `Anpfiff ${berlinTime.format(g.kickoff)}` : g.state === 'in' ? liveMinute(g) : 'Ende';
     const half = (side) => {
       const name = g[side];
       const box = el('div', { className: `half ${side}`, title: name });
@@ -773,6 +841,8 @@
           el('span', { textContent: teamAbbr(g, 'home') }), el('span', { textContent: teamAbbr(g, 'away') }),
           el('b', { className: pre ? 'dim' : '', textContent: pre ? '–' : g.homeScore }), el('b', { className: pre ? 'dim' : '', textContent: pre ? '–' : g.awayScore })),
         el('div', { className: 'st', textContent: status })));
+    const st = row.querySelector('.st');
+    if (g.state === 'in') st.dataset.liveMinute = g.id;
     row.setAttribute('aria-label', `${g.home} ${pre ? 'gegen' : key} ${g.away}, ${status}`);
     return row;
   }
@@ -957,7 +1027,7 @@
   function processEvents() {
     if (!players.length) return;
     const fresh = [];
-    const add = (entry) => entry && fresh.push(entry);
+    const add = (entry, teams = [], minute = '') => { if (entry) { entry.teams = teams; entry.minute = minute; fresh.push(entry); } };
     for (const g of games) {
       if (g.state === 'pre') continue;
       const gk = gameKey(g);
@@ -969,7 +1039,7 @@
           add(emit(`${gk}:goal:${side}:${n}`, '⚽', `Tor für ${team}`, [
             ...ownersOf(team).map((person) => ({ person, kind: 'give', amount: values.teamGoal })),
             ...ownersOf(opp).map((person) => ({ person, kind: 'drink', amount: values.conceded })),
-          ]));
+          ]), [team]);
         }
       }
       // Tore und Karten erscheinen immer im Ticker. Wer den Spieler erst später pickt,
@@ -987,25 +1057,25 @@
         const icon = ev.kind === 'goal' ? '🎯' : '🟥';
         if (near === undefined) {
           processed.add(base);
-          add(record(base, icon, title, effects, true));
+          add(record(base, icon, title, effects, true), [ev.team].filter(Boolean), ev.minute);
         } else if (effects.length) {
-          add(record(base, icon, `${title} (nachträglich)`, effects));
+          add(record(base, icon, `${title} (nachträglich)`, effects), [ev.team].filter(Boolean), ev.minute);
         }
       }
       const behind = score.home === score.away ? null : score.home < score.away ? g.home : g.away;
       if (g.halftime && behind) {
-        add(emit(`${gk}:ht`, '⏸️', `Halbzeit ${g.home} ${score.home}:${score.away} ${g.away}`, ownersOf(behind).map((person) => ({ person, kind: 'drink', amount: values.halftime }))));
+        add(emit(`${gk}:ht`, '⏸️', `Halbzeit ${g.home} ${score.home}:${score.away} ${g.away}`, ownersOf(behind).map((person) => ({ person, kind: 'drink', amount: values.halftime }))), [g.home, g.away], 'HZ');
       }
       if (g.state === 'post') {
         const title = `Abpfiff ${g.home} ${score.home}:${score.away} ${g.away}`;
         if (!behind) {
-          add(emit(`${gk}:ft`, '🤝', title, [...ownersOf(g.home), ...ownersOf(g.away)].map((person) => ({ person, kind: 'drink', amount: values.draw }))));
+          add(emit(`${gk}:ft`, '🤝', title, [...ownersOf(g.home), ...ownersOf(g.away)].map((person) => ({ person, kind: 'drink', amount: values.draw }))), [g.home, g.away], 'Ende');
         } else {
           const winner = behind === g.home ? g.away : g.home;
           add(emit(`${gk}:ft`, '🏁', title, [
             ...ownersOf(behind).map((person) => ({ person, kind: 'ex' })),
             ...ownersOf(winner).map((person) => ({ person, kind: 'giveEx' })),
-          ]));
+          ]), [g.home, g.away], 'Ende');
         }
       }
     }
@@ -1013,7 +1083,17 @@
     if (fresh.length) notify(fresh);
   }
 
+  // Kopie der Runde für den Service Worker (der kann kein localStorage lesen).
+  function idbSet(key, value) {
+    try {
+      const req = indexedDB.open('kt', 1);
+      req.onupgradeneeded = () => req.result.createObjectStore('kv');
+      req.onsuccess = () => { try { req.result.transaction('kv', 'readwrite').objectStore('kv').put(value, key); } catch {} };
+    } catch {}
+  }
+
   function save() {
+    idbSet('round', JSON.parse(JSON.stringify({ players, values })));
     store.set('kt-players', players);
     store.set('kt-feed', feed);
     store.set('kt-processed', [...processed]);
@@ -1037,30 +1117,54 @@
   $('toast').addEventListener('click', () => { $('toast').hidden = true; showTab('zaehler'); });
 
   // ---------- Darstellung Live ----------
+  // Offene Verteil-Aufgaben pro Person zusammengefasst: eine Karte statt einer pro Tor.
   function renderTodos() {
     const box = $('todos');
     box.innerHTML = '';
     const open = feed.flatMap((entry) => entry.gives.filter((g) => g.left > 0).map((give) => ({ entry, give }))).reverse();
-    if (open.length) box.append(el('h2', { className: 'sec', textContent: 'Zu verteilen' }));
-    for (const { entry, give } of open) {
-      const what = give.kind === 'ex' ? `${give.from} verteilt ein Ex` : `${give.from} verteilt ${plural(give.left, 'Schluck', 'Schlucke')}`;
+    const groups = new Map();
+    for (const item of open) {
+      const key = `${item.give.from}|${item.give.kind}`;
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(item);
+    }
+    if (groups.size) box.append(el('h2', { className: 'sec', textContent: 'Zu verteilen' }));
+    for (const items of groups.values()) {
+      const { from: fromName, kind } = items[0].give;
+      const total = items.reduce((n, i) => n + i.give.left, 0);
+      const what = kind === 'ex'
+        ? `${fromName} verteilt ${total === 1 ? 'ein Ex' : `${total} Ex`}`
+        : `${fromName} verteilt ${plural(total, 'Schluck', 'Schlucke')}`;
+      const titles = [...new Set(items.map((i) => i.entry.title))];
+      const reason = items.length === 1 ? `${items[0].entry.icon} ${items[0].entry.title}` : `${items.length}× · ${titles.join(' · ')}`;
+      const teams = [...new Set(items.flatMap((i) => i.entry.teams || []))].slice(0, 3);
+      const minute = items.length === 1 ? items[0].entry.minute : '';
+
       const targets = el('div', { className: 'targets' });
-      for (const target of players.filter((p) => p.name !== give.from)) {
+      for (const target of players.filter((p) => p.name !== fromName)) {
         targets.append(el('button', {
+          className: 'person',
+          style: `--c: ${colorOf(target)}`,
           textContent: target.name,
           onclick: () => {
-            if (give.kind === 'ex') target.ex = (target.ex || 0) + 1; else target.count++;
-            give.left--;
-            entry.lines.push(`→ ${target.name} ${give.kind === 'ex' ? 'muss exen 🍺' : 'trinkt 1'}`);
+            const next = items.find((i) => i.give.left > 0);
+            if (!next) return;
+            if (kind === 'ex') target.ex = (target.ex || 0) + 1; else target.count++;
+            next.give.left--;
+            next.entry.lines.push(`→ ${target.name} ${kind === 'ex' ? 'muss exen 🍺' : 'trinkt 1'}`);
             renderAll();
           },
         }));
       }
-      targets.append(el('button', { className: 'done', textContent: 'Fertig', onclick: () => { give.left = 0; renderAll(); } }));
-      box.append(el('div', { className: 'todo' },
-        el('div', { className: 'what', textContent: what }),
-        el('div', { className: 'why', textContent: `${entry.icon} ${entry.title}` }),
-        targets));
+      targets.append(el('button', { className: 'done', textContent: 'Fertig', onclick: () => { items.forEach((i) => { i.give.left = 0; }); renderAll(); } }));
+      const from = players.find((p) => p.name === fromName);
+      const card = el('div', { className: 'todo' },
+        el('div', { className: 'todo-head' }, ...teams.map((t) => crest(t, 24)),
+          el('span', { textContent: reason }), minute ? el('span', { className: 'min', textContent: minute }) : ''),
+        el('div', { className: 'what' }, el('span', { className: 'dot' }), what),
+        targets);
+      if (from) card.style.setProperty('--c', colorOf(from));
+      box.append(card);
     }
   }
 
@@ -1075,8 +1179,8 @@
       const ul = el('ul');
       entry.lines.forEach((line) => ul.append(el('li', { textContent: line })));
       box.append(el('div', { className: 'entry' },
-        el('div', { className: 'time', textContent: entry.time }),
-        el('div', {}, el('div', { className: 'title', textContent: `${entry.icon} ${entry.title}` }), ul)));
+        el('div', { className: 'when' }, el('span', { className: 'min', textContent: entry.minute || entry.time })),
+        el('div', {}, el('div', { className: 'title' }, ...(entry.teams || []).slice(0, 2).map((t) => crest(t, 20)), el('span', { textContent: `${entry.icon} ${entry.title}` })), ul)));
     }
   }
 
@@ -1091,14 +1195,18 @@
     for (const p of players) {
       const info = el('div', {}, el('div', { className: 'name', textContent: p.name }));
       if (p.teams?.length) {
-        info.append(el('div', { className: 'team-chips' }, ...p.teams.map((t) =>
-          el('span', { className: games.length && !games.some((g) => sameClub(g.home, t) || sameClub(g.away, t)) ? 'off' : '', textContent: t }))));
+        info.append(el('div', { className: 'crests' }, ...p.teams.map((t) => {
+          const c = crest(t, 30);
+          if (games.length && !games.some((g) => sameClub(g.home, t) || sameClub(g.away, t))) c.classList.add('off');
+          return c;
+        })));
       }
-      if (p.ex) info.append(el('span', { className: 'ex', textContent: `🍺 ${p.ex}× Ex` }));
       const avatar = el('div', { className: 'avatar', textContent: [...p.name][0] || '?' });
       avatar.style.setProperty('--c', colorOf(p));
-      const top = el('div', { className: 'top-line' }, avatar, info,
-        el('div', { className: 'score' }, el('b', { textContent: p.count }), el('span', { textContent: 'Schlucke' })));
+      const tally = el('div', { className: 'cells tally' },
+        el('span', { textContent: 'SCHL.' }), el('span', { textContent: 'EX' }),
+        el('b', { textContent: p.count }), el('b', { className: p.ex ? 'hot' : 'dim', textContent: p.ex || 0 }));
+      const top = el('div', { className: 'top-line' }, avatar, info, tally);
 
       const pickInput = el('div', { className: 'pick-input' });
       const input = el('input', { type: 'text', placeholder: 'Spielername' });
@@ -1119,8 +1227,10 @@
       let say;
       if (pick) {
         const unknown = isOutWithoutReplacement(pick.name);
-        say = el('button', { className: 'say' + (unknown ? ' unknown' : '') + (flash === pick ? ' flash' : ''), textContent: pick.name });
-        say.append(el('small', { textContent: unknown ? 'ausgewechselt – Ersatz per ⇄' : norm(pick.orig) !== norm(pick.name) ? `für ${pick.orig}` : 'Antippen, wenn der Name fällt' }));
+        say = el('button', { className: 'say' + (unknown ? ' unknown' : '') + (flash === pick ? ' flash' : '') });
+        const pickTeam = allLineupPlayers().find((x) => norm(x.name) === norm(pick.name))?.team;
+        say.append(...(pickTeam ? [crest(pickTeam, 30)] : []), el('span', { className: 'say-name', textContent: pick.name }));
+        say.querySelector('.say-name').append(el('small', { textContent: unknown ? 'ausgewechselt – Ersatz per ⇄' : norm(pick.orig) !== norm(pick.name) ? `für ${pick.orig}` : 'Antippen, wenn der Name fällt' }));
         say.onclick = () => { p.count++; renderAll(pick); };
       } else {
         say = el('button', { className: 'say add', textContent: '+ Spieler picken', onclick: openInput });
@@ -1143,7 +1253,7 @@
         more.append(el('button', { className: 'chip', textContent: '✕ Picks löschen', onclick: () => { if (confirm(`Alle Picks von ${p.name} löschen?`)) { p.picks = []; renderAll(); } } }));
       }
 
-      list.append(el('div', { className: 'p' }, top, el('div', { className: 'actions' }, say, minus, plus), more, pickInput));
+      list.append(el('div', { className: 'p', style: `--c: ${colorOf(p)}` }, top, el('div', { className: 'actions' }, say, minus, plus), more, pickInput));
     }
   }
 
@@ -1238,6 +1348,64 @@
   });
 
   // Start: ohne Runde zuerst zur Einrichtung, sonst Live.
+  // ---------- Push-Nachrichten ----------
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  const pushSupported = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+  const swReady = location.protocol.startsWith('http') && 'serviceWorker' in navigator
+    ? navigator.serviceWorker.register('/sw.js').then(() => navigator.serviceWorker.ready).catch(() => null)
+    : Promise.resolve(null);
+  const setPushInfo = (text) => { $('pushInfo').textContent = text; };
+  const urlKey = (s) => { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return Uint8Array.from(atob(s), (c) => c.charCodeAt(0)); };
+
+  async function currentSubscription() {
+    const reg = await swReady;
+    return reg?.pushManager ? reg.pushManager.getSubscription() : null;
+  }
+  // Dem Server sagen, welche Spiele dieses Gerät verfolgt (nur wenn sich etwas geändert hat).
+  async function syncPush(force = false) {
+    const sub = await currentSubscription();
+    if (!sub) return;
+    const watched = games.filter((g) => g.source !== 'oldb').map((g) => ({ id: g.id, date: berlinDate.format(g.kickoff) }));
+    const body = JSON.stringify({ subscription: sub.toJSON(), games: watched });
+    if (!force && store.get('kt-push-sync', '') === body) return;
+    const res = await fetch('/api/push/subscribe', { method: 'POST', headers: { 'content-type': 'application/json' }, body }).catch(() => null);
+    if (res?.ok) store.set('kt-push-sync', body);
+  }
+  async function enablePush() {
+    if (isIOS && !standalone) throw new Error('Auf iPhone/iPad erst „Teilen → Zum Home-Bildschirm“, dann die App von dort öffnen.');
+    if (!pushSupported) throw new Error('Dieser Browser kann keine Push-Nachrichten.');
+    if (await Notification.requestPermission() !== 'granted') throw new Error('Mitteilungen wurden nicht erlaubt (Einstellungen → Mitteilungen).');
+    const reg = await swReady;
+    const keyRes = await fetch('/api/push/key').catch(() => null);
+    const key = keyRes?.ok ? (await keyRes.json()).key : null;
+    if (!reg || !key) throw new Error('Push ist auf dem Server noch nicht eingerichtet.');
+    await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlKey(key) });
+    await syncPush(true);
+  }
+  async function disablePush() {
+    const sub = await currentSubscription();
+    if (!sub) return;
+    await fetch('/api/push/unsubscribe', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ endpoint: sub.endpoint }) }).catch(() => null);
+    await sub.unsubscribe();
+    store.set('kt-push-sync', '');
+  }
+  $('pushToggle').addEventListener('change', async (e) => {
+    const on = e.target.checked;
+    try {
+      if (on) { await enablePush(); setPushInfo('An: Meldungen kommen auch bei gesperrtem Handy'); }
+      else { await disablePush(); setPushInfo('Aus'); }
+    } catch (err) {
+      e.target.checked = false;
+      setPushInfo(err.message);
+    }
+  });
+  currentSubscription().then((sub) => {
+    $('pushToggle').checked = !!sub;
+    if (sub) setPushInfo('An: Meldungen kommen auch bei gesperrtem Handy');
+    else if (isIOS && !standalone) setPushInfo('Erst zum Home-Bildschirm hinzufügen (Teilen-Symbol)');
+  }).catch(() => {});
+
   // Zurück in der App (Handy entsperrt, Tab gewechselt): sofort den neuesten Stand holen.
   let lastLoad = 0;
   const loadNow = () => { lastLoad = Date.now(); loadGames({ quiet: true }); };

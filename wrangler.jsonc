@@ -6,5 +6,13 @@
   "assets": {
     "directory": "./public",
     "binding": "ASSETS"
+  },
+  // Speicher für Push-Abos. Ohne "id" legt Wrangler den Namespace beim Deploy selbst an.
+  "kv_namespaces": [
+    { "binding": "PUSH" }
+  ],
+  // Jede Minute die abonnierten Spiele prüfen und neue Ereignisse pushen.
+  "triggers": {
+    "crons": ["* * * * *"]
   }
 }

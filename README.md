@@ -38,6 +38,14 @@ npx wrangler login
 npx wrangler deploy
 ```
 
+## Push-Nachrichten
+
+Der Worker prüft jede Minute (Cron) die Spiele, für die jemand Push eingeschaltet hat, und schickt bei Tor, Torschütze, Roter Karte, Halbzeit und Abpfiff eine Nachricht. Das Handy rechnet beim Empfang aus der gespeicherten Runde aus, wer trinkt, exen muss oder verteilt.
+
+- Abos und Spielstände liegen im KV-Namespace mit der Bindung `PUSH`. Wrangler legt ihn beim Deploy selbst an. Falls der Build daran scheitert: im Cloudflare-Dashboard unter *Storage & Databases → KV* einen Namespace anlegen und dessen ID in `wrangler.jsonc` bei `kv_namespaces` als `"id"` eintragen.
+- Die VAPID-Schlüssel erzeugt der Worker beim ersten Bedarf selbst und speichert sie im KV.
+- iPhone/iPad (ab iOS 16.4): Seite in Safari öffnen → Teilen → *Zum Home-Bildschirm* → App von dort öffnen → im Live-Tab *Push-Nachrichten* einschalten.
+
 ## Hinweis
 
 Trinkt verantwortungsvoll. Kleine Schlucke, Wasser zwischendurch, und alkoholfreies Bier zählt genauso.
