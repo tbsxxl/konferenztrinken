@@ -7,7 +7,7 @@ Das Trinkspiel zur Bundesliga-Konferenz am Samstag um 15:30 Uhr – als kleine W
 - **Auslosung**: verteilt die Teams und lost auf Wunsch gleich die Spieler-Picks aus
 - **Live**: erkennt Tore, Rote Karten, Halbzeit, Abpfiff und Auswechslungen selbst und verbucht sie:
   - Tor fürs eigene Team → Schlucke verteilen, Gegentor → trinken
-  - gepickter Spieler trifft → Schlucke verteilen
+  - gepickter Spieler trifft → ein Ex verteilen
   - Rot für den Pick oder jemanden aus dem eigenen Team → exen
   - Niederlage → exen, Sieg → ein Ex verteilen, Unentschieden → beide trinken
   - Verteilen per Antippen, wer trinken soll. Spielernamen weiter von Hand antippen.

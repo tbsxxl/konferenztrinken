@@ -293,7 +293,7 @@
     <div class="card"><ul class="rules">
       <li><span class="ico">⚽</span><span class="what">Tor für dein Team<span class="auto-dot"></span></span><span class="tag give"><b data-v="teamGoal">3</b> verteilen</span></li>
       <li><span class="ico">🥅</span><span class="what">Gegentor<span class="auto-dot"></span></span><span class="tag drink"><b data-v="conceded">2</b> trinken</span></li>
-      <li><span class="ico">🎯</span><span class="what">Dein Spieler trifft<span class="auto-dot"></span></span><span class="tag give"><b data-v="pickGoal">3</b> verteilen</span></li>
+      <li><span class="ico">🎯</span><span class="what">Dein Spieler trifft<span class="auto-dot"></span></span><span class="tag give">Ex verteilen</span></li>
       <li><span class="ico">🟥</span><span class="what">Rote Karte<span class="auto-dot"></span><small>für deinen Spieler oder jemanden aus deinem Team</small></span><span class="tag ex">Exen</span></li>
       <li><span class="ico">📹</span><span class="what">Elfmeter, VAR-Check<small>für dein Team</small></span><span class="tag drink">1 trinken</span></li>
     </ul></div>
@@ -319,7 +319,6 @@
     <div class="card values">
       <label for="v-teamGoal">Tor fürs Team (verteilen)</label><input type="number" min="0" id="v-teamGoal" data-key="teamGoal" />
       <label for="v-conceded">Gegentor (trinken)</label><input type="number" min="0" id="v-conceded" data-key="conceded" />
-      <label for="v-pickGoal">Spieler trifft (verteilen)</label><input type="number" min="0" id="v-pickGoal" data-key="pickGoal" />
       <label for="v-halftime">Halbzeit hinten (trinken)</label><input type="number" min="0" id="v-halftime" data-key="halftime" />
       <label for="v-draw">Unentschieden (trinken)</label><input type="number" min="0" id="v-draw" data-key="draw" />
     </div>
@@ -372,7 +371,7 @@
   tabs.forEach((t) => t.addEventListener('click', () => showTab(t.dataset.tab)));
 
   // ---------- Werte ----------
-  const DEFAULT_VALUES = { teamGoal: 3, conceded: 2, pickGoal: 3, halftime: 1, draw: 1 };
+  const DEFAULT_VALUES = { teamGoal: 3, conceded: 2, halftime: 1, draw: 1 };
   const values = { ...DEFAULT_VALUES, ...store.get('kt-values', {}) };
   function showValues() {
     document.querySelectorAll('[data-v]').forEach((b) => { b.textContent = values[b.dataset.v]; });
@@ -713,7 +712,7 @@
       for (const ev of g.events) {
         const key = `${g.id}:${ev.kind}:${norm(ev.player)}:${ev.minute}`;
         if (ev.kind === 'goal') {
-          add(emit(key, '🎯', `${ev.player} trifft ${ev.minute}`, pickersOf(ev.player).map((person) => ({ person, kind: 'give', amount: values.pickGoal }))));
+          add(emit(key, '🎯', `${ev.player} trifft ${ev.minute}`, pickersOf(ev.player).map((person) => ({ person, kind: 'giveEx' }))));
         } else {
           const hit = new Set([...pickersOf(ev.player), ...ownersOf(ev.team)]);
           add(emit(key, '🟥', `Rot für ${ev.player} ${ev.minute}`, [...hit].map((person) => ({ person, kind: 'ex' }))));
