@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Konferenztrinken</title>
+  <meta name="description" content="Das Trinkspiel zur Bundesliga-Konferenz am Samstag um 15:30 Uhr: Regeln, Team-Auslosung und Schluck-Zähler." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍺</text></svg>" />
+  <style>
+    :root {
+      --bg: #f4f6f2;
+      --surface: #ffffff;
+      --text: #1b1f1a;
+      --muted: #5c665a;
+      --border: #dfe4dc;
+      --accent: #1f8a4c;
+      --accent-soft: #e3f3e9;
+      --warn: #b4500f;
+      --radius: 14px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f1410;
+        --surface: #171e18;
+        --text: #eef3ec;
+        --muted: #9aa797;
+        --border: #2a352b;
+        --accent: #43c477;
+        --accent-soft: #1b2e21;
+        --warn: #f0a060;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    main { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
+    header h1 { font-size: clamp(2rem, 7vw, 3rem); margin: 0 0 4px; letter-spacing: -0.02em; }
+    header p { margin: 0; color: var(--muted); }
+    nav { display: flex; gap: 8px; margin: 24px 0; flex-wrap: wrap; }
+    nav button {
+      flex: 1 1 0; min-width: 100px; padding: 10px 14px; border-radius: 999px;
+      border: 1px solid var(--border); background: var(--surface); color: var(--text);
+      font: inherit; font-weight: 600; cursor: pointer;
+    }
+    nav button[aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+    section[hidden] { display: none; }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px; margin-bottom: 16px;
+    }
+    .card h2 { margin: 0 0 12px; font-size: 1.15rem; }
+    ul.rules { list-style: none; margin: 0; padding: 0; }
+    ul.rules li { display: flex; gap: 12px; padding: 10px 0; border-top: 1px solid var(--border); }
+    ul.rules li:first-child { border-top: 0; padding-top: 0; }
+    .ico { font-size: 1.3rem; width: 1.6rem; flex: none; text-align: center; }
+    .note { background: var(--accent-soft); border-color: transparent; }
+    textarea, input[type="text"] {
+      width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border);
+      background: var(--bg); color: var(--text); font: inherit;
+    }
+    textarea { min-height: 130px; resize: vertical; }
+    label { display: block; font-weight: 600; margin: 12px 0 6px; }
+    label:first-of-type { margin-top: 0; }
+    .hint { color: var(--muted); font-size: 0.9rem; margin: 4px 0 0; }
+    .btn {
+      display: inline-block; margin-top: 16px; padding: 12px 20px; border-radius: 10px; border: 0;
+      background: var(--accent); color: #fff; font: inherit; font-weight: 700; cursor: pointer;
+    }
+    .btn.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+    .result { display: grid; gap: 10px; margin-top: 16px; }
+    .result div { padding: 12px 14px; border-radius: 10px; background: var(--accent-soft); }
+    .result strong { display: block; }
+    .error { color: var(--warn); margin-top: 12px; }
+    .players { display: grid; gap: 10px; }
+    .player {
+      display: grid; grid-template-columns: 1fr auto auto auto; align-items: center; gap: 8px;
+      padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border);
+    }
+    .player .name { font-weight: 600; overflow-wrap: anywhere; }
+    .player .teams { display: block; font-weight: 400; color: var(--muted); font-size: 0.85rem; }
+    .player .count { font-variant-numeric: tabular-nums; font-size: 1.4rem; font-weight: 700; min-width: 2.2ch; text-align: center; }
+    .player button {
+      width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border);
+      background: var(--bg); color: var(--text); font-size: 1.2rem; cursor: pointer;
+    }
+    footer { color: var(--muted); font-size: 0.85rem; text-align: center; margin-top: 32px; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>🍺 Konferenztrinken</h1>
+    <p>Das Trinkspiel zur Bundesliga-Konferenz, samstags um 15:30 Uhr.</p>
+  </header>
+
+  <nav role="tablist">
+    <button role="tab" data-tab="regeln" aria-selected="true">Regeln</button>
+    <button role="tab" data-tab="auslosung" aria-selected="false">Auslosung</button>
+    <button role="tab" data-tab="zaehler" aria-selected="false">Zähler</button>
+  </nav>
+
+  <section id="regeln">
+    <div class="card note">
+      Ein festes Regelwerk gibt es nicht, jede Runde spielt es etwas anders. Das hier ist eine typische Variante.
+    </div>
+
+    <div class="card">
+      <h2>Vorbereitung</h2>
+      <ul class="rules">
+        <li><span class="ico">🎲</span><span>Vor Anpfiff werden die Teams der Konferenzspiele per Los verteilt. Jede Person bekommt ein oder zwei Teams. Dafür gibt es den Tab <em>Auslosung</em>.</span></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>Grundregeln</h2>
+      <ul class="rules">
+        <li><span class="ico">📺</span><span><strong>Schalte:</strong> Bei jedem Wechsel ins Stadion deines Teams trinkst du einen Schluck.</span></li>
+        <li><span class="ico">⚽</span><span><strong>Tor für dein Team:</strong> Du verteilst Schlucke (z. B. 3) an die anderen.</span></li>
+        <li><span class="ico">🥅</span><span><strong>Gegentor:</strong> Du trinkst selbst (z. B. 2 Schlucke).</span></li>
+        <li><span class="ico">🟥</span><span><strong>Elfmeter, Rote Karte, VAR-Check:</strong> Ein Extraschluck für die Person, deren Team betroffen ist.</span></li>
+        <li><span class="ico">⏸️</span><span><strong>Halbzeit:</strong> Wer gerade hinten liegt, trinkt.</span></li>
+        <li><span class="ico">🏁</span><span><strong>Abpfiff:</strong> Wer verliert, trinkt aus; bei Unentschieden trinken beide einen Schluck.</span></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>Beliebte Zusatzregeln</h2>
+      <ul class="rules">
+        <li><span class="ico">🎙️</span><span>Der Kommentator sagt „Tor in …“: Alle trinken, bevor klar ist, wo.</span></li>
+        <li><span class="ico">🙈</span><span>Ein Spiel ohne eine einzige Schalte in einer Halbzeit: Der Besitzer des Teams trinkt doppelt.</span></li>
+      </ul>
+    </div>
+
+    <div class="card note">
+      <strong>Tipp:</strong> Die Konferenz hat oft viele Tore und Schalten. Mit kleinen Schlucken oder einem Bier mit wenig Alkohol (bzw. einem alkoholfreien) kommt man gut durch die 90 Minuten.
+    </div>
+  </section>
+
+  <section id="auslosung" hidden>
+    <div class="card">
+      <h2>Teams auslosen</h2>
+      <label for="names">Mitspieler (eine Person pro Zeile)</label>
+      <textarea id="names" placeholder="Anna&#10;Ben&#10;Chris"></textarea>
+
+      <label for="teams">Teams der 15:30-Spiele (ein Team pro Zeile)</label>
+      <textarea id="teams" placeholder="Werder Bremen&#10;VfB Stuttgart&#10;…"></textarea>
+      <p class="hint">Trag die Teams des aktuellen Spieltags ein, meist sind es 5 Spiele, also 10 Teams.</p>
+
+      <label for="perPlayer">Teams pro Person</label>
+      <input type="text" id="perPlayer" inputmode="numeric" value="auto" />
+      <p class="hint">„auto“ verteilt alle Teams möglichst gleichmäßig. Oder eine Zahl wie 1 oder 2 eintragen.</p>
+
+      <button class="btn" id="draw">Auslosen 🎲</button>
+      <div class="error" id="drawError" role="alert"></div>
+      <div class="result" id="drawResult" aria-live="polite"></div>
+      <button class="btn secondary" id="toCounter" hidden>Zum Zähler übernehmen →</button>
+    </div>
+  </section>
+
+  <section id="zaehler" hidden>
+    <div class="card">
+      <h2>Schluck-Zähler</h2>
+      <div class="players" id="players"></div>
+      <label for="newPlayer" style="margin-top:16px">Person hinzufügen</label>
+      <input type="text" id="newPlayer" placeholder="Name" />
+      <button class="btn" id="addPlayer">Hinzufügen</button>
+      <button class="btn secondary" id="resetCounts">Alles auf 0</button>
+    </div>
+  </section>
+
+  <footer>Trinkt verantwortungsvoll · Wasser zwischendurch · Alkoholfrei zählt auch.</footer>
+</main>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const store = {
+    get(key, fallback) {
+      try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; }
+    },
+    set(key, value) {
+      try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+    }
+  };
+
+  // Tabs
+  const tabs = document.querySelectorAll('nav [data-tab]');
+  function showTab(name) {
+    tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.tab === name)));
+    document.querySelectorAll('main > section').forEach((s) => { s.hidden = s.id !== name; });
+    store.set('kt-tab', name);
+  }
+  tabs.forEach((t) => t.addEventListener('click', () => showTab(t.dataset.tab)));
+  showTab(store.get('kt-tab', 'regeln'));
+
+  // Auslosung
+  const lines = (text) => text.split('\n').map((s) => s.trim()).filter(Boolean);
+  const shuffle = (arr) => {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+
+  $('names').value = store.get('kt-names', '');
+  $('teams').value = store.get('kt-teams', '');
+  let lastDraw = null;
+
+  $('draw').addEventListener('click', () => {
+    const names = lines($('names').value);
+    const teams = lines($('teams').value);
+    store.set('kt-names', $('names').value);
+    store.set('kt-teams', $('teams').value);
+    $('drawError').textContent = '';
+    $('drawResult').innerHTML = '';
+    $('toCounter').hidden = true;
+
+    if (names.length < 2) return ($('drawError').textContent = 'Mindestens zwei Mitspieler eintragen.');
+    if (teams.length < names.length) return ($('drawError').textContent = 'Es braucht mindestens so viele Teams wie Mitspieler.');
+
+    const raw = $('perPlayer').value.trim().toLowerCase();
+    let perPlayer = raw === 'auto' || raw === '' ? Infinity : parseInt(raw, 10);
+    if (!Number.isFinite(perPlayer) && perPlayer !== Infinity || perPlayer < 1) {
+      return ($('drawError').textContent = 'Teams pro Person: „auto“ oder eine Zahl ab 1.');
+    }
+    if (perPlayer !== Infinity && perPlayer * names.length > teams.length) {
+      return ($('drawError').textContent = `Für ${names.length} Personen mit je ${perPlayer} Teams braucht es ${perPlayer * names.length} Teams.`);
+    }
+
+    const pool = shuffle(teams);
+    const order = shuffle(names);
+    const take = perPlayer === Infinity ? pool.length : perPlayer * names.length;
+    const result = order.map((name) => ({ name, teams: [] }));
+    pool.slice(0, take).forEach((team, i) => result[i % result.length].teams.push(team));
+
+    lastDraw = result;
+    for (const r of result) {
+      const div = document.createElement('div');
+      const strong = document.createElement('strong');
+      strong.textContent = r.name;
+      div.append(strong, r.teams.join(' · '));
+      $('drawResult').append(div);
+    }
+    $('toCounter').hidden = false;
+  });
+
+  // Zähler
+  let players = store.get('kt-players', []);
+  function render() {
+    store.set('kt-players', players);
+    const list = $('players');
+    list.innerHTML = '';
+    if (!players.length) {
+      list.innerHTML = '<p class="hint">Noch niemand dabei. Lose Teams aus oder füge Personen hinzu.</p>';
+      return;
+    }
+    players.forEach((p, i) => {
+      const row = document.createElement('div');
+      row.className = 'player';
+      const name = document.createElement('span');
+      name.className = 'name';
+      name.textContent = p.name;
+      if (p.teams?.length) {
+        const t = document.createElement('span');
+        t.className = 'teams';
+        t.textContent = p.teams.join(' · ');
+        name.append(t);
+      }
+      const minus = document.createElement('button');
+      minus.textContent = '−';
+      minus.setAttribute('aria-label', `Einen Schluck weniger für ${p.name}`);
+      minus.onclick = () => { p.count = Math.max(0, p.count - 1); render(); };
+      const count = document.createElement('span');
+      count.className = 'count';
+      count.textContent = p.count;
+      const plus = document.createElement('button');
+      plus.textContent = '+';
+      plus.setAttribute('aria-label', `Ein Schluck mehr für ${p.name}`);
+      plus.onclick = () => { p.count++; render(); };
+      row.append(name, minus, count, plus);
+      list.append(row);
+    });
+  }
+
+  $('toCounter').addEventListener('click', () => {
+    if (!lastDraw) return;
+    players = lastDraw.map((r) => ({ name: r.name, teams: r.teams, count: 0 }));
+    render();
+    showTab('zaehler');
+  });
+  $('addPlayer').addEventListener('click', () => {
+    const name = $('newPlayer').value.trim();
+    if (!name) return;
+    players.push({ name, teams: [], count: 0 });
+    $('newPlayer').value = '';
+    render();
+  });
+  $('newPlayer').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('addPlayer').click(); });
+  $('resetCounts').addEventListener('click', () => { players.forEach((p) => (p.count = 0)); render(); });
+  render();
+</script>
+</body>
+</html>
