@@ -65,6 +65,8 @@
       }
     }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    /* Ausgeblendet heißt ausgeblendet, auch bei Elementen mit eigener display-Regel (z. B. .btn). */
+    [hidden] { display: none !important; }
     html { background: var(--bg); }
     body {
       margin: 0; min-height: 100vh; color: var(--label); font: 17px/1.35 var(--font); letter-spacing: -0.01em;
