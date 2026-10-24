@@ -194,31 +194,29 @@
     .todo .targets button.person { background: var(--c); text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); }
     .todo .targets button.done { background: var(--fill); color: var(--label); }
 
-    /* Tabelle im TV-Stil */
-    .players { display: grid; gap: 6px; }
-    .table-head { display: grid; grid-template-columns: 30px minmax(0, 1fr) 46px 46px; gap: 0; padding: 0 0 2px 10px; font-size: 11px; font-weight: 700; color: var(--secondary); letter-spacing: 0.04em; }
-    .table-head span:nth-child(n+3) { text-align: center; }
-    .p { position: relative; border-radius: 14px; overflow: hidden; background: linear-gradient(180deg, #13303f, #0b1f2a); color: #fff; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2); }
-    .p::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--c); }
-    .p .row-main { display: grid; grid-template-columns: 30px minmax(0, 1fr) 46px 46px; align-items: center; padding: 10px 0 10px 10px; }
-    .p .rank { font: 800 18px/1 var(--rounded); color: rgba(255, 255, 255, 0.55); text-align: center; }
+    /* Spieler-Banner: gleicher Stil wie die Spiele, aber einfarbig, Sechseck-Muster, Zahlenbox rechts */
+    .players { display: grid; gap: 8px; }
+    .p { position: relative; border-radius: 20px; overflow: hidden; color: #fff; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18); background: #0b1f2a; }
+    .p .row-main { display: grid; grid-template-columns: 58px minmax(0, 1fr) auto; align-items: center; gap: 12px; min-height: 92px; padding: 10px 12px 10px 14px; background-color: var(--c); background-size: 4px 4px, auto 100%; background-repeat: repeat, no-repeat; background-position: 0 0, left center; }
+    .p .disc { position: relative; width: 58px; height: 58px; border-radius: 50%; background: #fff; color: var(--c); display: grid; place-items: center; font: 800 28px/1 var(--rounded); text-transform: uppercase; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3); }
+    .p .rank { position: absolute; left: -4px; bottom: -4px; min-width: 22px; height: 22px; padding: 0 5px; border-radius: 999px; background: #0b1f2a; color: #fff; display: grid; place-items: center; font: 800 12px/1 var(--rounded); box-shadow: 0 0 0 2px var(--c); }
+    .p .info { min-width: 0; }
     .p .who-line { display: flex; align-items: center; gap: 8px; min-width: 0; }
-    .p .name { font-size: 17px; font-weight: 800; letter-spacing: 0.01em; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background: none; border: 0; padding: 0; color: inherit; text-align: left; }
-    .p .name::after { content: " ›"; color: rgba(255, 255, 255, 0.35); font-weight: 600; }
+    .p .name { font-size: 18px; font-weight: 800; letter-spacing: 0.01em; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background: none; border: 0; padding: 0; color: #fff; text-align: left; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35); }
+    .p .name::after { content: " ›"; opacity: 0.6; font-weight: 600; }
     .p.open .name::after { content: " ⌄"; }
     .p .sub { display: flex; align-items: center; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
     .p .crests { display: flex; gap: 3px; margin: 0; }
-    .p .stat { text-align: center; font: 800 24px/1 var(--rounded); font-variant-numeric: tabular-nums; border-left: 1px solid rgba(255, 255, 255, 0.08); padding: 6px 0; }
-    .p .stat.ex { color: #ff6b5e; }
-    .p .stat.zero { color: rgba(255, 255, 255, 0.3); }
-    .pick-btn { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; border: 0; border-radius: 999px; padding: 4px 10px 4px 4px; background: rgba(255, 255, 255, 0.1); color: #fff; font-size: 13px; font-weight: 600; }
+    .p .cells { align-self: center; }
+    .p .cells b.dim { color: rgba(255, 255, 255, 0.35); }
+    .pick-btn { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; border: 0; border-radius: 999px; padding: 4px 10px 4px 4px; background: rgba(0, 0, 0, 0.5); color: #fff; font-size: 13px; font-weight: 600; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
     .pick-btn .crest-sm { --sz: 20px; }
     .pick-btn span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .pick-btn.add { padding: 4px 10px; color: rgba(255, 255, 255, 0.6); }
     .pick-btn.unknown { box-shadow: inset 0 0 0 1.5px var(--red); }
     .pick-btn.flash { animation: pickflash 0.7s; }
     @keyframes pickflash { 0% { background: var(--accent); color: #fff; } }
-    .p .panel { display: none; padding: 10px 12px 12px 15px; background: rgba(0, 0, 0, 0.25); border-top: 1px solid rgba(255, 255, 255, 0.06); }
+    .p .panel { display: none; padding: 12px 14px 14px; background: #0b1f2a; }
     .p.open .panel { display: grid; gap: 10px; }
     .stepper { display: flex; align-items: center; gap: 8px; font-size: 14px; color: rgba(255, 255, 255, 0.75); }
     .stepper span { flex: 1; }
@@ -643,6 +641,14 @@
         const w = R * 0.9, top = cy - R * 0.9;
         return `M${f(cx - w)} ${f(top)}Q${f(cx - w / 2)} ${f(top + R * 0.12)} ${f(cx)} ${f(top - R * 0.08)}Q${f(cx + w / 2)} ${f(top + R * 0.12)} ${f(cx + w)} ${f(top)}`
           + `L${f(cx + w)} ${f(cy + R * 0.15)}Q${f(cx + w)} ${f(cy + R * 0.75)} ${f(cx)} ${f(cy + R * 1.1)}Q${f(cx - w)} ${f(cy + R * 0.75)} ${f(cx - w)} ${f(cy + R * 0.15)}Z`;
+      }
+      case 'hex': {
+        let d = '';
+        for (let k = 0; k < 6; k++) {
+          const t = (Math.PI / 3) * k;
+          d += `${k ? 'L' : 'M'}${f(cx + R * 1.1 * Math.cos(t))} ${f(cy + R * 1.1 * Math.sin(t))}`;
+        }
+        return d + 'Z';
       }
       case 'oval': { const rx = R * 0.78, ry = R * 1.05; return `M${f(cx - rx)} ${f(cy)}a${f(rx)} ${f(ry)} 0 1 0 ${f(2 * rx)} 0a${f(rx)} ${f(ry)} 0 1 0 ${f(-2 * rx)} 0Z`; }
       case 'arch': { const w = R * 0.95, top = cy - R; return `M${f(cx - w)} ${f(top)}h${f(2 * w)}v${f(R * 0.9)}a${f(w)} ${f(w)} 0 0 1 ${f(-2 * w)} 0Z`; }
@@ -1206,7 +1212,6 @@
         el('a', { href: '#', textContent: 'Jetzt Mitspieler eintragen →', style: 'color:var(--accent)', onclick: (e) => { e.preventDefault(); showTab('auslosung'); } })));
       return;
     }
-    list.append(el('div', { className: 'table-head' }, el('span', { textContent: '#' }), el('span', { textContent: 'SPIELER' }), el('span', { textContent: 'SCHL.' }), el('span', { textContent: 'EX' })));
     const ranked = [...players].sort((a, b) => b.count - a.count || (b.ex || 0) - (a.ex || 0));
     ranked.forEach((p, idx) => {
       const isOpen = openRows.has(p.name);
@@ -1231,11 +1236,13 @@
       }));
       const nameBtn = el('button', { className: 'name', textContent: p.name, onclick: toggle });
       nameBtn.setAttribute('aria-expanded', String(isOpen));
+      const disc = el('div', { className: 'disc', textContent: [...p.name][0] || '?' }, el('span', { className: 'rank', textContent: idx + 1 }));
       const main = el('div', { className: 'row-main' },
-        el('div', { className: 'rank', textContent: idx + 1 }),
-        el('div', {}, el('div', { className: 'who-line' }, nameBtn), el('div', { className: 'sub' }, crests, ...pickButtons)),
-        el('div', { className: 'stat' + (p.count ? '' : ' zero'), textContent: p.count }),
-        el('div', { className: 'stat ex' + (p.ex ? '' : ' zero'), textContent: p.ex || 0 }));
+        disc,
+        el('div', { className: 'info' }, el('div', { className: 'who-line' }, nameBtn), el('div', { className: 'sub' }, crests, ...pickButtons)),
+        el('div', { className: 'cells' },
+          el('span', { textContent: 'SCHL.' }), el('span', { textContent: 'EX' }),
+          el('b', { className: p.count ? '' : 'dim', textContent: p.count }), el('b', { className: p.ex ? 'hot' : 'dim', textContent: p.ex || 0 })));
 
       // Aufklappbereich: Zähler von Hand, Picks verwalten.
       const stepper = (label, get, set) => {
@@ -1271,7 +1278,9 @@
         el('div', { className: 'pick-input' }, input, el('button', { textContent: 'OK', onclick: addPick })),
         more);
 
-      list.append(el('div', { className: 'p' + (isOpen ? ' open' : ''), style: `--c: ${colorOf(p)}` }, main, panel));
+      const row = el('div', { className: 'p' + (isOpen ? ' open' : ''), style: `--c: ${colorOf(p)}` }, main, panel);
+      main.style.backgroundImage = `radial-gradient(rgba(0, 0, 0, 0.13) 0.7px, transparent 1.1px), ${bannerBackground(colorOf(p), 'hex', 'home')}`;
+      list.append(row);
     });
   }
 
