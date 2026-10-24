@@ -27,44 +27,50 @@ const lastName = (name) => norm(name).replace(/[^a-z0-9 -]/g, '').split(' ').fil
 
 function describe(msg, round) {
   const players = round?.players || [];
-  const values = { teamGoal: 3, conceded: 2, halftime: 1, draw: 1, ...(round?.values || {}) };
+  // Gleiche Regelwerte wie auf der Seite: Anzahl, 'ex' oder 0 (aus).
+  const RULES = { teamGoal: ['give', 3], conceded: ['drink', 2], pickGoal: ['give', 'ex'], red: ['drink', 'ex'], halftime: ['drink', 1], win: ['give', 'ex'], draw: ['drink', 1], loss: ['drink', 'ex'] };
+  const values = { ...Object.fromEntries(Object.entries(RULES).map(([k, [, d]]) => [k, d])), ...(round?.values || {}) };
   const owners = (team) => players.filter((p) => (p.teams || []).some((t) => clubKey(t) === clubKey(team)));
   const pickers = (name) => players.filter((p) => (p.picks || []).some((k) =>
     [k.orig, ...(k.history || []), k.name].some((n) => norm(n) === norm(name) || lastName(n) === lastName(name))));
   const names = (list) => list.map((p) => p.name).join(', ');
-  // "Anna trinkt", aber "Anna, Ben trinken"
-  const say = (list, one, many, rest) => `${names(list)} ${list.length > 1 ? many : one} ${rest}`;
+  // "Anna trinkt 2", "Anna, Ben müssen exen", "Ben verteilt ein Ex"
+  const line = (list, key) => {
+    const v = values[key], give = RULES[key][0] === 'give', many = list.length > 1;
+    if (!list.length || !v) return null;
+    if (v === 'ex') return give ? `${names(list)} ${many ? 'verteilen je' : 'verteilt'} ein Ex` : `${names(list)} ${many ? 'müssen' : 'muss'} exen 🍺`;
+    return `${names(list)} ${give ? (many ? 'verteilen' : 'verteilt') : (many ? 'trinken' : 'trinkt')} ${v}`;
+  };
   const score = (e) => `${e.home} ${e.hs}:${e.as} ${e.away}`;
 
   let title = '';
   const lines = [];
+  const push = (l) => { if (l) lines.push(l); };
   for (const e of msg.events || []) {
     if (e.kind === 'goal') {
       title ||= `⚽ Tor für ${e.team}`;
       lines.push(score(e));
-      if (owners(e.team).length) lines.push(say(owners(e.team), 'verteilt', 'verteilen', values.teamGoal));
-      if (owners(e.opp).length) lines.push(say(owners(e.opp), 'trinkt', 'trinken', values.conceded));
+      push(line(owners(e.team), 'teamGoal'));
+      push(line(owners(e.opp), 'conceded'));
     } else if (e.kind === 'scorer') {
       title ||= `🎯 ${e.player} trifft ${e.minute}`;
       if (title.startsWith('⚽')) lines.unshift(`🎯 ${e.player} ${e.minute}`);
-      if (pickers(e.player).length) lines.push(say(pickers(e.player), 'verteilt', 'verteilen je', 'ein Ex'));
+      push(line(pickers(e.player), 'pickGoal'));
     } else if (e.kind === 'red') {
       title ||= `🟥 Rot für ${e.player} ${e.minute}`;
-      const hit = [...new Set([...pickers(e.player), ...owners(e.team)])];
-      if (hit.length) lines.push(say(hit, 'muss', 'müssen', 'exen 🍺'));
+      push(line([...new Set([...pickers(e.player), ...owners(e.team)])], 'red'));
     } else if (e.kind === 'ht') {
       title ||= `⏸️ Halbzeit: ${score(e)}`;
       const behind = e.hs === e.as ? null : e.hs < e.as ? e.home : e.away;
-      if (behind && owners(behind).length) lines.push(say(owners(behind), 'trinkt', 'trinken', values.halftime));
+      if (behind) push(line(owners(behind), 'halftime'));
     } else if (e.kind === 'ft') {
       title ||= `🏁 Abpfiff: ${score(e)}`;
       if (e.hs === e.as) {
-        const both = [...owners(e.home), ...owners(e.away)];
-        if (both.length) lines.push(say(both, 'trinkt', 'trinken', values.draw));
+        push(line([...owners(e.home), ...owners(e.away)], 'draw'));
       } else {
         const [win, lose] = e.hs > e.as ? [e.home, e.away] : [e.away, e.home];
-        if (owners(lose).length) lines.push(say(owners(lose), 'muss', 'müssen', 'exen 🍺'));
-        if (owners(win).length) lines.push(say(owners(win), 'verteilt', 'verteilen je', 'ein Ex'));
+        push(line(owners(lose), 'loss'));
+        push(line(owners(win), 'win'));
       }
     }
   }

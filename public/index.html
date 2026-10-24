@@ -158,6 +158,26 @@
     .sofar .nm { font: 800 17px/1 var(--display); text-transform: uppercase; min-width: 70px; }
     .sofar .cr { display: flex; gap: 4px; flex-wrap: wrap; }
 
+    /* Regeln antippbar + Bearbeiten-Blatt */
+    .rules li[data-rule] { cursor: pointer; }
+    .rules li[data-rule] .tag::after { content: "›"; margin-left: 6px; opacity: 0.55; }
+    .rules li[data-rule]:active { background: var(--fill); }
+    .tag.off { background: var(--fill); color: var(--tertiary); text-decoration: line-through; }
+    .sheet-backdrop { position: fixed; inset: 0; z-index: 30; background: rgba(0, 0, 0, 0.5); display: flex; align-items: flex-end; justify-content: center; animation: fade 0.2s; }
+    @keyframes fade { from { opacity: 0; } }
+    .sheet { width: min(560px, 100%); padding: 10px 20px calc(24px + env(safe-area-inset-bottom)); border-radius: 28px 28px 0 0; background: linear-gradient(180deg, #1f1f1f, #121212); color: #fff; animation: up 0.3s cubic-bezier(0.2, 1, 0.3, 1); --fill: rgba(255, 255, 255, 0.1); --label: #fff; }
+    @keyframes up { from { transform: translateY(100%); } }
+    .grabber { width: 38px; height: 5px; border-radius: 3px; background: rgba(255, 255, 255, 0.3); margin: 0 auto 14px; }
+    .sheet-title { font: 800 26px/1.1 var(--display); text-transform: uppercase; letter-spacing: 0.02em; text-align: center; }
+    .sheet-sub { text-align: center; color: rgba(255, 255, 255, 0.6); font-size: 14px; margin-top: 4px; }
+    .sheet-value { display: grid; grid-template-columns: 64px 1fr 64px; align-items: center; gap: 12px; margin: 22px 0 16px; }
+    .sheet-value button { height: 64px; border: 0; border-radius: 18px; background: var(--fill); color: #fff; font-size: 30px; font-weight: 600; }
+    .sheet-value output { min-width: 0; text-align: center; font: 800 56px/1 var(--display); text-transform: uppercase; }
+    .sheet-value output small { display: block; font: 700 14px/1.2 var(--display); letter-spacing: 0.08em; color: rgba(255, 255, 255, 0.6); margin-top: 4px; }
+    .sheet-opts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .sheet-opts button { min-height: 46px; border: 0; border-radius: 14px; background: var(--fill); color: #fff; font-weight: 600; font-size: 15px; }
+    .sheet-opts button.on { background: #fff; color: #121212; }
+
     /* iOS-Schalter */
     input.switch { appearance: none; -webkit-appearance: none; flex: none; width: 51px; height: 31px; border-radius: 999px; background: var(--fill); position: relative; margin: 0; cursor: pointer; transition: background 0.25s; }
     input.switch::before { content: ""; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15), 0 1px 1px rgba(0, 0, 0, 0.16); transition: transform 0.25s cubic-bezier(0.3, 1.3, 0.6, 1); }
@@ -455,45 +475,56 @@
   <section id="regeln" hidden>
     <header class="lt"><div><div class="eyebrow">So geht’s</div><h1>Regeln</h1></div></header>
     <div class="list"><div class="cell" style="font-size:15px;color:var(--secondary);display:block;padding:14px 18px">
-      Vor Anpfiff werden die Teams der 15:30-Spiele verlost, und jede Person bekommt einen Spieler gepickt. Alles mit <span class="auto-dot" style="margin:0 2px"></span> rechnet der Live-Tab selbst.
+      Vor Anpfiff werden die Teams der 15:30-Spiele verlost, und jede Person bekommt einen Spieler gepickt. Alles mit <span class="auto-dot" style="margin:0 2px"></span> rechnet der Live-Tab selbst. <b style="color:var(--label)">Tippe auf eine Regel, um den Wert zu ändern.</b>
     </div></div>
 
     <h2 class="sec">Tore &amp; Karten</h2>
     <div class="list"><ul class="rules">
-      <li><span class="ico">⚽</span><span class="what">Tor für dein Team<span class="auto-dot"></span></span><span class="tag give"><b data-v="teamGoal">3</b> verteilen</span></li>
-      <li><span class="ico">🥅</span><span class="what">Gegentor<span class="auto-dot"></span></span><span class="tag drink"><b data-v="conceded">2</b> trinken</span></li>
-      <li><span class="ico">🎯</span><span class="what">Dein Spieler trifft<span class="auto-dot"></span></span><span class="tag give">Ex verteilen</span></li>
-      <li><span class="ico">🟥</span><span class="what">Rote Karte<span class="auto-dot"></span><small>für deinen Spieler oder dein Team</small></span><span class="tag ex">Exen</span></li>
-      <li><span class="ico">📹</span><span class="what">Elfmeter, VAR-Check<small>für dein Team</small></span><span class="tag drink">1 trinken</span></li>
+      <li data-rule="teamGoal"><span class="ico">⚽</span><span class="what">Tor für dein Team<span class="auto-dot"></span></span><span class="tag"></span></li>
+      <li data-rule="conceded"><span class="ico">🥅</span><span class="what">Gegentor<span class="auto-dot"></span></span><span class="tag"></span></li>
+      <li data-rule="pickGoal"><span class="ico">🎯</span><span class="what">Dein Spieler trifft<span class="auto-dot"></span></span><span class="tag"></span></li>
+      <li data-rule="red"><span class="ico">🟥</span><span class="what">Rote Karte<span class="auto-dot"></span><small>für deinen Spieler oder dein Team</small></span><span class="tag"></span></li>
+      <li data-rule="penalty"><span class="ico">📹</span><span class="what">Elfmeter, VAR-Check<small>für dein Team</small></span><span class="tag"></span></li>
     </ul></div>
 
     <h2 class="sec">Halbzeit &amp; Abpfiff</h2>
     <div class="list"><ul class="rules">
-      <li><span class="ico">⏸️</span><span class="what">Halbzeit, du liegst hinten<span class="auto-dot"></span></span><span class="tag drink"><b data-v="halftime">1</b> trinken</span></li>
-      <li><span class="ico">🏆</span><span class="what">Sieg<span class="auto-dot"></span></span><span class="tag give">Ex verteilen</span></li>
-      <li><span class="ico">🤝</span><span class="what">Unentschieden<span class="auto-dot"></span><small>beide</small></span><span class="tag drink"><b data-v="draw">1</b> trinken</span></li>
-      <li><span class="ico">💀</span><span class="what">Niederlage<span class="auto-dot"></span></span><span class="tag ex">Exen</span></li>
+      <li data-rule="halftime"><span class="ico">⏸️</span><span class="what">Halbzeit, du liegst hinten<span class="auto-dot"></span></span><span class="tag"></span></li>
+      <li data-rule="win"><span class="ico">🏆</span><span class="what">Sieg<span class="auto-dot"></span></span><span class="tag"></span></li>
+      <li data-rule="draw"><span class="ico">🤝</span><span class="what">Unentschieden<span class="auto-dot"></span><small>beide</small></span><span class="tag"></span></li>
+      <li data-rule="loss"><span class="ico">💀</span><span class="what">Niederlage<span class="auto-dot"></span></span><span class="tag"></span></li>
     </ul></div>
 
     <h2 class="sec">Während des Spiels</h2>
     <div class="list"><ul class="rules">
-      <li><span class="ico">📺</span><span class="what">Schalte zu deinem Spiel</span><span class="tag drink">1 trinken</span></li>
-      <li><span class="ico">🗣️</span><span class="what">Name deines Spielers fällt<small>im Live-Tab antippen</small></span><span class="tag drink">1 trinken</span></li>
+      <li data-rule="schalte"><span class="ico">📺</span><span class="what">Schalte zu deinem Spiel</span><span class="tag"></span></li>
+      <li data-rule="name"><span class="ico">🗣️</span><span class="what">Name deines Spielers fällt<small>im Live-Tab antippen</small></span><span class="tag"></span></li>
       <li><span class="ico">🔁</span><span class="what">Auswechslung<span class="auto-dot"></span><small>der Eingewechselte zählt</small></span><span></span></li>
-      <li><span class="ico">🎙️</span><span class="what">„Tor in …“<small>bevor klar ist, wo</small></span><span class="tag drink">alle</span></li>
-      <li><span class="ico">🙈</span><span class="what">Keine Schalte in einer Halbzeit<small>für den Besitzer</small></span><span class="tag drink">doppelt</span></li>
+      <li><span class="ico">🎙️</span><span class="what">„Tor in …“<small>bevor klar ist, wo</small></span><span class="tag">alle</span></li>
+      <li><span class="ico">🙈</span><span class="what">Keine Schalte in einer Halbzeit<small>für den Besitzer</small></span><span class="tag">doppelt</span></li>
     </ul></div>
-
-    <h2 class="sec">Werte</h2>
-    <div class="list values">
-      <div class="cell"><label for="v-teamGoal">Tor fürs Team · verteilen</label><input type="number" min="0" id="v-teamGoal" data-key="teamGoal" /></div>
-      <div class="cell"><label for="v-conceded">Gegentor · trinken</label><input type="number" min="0" id="v-conceded" data-key="conceded" /></div>
-      <div class="cell"><label for="v-halftime">Halbzeit hinten · trinken</label><input type="number" min="0" id="v-halftime" data-key="halftime" /></div>
-      <div class="cell"><label for="v-draw">Unentschieden · trinken</label><input type="number" min="0" id="v-draw" data-key="draw" /></div>
-    </div>
 
     <footer>Trinkt verantwortungsvoll · Wasser zwischendurch · Alkoholfrei zählt auch.<br />Spieldaten: ESPN &amp; OpenLigaDB, ohne Gewähr.</footer>
   </section>
+
+  <div class="sheet-backdrop" id="ruleSheet" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="ruleSheetTitle">
+      <div class="grabber"></div>
+      <div class="sheet-title" id="ruleSheetTitle"></div>
+      <div class="sheet-sub" id="ruleSheetSub"></div>
+      <div class="sheet-value">
+        <button id="ruleMinus" aria-label="weniger">−</button>
+        <output id="ruleValue"></output>
+        <button id="rulePlus" aria-label="mehr">+</button>
+      </div>
+      <div class="sheet-opts">
+        <button id="ruleEx">🍺 Ex</button>
+        <button id="ruleOff">Aus</button>
+        <button id="ruleReset">Standard</button>
+      </div>
+      <button class="btn" id="ruleDone">Fertig</button>
+    </div>
+  </div>
 </main>
 
 <nav>
@@ -548,21 +579,76 @@
   tabs.forEach((t) => t.addEventListener('click', () => showTab(t.dataset.tab)));
 
   // ---------- Werte ----------
-  const DEFAULT_VALUES = { teamGoal: 3, conceded: 2, halftime: 1, draw: 1 };
+  // Jede Regel: wer betroffen ist trinkt („drink“) oder verteilt („give“); Wert = Anzahl, 'ex' oder 0 (aus).
+  const RULES = {
+    teamGoal: { type: 'give', def: 3, title: 'Tor für dein Team' },
+    conceded: { type: 'drink', def: 2, title: 'Gegentor' },
+    pickGoal: { type: 'give', def: 'ex', title: 'Dein Spieler trifft' },
+    red: { type: 'drink', def: 'ex', title: 'Rote Karte' },
+    penalty: { type: 'drink', def: 1, title: 'Elfmeter, VAR-Check' },
+    halftime: { type: 'drink', def: 1, title: 'Halbzeit, du liegst hinten' },
+    win: { type: 'give', def: 'ex', title: 'Sieg' },
+    draw: { type: 'drink', def: 1, title: 'Unentschieden' },
+    loss: { type: 'drink', def: 'ex', title: 'Niederlage' },
+    schalte: { type: 'drink', def: 1, title: 'Schalte zu deinem Spiel' },
+    name: { type: 'drink', def: 1, title: 'Name deines Spielers fällt' },
+  };
+  const DEFAULT_VALUES = Object.fromEntries(Object.entries(RULES).map(([k, r]) => [k, r.def]));
   const values = { ...DEFAULT_VALUES, ...store.get('kt-values', {}) };
-  function showValues() {
-    document.querySelectorAll('[data-v]').forEach((b) => { b.textContent = values[b.dataset.v]; });
+  const ruleLabel = (key) => {
+    const v = values[key], give = RULES[key].type === 'give';
+    if (!v) return 'aus';
+    if (v === 'ex') return give ? 'Ex verteilen' : 'Exen';
+    return `${v} ${give ? 'verteilen' : 'trinken'}`;
+  };
+  // Effekt einer Regel für eine Person (null = Regel aus).
+  function effect(person, key) {
+    const v = values[key], give = RULES[key].type === 'give';
+    if (!v) return null;
+    if (v === 'ex') return { person, kind: give ? 'giveEx' : 'ex' };
+    return { person, kind: give ? 'give' : 'drink', amount: v };
   }
-  document.querySelectorAll('.values input').forEach((input) => {
-    input.value = values[input.dataset.key];
-    input.addEventListener('change', () => {
-      const n = parseInt(input.value, 10);
-      values[input.dataset.key] = Number.isNaN(n) || n < 0 ? DEFAULT_VALUES[input.dataset.key] : n;
-      input.value = values[input.dataset.key];
-      store.set('kt-values', values);
-      showValues();
+  const effects = (people, key) => people.map((p) => effect(p, key)).filter(Boolean);
+  function showValues() {
+    document.querySelectorAll('li[data-rule]').forEach((li) => {
+      const key = li.dataset.rule, v = values[key];
+      const tag = li.querySelector('.tag');
+      tag.textContent = ruleLabel(key);
+      tag.className = 'tag ' + (!v ? 'off' : RULES[key].type === 'give' ? 'give' : v === 'ex' ? 'ex' : 'drink');
     });
-  });
+  }
+
+  // Bearbeiten-Blatt für eine Regel
+  let editing = null;
+  function renderSheet() {
+    const v = values[editing];
+    $('ruleSheetTitle').textContent = RULES[editing].title;
+    $('ruleSheetSub').textContent = RULES[editing].type === 'give' ? 'Wie viel darf man verteilen?' : 'Wie viel muss man trinken?';
+    $('ruleValue').replaceChildren(!v ? 'Aus' : v === 'ex' ? 'Ex' : String(v), ...(typeof v === 'number' && v > 0 ? [el('small', { textContent: v === 1 ? 'Schluck' : 'Schlucke' })] : []));
+    $('ruleEx').classList.toggle('on', v === 'ex');
+    $('ruleOff').classList.toggle('on', !v);
+  }
+  function setRule(v) {
+    values[editing] = v;
+    store.set('kt-values', values);
+    showValues();
+    renderSheet();
+    save();
+  }
+  document.querySelectorAll('li[data-rule]').forEach((li) => li.addEventListener('click', () => {
+    editing = li.dataset.rule;
+    renderSheet();
+    $('ruleSheet').hidden = false;
+  }));
+  $('rulePlus').addEventListener('click', () => { const v = values[editing]; setRule(v === 'ex' ? 1 : Math.min(20, (v || 0) + 1)); });
+  $('ruleMinus').addEventListener('click', () => { const v = values[editing]; setRule(v === 'ex' ? 1 : Math.max(0, (v || 0) - 1)); });
+  $('ruleEx').addEventListener('click', () => setRule('ex'));
+  $('ruleOff').addEventListener('click', () => setRule(0));
+  $('ruleReset').addEventListener('click', () => setRule(RULES[editing].def));
+  const closeSheet = () => { $('ruleSheet').hidden = true; };
+  $('ruleDone').addEventListener('click', closeSheet);
+  $('ruleSheet').addEventListener('click', (e) => { if (e.target === $('ruleSheet')) closeSheet(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet(); });
   showValues();
 
   // ---------- Live-Daten ----------
@@ -1130,8 +1216,8 @@
         const team = g[side], opp = g[side === 'home' ? 'away' : 'home'];
         for (let n = 1; n <= score[side]; n++) {
           add(emit(`${gk}:goal:${side}:${n}`, '⚽', `Tor für ${team}`, [
-            ...ownersOf(team).map((person) => ({ person, kind: 'give', amount: values.teamGoal })),
-            ...ownersOf(opp).map((person) => ({ person, kind: 'drink', amount: values.conceded })),
+            ...effects(ownersOf(team), 'teamGoal'),
+            ...effects(ownersOf(opp), 'conceded'),
           ]), [team]);
         }
       }
@@ -1145,29 +1231,29 @@
         const hit = ev.kind === 'goal' ? scorerPickers(g, ev.player) : [...new Set([...scorerPickers(g, ev.player), ...ownersOf(ev.team)])];
         const due = hit.filter((p) => !processed.has(`${base}:${norm(p.name)}`));
         due.forEach((p) => processed.add(`${base}:${norm(p.name)}`));
-        const effects = due.map((person) => ({ person, kind: ev.kind === 'goal' ? 'giveEx' : 'ex' }));
+        const fx = effects(due, ev.kind === 'goal' ? 'pickGoal' : 'red');
         const title = ev.kind === 'goal' ? `${ev.player} trifft ${ev.minute}` : `Rot für ${ev.player} ${ev.minute}`;
         const icon = ev.kind === 'goal' ? '🎯' : '🟥';
         if (near === undefined) {
           processed.add(base);
-          add(record(base, icon, title, effects, true), [ev.team].filter(Boolean), ev.minute);
-        } else if (effects.length) {
-          add(record(base, icon, `${title} (nachträglich)`, effects), [ev.team].filter(Boolean), ev.minute);
+          add(record(base, icon, title, fx, true), [ev.team].filter(Boolean), ev.minute);
+        } else if (fx.length) {
+          add(record(base, icon, `${title} (nachträglich)`, fx), [ev.team].filter(Boolean), ev.minute);
         }
       }
       const behind = score.home === score.away ? null : score.home < score.away ? g.home : g.away;
       if (g.halftime && behind) {
-        add(emit(`${gk}:ht`, '⏸️', `Halbzeit ${g.home} ${score.home}:${score.away} ${g.away}`, ownersOf(behind).map((person) => ({ person, kind: 'drink', amount: values.halftime }))), [g.home, g.away], 'HZ');
+        add(emit(`${gk}:ht`, '⏸️', `Halbzeit ${g.home} ${score.home}:${score.away} ${g.away}`, effects(ownersOf(behind), 'halftime')), [g.home, g.away], 'HZ');
       }
       if (g.state === 'post') {
         const title = `Abpfiff ${g.home} ${score.home}:${score.away} ${g.away}`;
         if (!behind) {
-          add(emit(`${gk}:ft`, '🤝', title, [...ownersOf(g.home), ...ownersOf(g.away)].map((person) => ({ person, kind: 'drink', amount: values.draw }))), [g.home, g.away], 'Ende');
+          add(emit(`${gk}:ft`, '🤝', title, effects([...ownersOf(g.home), ...ownersOf(g.away)], 'draw')), [g.home, g.away], 'Ende');
         } else {
           const winner = behind === g.home ? g.away : g.home;
           add(emit(`${gk}:ft`, '🏁', title, [
-            ...ownersOf(behind).map((person) => ({ person, kind: 'ex' })),
-            ...ownersOf(winner).map((person) => ({ person, kind: 'giveEx' })),
+            ...effects(ownersOf(behind), 'loss'),
+            ...effects(ownersOf(winner), 'win'),
           ]), [g.home, g.away], 'Ende');
         }
       }
@@ -1296,7 +1382,11 @@
       const pickButtons = p.picks.map((pick) => {
         const unknown = isOutWithoutReplacement(pick.name);
         const team = allLineupPlayers().find((x) => norm(x.name) === norm(pick.name))?.team;
-        const btn = el('button', { className: 'pick-btn' + (unknown ? ' unknown' : '') + (flash === pick ? ' flash' : ''), onclick: () => { p.count++; renderAll(pick); } },
+        const btn = el('button', { className: 'pick-btn' + (unknown ? ' unknown' : '') + (flash === pick ? ' flash' : ''), onclick: () => {
+          const fx = effect(p, 'name');
+          if (fx?.kind === 'ex') p.ex = (p.ex || 0) + 1; else if (fx) p.count += fx.amount;
+          renderAll(pick);
+        } },
           ...(team ? [crest(team, 20)] : []), el('span', { textContent: `🗣 ${pick.name}${norm(pick.orig) !== norm(pick.name) ? ` (für ${pick.orig})` : ''}` }));
         btn.title = unknown ? 'Ausgewechselt, Ersatz unbekannt: aufklappen → Wechsel' : 'Antippen, wenn der Name fällt';
         btn.setAttribute('aria-label', `${pick.name} wurde genannt: ein Schluck für ${p.name}`);
