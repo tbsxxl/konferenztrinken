@@ -125,6 +125,37 @@
       box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
     }
 
+    /* Runde: Mitspieler-Schilder, Team-Wappen, Glücksrad */
+    .btn.ghost { background: var(--fill); color: var(--label); box-shadow: none; margin-top: 10px; }
+    .roster { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 14px 14px; }
+    .roster:empty::before { content: "Noch niemand. Name eintippen und Enter."; color: var(--secondary); font-size: 14px; padding: 4px; }
+    .rchip { display: inline-flex; align-items: center; gap: 8px; padding: 4px 6px 4px 4px; border-radius: 999px; background: var(--c); color: #fff; font-weight: 700; font-size: 15px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); }
+    .rchip .ini { width: 28px; height: 28px; border-radius: 50%; background: #fff; color: var(--c); display: grid; place-items: center; font: 800 15px/1 var(--display); text-shadow: none; text-transform: uppercase; }
+    .rchip button { width: 26px; height: 26px; border: 0; border-radius: 50%; background: rgba(0, 0, 0, 0.25); color: #fff; font-size: 14px; line-height: 1; padding: 0; }
+    .team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 10px 6px; padding: 14px; }
+    .team-grid:empty::before { content: "Noch keine Spiele geladen."; color: var(--secondary); font-size: 14px; grid-column: 1 / -1; }
+    .team-grid .t { display: grid; justify-items: center; gap: 4px; font: 700 12px/1 var(--display); letter-spacing: 0.04em; color: var(--secondary); }
+    .edit-teams summary { padding: 0 18px 14px; color: var(--accent-text); font-size: 14px; cursor: pointer; }
+    .edit-teams textarea { border-top: 0.5px solid var(--sep) !important; }
+    .turn { margin-top: 4px; border-radius: 20px; padding: 14px 18px; background: var(--c, var(--accent)); color: #fff; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2); }
+    .turn .ini { width: 44px; height: 44px; border-radius: 50%; background: #fff; color: var(--c); display: grid; place-items: center; font: 800 24px/1 var(--display); text-transform: uppercase; }
+    .turn b { font: 800 26px/1 var(--display); text-transform: uppercase; letter-spacing: 0.02em; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); }
+    .turn span { display: block; font-size: 13px; opacity: 0.85; margin-top: 2px; }
+    .wheel-wrap { position: relative; width: min(340px, 88vw); aspect-ratio: 1; margin: 22px auto 6px; }
+    #wheel { width: 100%; height: 100%; display: block; cursor: pointer; filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.35)); transition: transform 4.6s cubic-bezier(0.12, 0.72, 0.08, 1); }
+    .pointer { position: absolute; left: 50%; top: -6px; transform: translateX(-50%); z-index: 2; width: 0; height: 0; border-left: 16px solid transparent; border-right: 16px solid transparent; border-top: 30px solid #fff; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.45)); }
+    .hub { position: absolute; z-index: 3; left: 50%; top: 50%; translate: -50% -50%; width: 27%; aspect-ratio: 1; border-radius: 50%; border: 4px solid #fff; background: var(--accent); color: #fff; font: 800 20px/1 var(--display); letter-spacing: 0.06em; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4); }
+    .hub:disabled { opacity: 0.85; }
+    .hub:active { transform: scale(0.94); }
+    .wheel-result { min-height: 64px; display: flex; justify-content: center; }
+    .wheel-result .won { display: inline-flex; align-items: center; gap: 10px; padding: 8px 16px 8px 8px; border-radius: 999px; background: #121212; color: #fff; font: 800 20px/1 var(--display); text-transform: uppercase; letter-spacing: 0.02em; animation: pop 0.45s cubic-bezier(0.3, 1.5, 0.6, 1); }
+    @keyframes pop { from { transform: scale(0.6); opacity: 0; } }
+    .sofar { display: flex; align-items: center; gap: 10px; padding: 10px 14px; position: relative; }
+    .sofar + .sofar::before { content: ""; position: absolute; top: 0; left: 14px; right: 0; border-top: 0.5px solid var(--sep); }
+    .sofar .ini { width: 30px; height: 30px; border-radius: 50%; background: var(--c); color: #fff; display: grid; place-items: center; font: 800 16px/1 var(--display); text-transform: uppercase; flex: none; }
+    .sofar .nm { font: 800 17px/1 var(--display); text-transform: uppercase; min-width: 70px; }
+    .sofar .cr { display: flex; gap: 4px; flex-wrap: wrap; }
+
     /* iOS-Schalter */
     input.switch { appearance: none; -webkit-appearance: none; flex: none; width: 51px; height: 31px; border-radius: 999px; background: var(--fill); position: relative; margin: 0; cursor: pointer; transition: background 0.25s; }
     input.switch::before { content: ""; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15), 0 1px 1px rgba(0, 0, 0, 0.16); transition: transform 0.25s cubic-bezier(0.3, 1.3, 0.6, 1); }
@@ -370,23 +401,52 @@
   <!-- RUNDE -->
   <section id="auslosung" hidden>
     <header class="lt"><div><div class="eyebrow">Vor Anpfiff</div><h1>Neue Runde</h1></div></header>
-    <h2 class="sec">Mitspieler</h2>
-    <div class="list"><textarea id="names" placeholder="Anna&#10;Ben&#10;Chris" aria-label="Mitspieler"></textarea></div>
-    <p class="foot">Ein Name pro Zeile.</p>
 
-    <h2 class="sec">Teams</h2>
-    <div class="list"><textarea id="teams" placeholder="Werden automatisch geladen" aria-label="Teams"></textarea></div>
-    <p class="foot">Kommen automatisch aus der 15:30-Konferenz.</p>
+    <div id="setupStage">
+      <h2 class="sec">Mitspieler <small id="rosterCount"></small></h2>
+      <div class="list">
+        <div class="add-row">
+          <input type="text" id="rosterInput" placeholder="Name eingeben …" aria-label="Mitspieler hinzufügen" autocomplete="off" enterkeyhint="done" />
+          <button class="btn small" id="rosterAdd">Hinzufügen</button>
+        </div>
+        <div class="roster" id="roster"></div>
+      </div>
+      <textarea id="names" hidden aria-hidden="true"></textarea>
 
-    <h2 class="sec">Optionen</h2>
-    <div class="list">
-      <div class="cell"><label for="perPlayer">Teams pro Person</label><input type="text" class="inline-input" id="perPlayer" inputmode="numeric" value="auto" /></div>
-      <label class="cell"><span>Spieler-Picks auslosen</span><input type="checkbox" class="switch" id="autoPicks" checked /></label>
+      <h2 class="sec">Teams <small id="teamsCount"></small></h2>
+      <div class="list">
+        <div class="team-grid" id="teamGrid"></div>
+        <details class="edit-teams"><summary>Teams bearbeiten</summary>
+          <textarea id="teams" placeholder="Ein Team pro Zeile" aria-label="Teams"></textarea>
+        </details>
+      </div>
+
+      <h2 class="sec">Optionen</h2>
+      <div class="list">
+        <div class="cell"><label for="perPlayer">Teams pro Person</label><input type="text" class="inline-input" id="perPlayer" inputmode="numeric" value="auto" /></div>
+        <label class="cell"><span>Spieler-Picks auslosen</span><input type="checkbox" class="switch" id="autoPicks" checked /></label>
+      </div>
+      <p class="foot">„auto“ verteilt alle Teams gleichmäßig. Niemand bekommt beide Teams eines Spiels.</p>
+
+      <button class="btn" id="wheelStart">🎡 Glücksrad drehen</button>
+      <button class="btn ghost" id="draw">Sofort auslosen</button>
+      <div class="error" id="drawError" role="alert"></div>
     </div>
-    <p class="foot">„auto“ verteilt alle Teams gleichmäßig. Picks kommen aus fremden Teams, sobald die Aufstellungen da sind.</p>
 
-    <button class="btn" id="draw">Auslosen &amp; loslegen</button>
-    <div class="error" id="drawError" role="alert"></div>
+    <div id="wheelStage" hidden>
+      <div class="turn" id="turnBanner"></div>
+      <div class="wheel-wrap">
+        <div class="pointer" aria-hidden="true"></div>
+        <svg id="wheel" viewBox="-110 -110 220 220" role="img" aria-label="Glücksrad mit den Vereinen"></svg>
+        <button class="hub" id="spin">DREH</button>
+      </div>
+      <div class="wheel-result" id="wheelResult" aria-live="polite"></div>
+      <h2 class="sec">Bisher</h2>
+      <div class="list" id="wheelSoFar"></div>
+      <button class="btn" id="wheelDone" hidden>Los geht’s</button>
+      <button class="btn ghost" id="wheelSkip">Rest sofort auslosen</button>
+      <button class="btn ghost" id="wheelCancel">Abbrechen</button>
+    </div>
   </section>
 
   <!-- REGELN -->
@@ -1315,6 +1375,8 @@
 
   function renderAll(flash) {
     save();
+    renderRoster();
+    renderTeamGrid();
     renderMismatch();
     renderBoard();
     renderTodos();
@@ -1328,30 +1390,65 @@
   $('names').value = store.get('kt-names', '');
   $('teams').value = store.get('kt-teams', '');
   $('autoPicks').checked = store.get('kt-autopicks', true);
-  $('teams').addEventListener('input', () => store.set('kt-teams-auto', false));
 
-  $('draw').addEventListener('click', () => {
-    const names = lines($('names').value);
-    const teams = lines($('teams').value);
+  // Mitspieler als farbige Schilder statt Textfeld.
+  let roster = lines($('names').value);
+  const rosterColor = (i) => PALETTE[i % PALETTE.length];
+  function saveRoster() {
+    $('names').value = roster.join('\n');
     store.set('kt-names', $('names').value);
-    store.set('kt-teams', $('teams').value);
+    renderRoster();
+  }
+  function renderRoster() {
+    const box = $('roster');
+    box.innerHTML = '';
+    roster.forEach((name, i) => {
+      const remove = el('button', { textContent: '✕', onclick: () => { roster.splice(i, 1); saveRoster(); } });
+      remove.setAttribute('aria-label', `${name} entfernen`);
+      box.append(el('span', { className: 'rchip', style: `--c: ${rosterColor(i)}` }, el('span', { className: 'ini', textContent: [...name][0] }), name, remove));
+    });
+    $('rosterCount').textContent = roster.length ? `${roster.length} dabei` : '';
+  }
+  function addRoster() {
+    const name = $('rosterInput').value.trim();
+    $('rosterInput').value = '';
+    if (!name || roster.some((n) => norm(n) === norm(name))) return;
+    roster.push(name);
+    saveRoster();
+    $('rosterInput').focus();
+  }
+  $('rosterAdd').addEventListener('click', addRoster);
+  $('rosterInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addRoster(); } });
+
+  // Teams als Wappen; bearbeiten bei Bedarf im Textfeld.
+  function renderTeamGrid() {
+    const teams = lines($('teams').value);
+    $('teamGrid').innerHTML = '';
+    for (const t of teams) {
+      const g = games.find((x) => sameClub(x.home, t) || sameClub(x.away, t));
+      const abbr = g ? teamAbbr(g, sameClub(g.home, t) ? 'home' : 'away') : (club(t)[0] || clubKey(t).slice(0, 3).toUpperCase());
+      $('teamGrid').append(el('div', { className: 't', title: t }, crest(t, 40), abbr));
+    }
+    $('teamsCount').textContent = teams.length ? `${teams.length} Teams` : '';
+  }
+  $('teams').addEventListener('input', () => { store.set('kt-teams-auto', false); store.set('kt-teams', $('teams').value); renderTeamGrid(); });
+
+  // Prüft die Eingaben und verteilt fair: Paarungen bleiben zusammen und werden reihum vergeben,
+  // so landen Heim und Gast eines Spiels nie bei derselben Person.
+  function planDraw() {
+    const names = [...roster];
+    const teams = lines($('teams').value);
     store.set('kt-autopicks', $('autoPicks').checked);
     $('drawError').textContent = '';
-
-    if (names.length < 2) return ($('drawError').textContent = 'Mindestens zwei Mitspieler eintragen.');
-    if (teams.length < names.length) return ($('drawError').textContent = 'Es braucht mindestens so viele Teams wie Mitspieler.');
-
+    const fail = (msg) => { $('drawError').textContent = msg; return null; };
+    if (names.length < 2) return fail('Mindestens zwei Mitspieler eintragen.');
+    if (teams.length < names.length) return fail('Es braucht mindestens so viele Teams wie Mitspieler.');
     const raw = $('perPlayer').value.trim().toLowerCase();
     const perPlayer = raw === 'auto' || raw === '' ? Infinity : parseInt(raw, 10);
-    if (Number.isNaN(perPlayer) || perPlayer < 1) {
-      return ($('drawError').textContent = 'Teams pro Person: „auto“ oder eine Zahl ab 1.');
-    }
-    if (perPlayer !== Infinity && perPlayer * names.length > teams.length) {
-      return ($('drawError').textContent = `Für ${names.length} Personen mit je ${perPlayer} Teams braucht es ${perPlayer * names.length} Teams.`);
-    }
-    if (players.some((p) => p.count || p.ex) && !confirm('Neue Runde starten? Zähler und Ticker werden zurückgesetzt.')) return;
+    if (Number.isNaN(perPlayer) || perPlayer < 1) return fail('Teams pro Person: „auto“ oder eine Zahl ab 1.');
+    if (perPlayer !== Infinity && perPlayer * names.length > teams.length) return fail(`Für ${names.length} Personen mit je ${perPlayer} Teams braucht es ${perPlayer * names.length} Teams.`);
+    if (players.some((p) => p.count || p.ex) && !confirm('Neue Runde starten? Zähler und Ticker werden zurückgesetzt.')) return null;
 
-    // Paarungen zusammen halten und reihum verteilen: Heim und Gast eines Spiels landen so bei verschiedenen Personen.
     const pairs = [];
     for (const t of teams) {
       const g = games.find((x) => sameClub(x.home, t) || sameClub(x.away, t));
@@ -1360,17 +1457,125 @@
     }
     const pool = shuffle(pairs).flatMap((pr) => shuffle(pr.teams));
     const take = perPlayer === Infinity ? pool.length : perPlayer * names.length;
-    players = shuffle(names).map((name) => ({ name, teams: [], count: 0, ex: 0, picks: [] }));
-    pool.slice(0, take).forEach((team, i) => players[i % players.length].teams.push(team));
+    const order = shuffle(names);
+    return { teams, order, steps: pool.slice(0, take).map((team, i) => ({ person: order[i % order.length], team })) };
+  }
 
-    // Neue Runde: Ticker leeren, bereits gefallene Tore usw. werden direkt nachgeholt.
+  function startRound(order, steps) {
+    // Reihenfolge wie in der Mitspielerliste, damit jede Person ihre Farbe behält.
+    players = [...order].sort((x, y) => roster.indexOf(x) - roster.indexOf(y)).map((name) => ({ name, teams: steps.filter((s) => s.person === name).map((s) => s.team), count: 0, ex: 0, picks: [] }));
     feed = [];
     processed = new Set();
     if ($('autoPicks').checked) autoPick({ quiet: true });
     processEvents();
     renderAll();
     showTab('zaehler');
+  }
+
+  $('draw').addEventListener('click', () => {
+    const plan = planDraw();
+    if (plan) startRound(plan.order, plan.steps);
   });
+
+  // ---------- Glücksrad ----------
+  // Das Rad deckt den fairen Plan Zug um Zug auf; bereits vergebene Felder werden grau.
+  const wheel = { plan: null, step: 0, rotation: 0, spinning: false };
+  const personColor = (name) => rosterColor(Math.max(0, roster.indexOf(name)));
+  function drawWheel() {
+    const svg = $('wheel');
+    const teams = wheel.plan.teams;
+    const n = teams.length, a = 360 / n;
+    const taken = new Map(wheel.plan.steps.slice(0, wheel.step).map((s) => [s.team, s.person]));
+    const pt = (deg, r) => { const t = ((deg - 90) * Math.PI) / 180; return [r * Math.cos(t), r * Math.sin(t)]; };
+    let out = '<circle r="100" fill="#141414"/>';
+    teams.forEach((t, i) => {
+      const g = games.find((x) => sameClub(x.home, t) || sameClub(x.away, t));
+      const side = g && (sameClub(g.home, t) ? 'home' : 'away');
+      const owner = taken.get(t);
+      const fill = owner ? personColor(owner) : g ? teamColor(g, side) : club(t)[1] || '#555';
+      const [x1, y1] = pt(i * a, 100), [x2, y2] = pt((i + 1) * a, 100);
+      const path = n === 1 ? '<circle r="100"/>' : `<path d="M0 0L${x1.toFixed(2)} ${y1.toFixed(2)}A100 100 0 ${a > 180 ? 1 : 0} 1 ${x2.toFixed(2)} ${y2.toFixed(2)}Z"/>`;
+      const mid = i * a + a / 2;
+      const [lx, ly] = pt(mid, 64), [ix, iy] = pt(mid, 84);
+      const abbr = g ? teamAbbr(g, side) : (club(t)[0] || clubKey(t).slice(0, 3).toUpperCase());
+      const logo = g && g[side + 'Logo'];
+      const esc = (v) => String(v).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+      out += `<g fill="${fill}" fill-opacity="${owner ? 0.38 : 1}" stroke="#fff" stroke-width="1.2">${path}</g>`;
+      out += `<text x="${lx.toFixed(2)}" y="${ly.toFixed(2)}" transform="rotate(${mid} ${lx.toFixed(2)} ${ly.toFixed(2)})" text-anchor="middle" dominant-baseline="central" fill="#fff" font-family="Barlow Condensed, Arial Narrow, sans-serif" font-weight="800" font-size="${n > 12 ? 9 : 12}" style="paint-order:stroke" stroke="rgba(0,0,0,.35)" stroke-width="2">${esc(owner ? owner : abbr)}</text>`;
+      if (logo && !owner) out += `<image href="${esc(logo)}" x="${(ix - 7).toFixed(2)}" y="${(iy - 7).toFixed(2)}" width="14" height="14" transform="rotate(${mid} ${ix.toFixed(2)} ${iy.toFixed(2)})"/>`;
+    });
+    out += '<circle r="100" fill="none" stroke="#fff" stroke-width="3"/>';
+    svg.innerHTML = out;
+  }
+  function renderWheelStage() {
+    const { plan, step } = wheel;
+    const done = step >= plan.steps.length;
+    const turn = $('turnBanner');
+    turn.innerHTML = '';
+    if (done) {
+      turn.style.setProperty('--c', 'var(--accent)');
+      turn.append(el('div', {}, el('b', { textContent: 'Alles verlost!' }), el('span', { textContent: 'Viel Spaß bei der Konferenz' })));
+    } else {
+      const who = plan.steps[step].person;
+      turn.style.setProperty('--c', personColor(who));
+      turn.append(el('span', { className: 'ini', textContent: [...who][0] }),
+        el('div', {}, el('b', { textContent: `${who} ist dran` }), el('span', { textContent: `Team ${step + 1} von ${plan.steps.length} · auf DREH tippen` })));
+    }
+    $('spin').hidden = done;
+    $('wheelDone').hidden = !done;
+    $('wheelSkip').hidden = done;
+    const so = $('wheelSoFar');
+    so.innerHTML = '';
+    for (const name of plan.order) {
+      const got = plan.steps.slice(0, step).filter((s) => s.person === name).map((s) => s.team);
+      so.append(el('div', { className: 'sofar' }, el('span', { className: 'ini', style: `--c: ${personColor(name)}`, textContent: [...name][0] }),
+        el('span', { className: 'nm', textContent: name }), el('div', { className: 'cr' }, ...got.map((t) => crest(t, 26)))));
+    }
+  }
+  function openWheel() {
+    const plan = planDraw();
+    if (!plan) return;
+    Object.assign(wheel, { plan, step: 0, spinning: false });
+    $('setupStage').hidden = true;
+    $('wheelStage').hidden = false;
+    $('wheelResult').innerHTML = '';
+    drawWheel();
+    renderWheelStage();
+    window.scrollTo(0, 0);
+  }
+  function spin() {
+    if (wheel.spinning || wheel.step >= wheel.plan.steps.length) return;
+    const { team, person } = wheel.plan.steps[wheel.step];
+    const n = wheel.plan.teams.length, a = 360 / n;
+    const i = wheel.plan.teams.indexOf(team);
+    // Ziel: Mitte des Feldes (mit etwas Zufall) landet unter dem Zeiger oben.
+    const target = i * a + a / 2 + (Math.random() - 0.5) * a * 0.6;
+    const delta = (((-target - wheel.rotation) % 360) + 360) % 360;
+    wheel.rotation += 360 * 5 + delta;
+    wheel.spinning = true;
+    $('spin').disabled = true;
+    $('wheelResult').innerHTML = '';
+    $('wheel').style.transform = `rotate(${wheel.rotation}deg)`;
+    setTimeout(() => {
+      wheel.spinning = false;
+      $('spin').disabled = false;
+      wheel.step++;
+      try { navigator.vibrate?.(120); } catch {}
+      $('wheelResult').append(el('div', { className: 'won' }, crest(team, 40), `${person} ← ${team}`));
+      drawWheel();
+      renderWheelStage();
+    }, 4700);
+  }
+  $('wheelStart').addEventListener('click', openWheel);
+  $('spin').addEventListener('click', spin);
+  $('wheel').addEventListener('click', spin);
+  $('wheelSkip').addEventListener('click', () => { wheel.step = wheel.plan.steps.length; drawWheel(); renderWheelStage(); });
+  $('wheelDone').addEventListener('click', () => {
+    $('wheelStage').hidden = true;
+    $('setupStage').hidden = false;
+    startRound(wheel.plan.order, wheel.plan.steps);
+  });
+  $('wheelCancel').addEventListener('click', () => { $('wheelStage').hidden = true; $('setupStage').hidden = false; });
 
   // ---------- Live-Tab Aktionen ----------
   $('autoPickNow').addEventListener('click', () => autoPick());
