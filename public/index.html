@@ -203,8 +203,8 @@
     .p .info { min-width: 0; }
     .p .who-line { display: flex; align-items: center; gap: 8px; min-width: 0; }
     .p .name { font-size: 18px; font-weight: 800; letter-spacing: 0.01em; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background: none; border: 0; padding: 0; color: #fff; text-align: left; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35); }
-    .p .name::after { content: " ›"; opacity: 0.6; font-weight: 600; }
-    .p.open .name::after { content: " ⌄"; }
+    .p .name::after { content: "›"; display: inline-block; margin-left: 6px; opacity: 0.6; font-weight: 600; transition: transform 0.2s; }
+    .p.open .name::after { transform: rotate(90deg); }
     .p .sub { display: flex; align-items: center; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
     .p .crests { display: flex; gap: 3px; margin: 0; }
     .p .cells { align-self: center; }
@@ -668,7 +668,7 @@
   function bannerBackground(color, shape, side) {
     const key = `${color}|${shape}|${side}`;
     if (bannerCache.has(key)) return bannerCache.get(key);
-    const W = 640, H = 200, cx = side === 'home' ? 88 : W - 88, cy = 100, dir = side === 'home' ? 1 : -1;
+    const W = 1800, H = 200, cx = side === 'home' ? 88 : W - 88, cy = 100, dir = side === 'home' ? 1 : -1;
     let layers = '';
     for (let i = 7; i >= 0; i--) {
       layers += `<path d="${shapePath(shape, cx, cy, 72 + i * 34, i, dir)}" fill="${shade(color, -0.02 * i)}" filter="url(#s)"/>`;
@@ -1236,7 +1236,8 @@
       }));
       const nameBtn = el('button', { className: 'name', textContent: p.name, onclick: toggle });
       nameBtn.setAttribute('aria-expanded', String(isOpen));
-      const disc = el('div', { className: 'disc', textContent: [...p.name][0] || '?' }, el('span', { className: 'rank', textContent: idx + 1 }));
+      const rank = ranked.findIndex((x) => x.count === p.count && (x.ex || 0) === (p.ex || 0)) + 1;
+      const disc = el('div', { className: 'disc', textContent: [...p.name][0] || '?' }, el('span', { className: 'rank', textContent: rank }));
       const main = el('div', { className: 'row-main' },
         disc,
         el('div', { className: 'info' }, el('div', { className: 'who-line' }, nameBtn), el('div', { className: 'sub' }, crests, ...pickButtons)),
