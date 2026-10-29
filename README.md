@@ -46,6 +46,13 @@ Der Worker prüft jede Minute (Cron) die Spiele, für die jemand Push eingeschal
 - Die VAPID-Schlüssel erzeugt der Worker beim ersten Bedarf selbst und speichert sie im KV.
 - iPhone/iPad (ab iOS 16.4): Seite in Safari öffnen → Teilen → *Zum Home-Bildschirm* → App von dort öffnen → im Live-Tab *Push-Nachrichten* einschalten.
 
+## Datenschutz & Barrierefreiheit
+
+- Keine Cookies, kein Tracking. Die Runde bleibt im Browser (localStorage/IndexedDB).
+- Spieldaten und Vereinslogos laufen über den Worker (`/api/…`, `/api/logo`), Schriften liegen in `public/fonts` (SIL OFL). Das Gerät verbindet sich nicht direkt mit ESPN, OpenLigaDB oder Google.
+- `public/datenschutz.html`: Datenschutzerklärung. **Name und Kontakt der verantwortlichen Person noch eintragen.**
+- Nach Apples Gestaltungsregeln: Tippflächen ≥ 44 pt, Personenfarben mit ≥ 4,5 : 1 Kontrast, Textgröße folgt der iOS-Einstellung, „Bewegung reduzieren“ wird beachtet, eigene Dialoge statt Browser-Popups.
+
 ## Hinweis
 
 Trinkt verantwortungsvoll. Kleine Schlucke, Wasser zwischendurch, und alkoholfreies Bier zählt genauso.

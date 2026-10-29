@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="darkreader-lock" />
+  <meta name="color-scheme" content="light dark" />
+  <title>Datenschutz · Konferenztrinken</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍺</text></svg>" />
+  <style>
+    @font-face { font-family: "Inter"; font-weight: 400; font-display: swap; src: url(/fonts/inter-latin-400-normal.woff2) format("woff2"); }
+    @font-face { font-family: "Inter"; font-weight: 700; font-display: swap; src: url(/fonts/inter-latin-700-normal.woff2) format("woff2"); }
+    @font-face { font-family: "Barlow Condensed"; font-weight: 800; font-display: swap; src: url(/fonts/barlow-condensed-latin-800-normal.woff2) format("woff2"); }
+    html { font-size: 17px; }
+    @supports (font: -apple-system-body) { html { font: -apple-system-body; } }
+    :root { --bg: #f2f2f2; --text: #111; --muted: #555; --card: linear-gradient(180deg, #1f1f1f, #121212); --accent: #d20515; }
+    @media (prefers-color-scheme: dark) { :root { --bg: #000; --text: #fff; --muted: rgba(255, 255, 255, 0.65); } }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, Inter, system-ui, sans-serif; font-size: 1rem; line-height: 1.5; }
+    main { max-width: 680px; margin: 0 auto; padding: calc(env(safe-area-inset-top) + 24px) 16px calc(env(safe-area-inset-bottom) + 40px); }
+    a { color: inherit; }
+    .back { display: inline-flex; align-items: center; min-height: 44px; font-weight: 700; text-decoration: none; color: var(--accent); }
+    h1 { font: 800 2.5rem/1 "Barlow Condensed", "Arial Narrow", sans-serif; text-transform: uppercase; margin: 8px 0 20px; }
+    section { background: var(--card); color: #fff; border-radius: 20px; padding: 16px 18px; margin-bottom: 12px; }
+    h2 { font: 800 1.25rem/1.2 "Barlow Condensed", "Arial Narrow", sans-serif; text-transform: uppercase; letter-spacing: 0.03em; margin: 0 0 6px; }
+    p, li { color: rgba(255, 255, 255, 0.82); margin: 6px 0; }
+    ul { padding-left: 20px; margin: 6px 0; }
+    .todo { color: #ffb4b8; font-weight: 700; }
+    footer { color: var(--muted); font-size: 0.8rem; text-align: center; margin-top: 20px; }
+  </style>
+</head>
+<body>
+<main>
+  <a class="back" href="/">‹ Zurück zur App</a>
+  <h1>Datenschutz</h1>
+
+  <section>
+    <h2>Verantwortlich</h2>
+    <p class="todo">[Name und Kontakt (E-Mail) der verantwortlichen Person hier eintragen]</p>
+    <p>Konferenztrinken ist ein privates, nicht kommerzielles Projekt ohne Werbung.</p>
+  </section>
+
+  <section>
+    <h2>Kurz gesagt</h2>
+    <ul>
+      <li>Keine Cookies, kein Tracking, keine Analyse, keine Werbung.</li>
+      <li>Deine Runde (Namen, Teams, Picks, Zählerstände, Regeln) bleibt auf deinem Gerät.</li>
+      <li>Spieldaten, Vereinslogos und Schriften kommen über unseren eigenen Server. Dein Gerät verbindet sich nicht direkt mit ESPN, OpenLigaDB oder Google.</li>
+      <li>Nur wenn du Push-Nachrichten einschaltest, speichern wir dafür nötige technische Daten.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Daten auf deinem Gerät</h2>
+    <p>Mitspielernamen, ausgeloste Teams, Spieler-Picks, Zählerstände, Ticker, Regelwerte und Einstellungen speichert die App im Speicher deines Browsers (localStorage und IndexedDB). Diese Daten werden nicht an uns übertragen. Du löschst sie, indem du die Website-Daten der Seite in den Browser- bzw. iPhone-Einstellungen entfernst oder die App vom Home-Bildschirm löschst.</p>
+  </section>
+
+  <section>
+    <h2>Hosting</h2>
+    <p>Die Seite wird über Cloudflare (Cloudflare, Inc., 101 Townsend St, San Francisco, CA 94107, USA) ausgeliefert. Beim Aufruf verarbeitet Cloudflare technisch notwendige Daten wie IP-Adresse, Zeitpunkt und Browserangaben, um die Seite auszuliefern und vor Angriffen zu schützen. Rechtsgrundlage ist unser berechtigtes Interesse an einem sicheren und funktionierenden Angebot (Art. 6 Abs. 1 lit. f DSGVO). Cloudflare ist unter dem EU-US Data Privacy Framework zertifiziert. Wir selbst werten keine Zugriffe aus.</p>
+  </section>
+
+  <section>
+    <h2>Spieldaten und Logos</h2>
+    <p>Spielstände, Aufstellungen, Torschützen und Vereinslogos ruft unser Server bei ESPN und OpenLigaDB ab und reicht sie an dich weiter. Dabei werden keine Daten über dich an diese Dienste übermittelt. Die Daten sind ohne Gewähr.</p>
+  </section>
+
+  <section>
+    <h2>Push-Nachrichten</h2>
+    <p>Push-Nachrichten gibt es nur, wenn du sie im Live-Tab einschaltest und in deinem Gerät erlaubst (Einwilligung, Art. 6 Abs. 1 lit. a DSGVO). Dann speichern wir bei Cloudflare (Workers KV):</p>
+    <ul>
+      <li>die Push-Adresse, die der Push-Dienst deines Geräteherstellers (z. B. Apple, Google oder Mozilla) vergibt, und die Schlüssel zur Verschlüsselung der Nachrichten,</li>
+      <li>die Kennungen der Spiele, die du verfolgst.</li>
+    </ul>
+    <p>Namen, Teams oder Zählerstände deiner Runde werden dafür nicht übertragen. Wer trinkt oder verteilt, rechnet dein Gerät beim Empfang selbst aus. Die Nachrichten laufen verschlüsselt über den Push-Dienst deines Geräteherstellers.</p>
+    <p>Löschung: sofort, wenn du den Schalter ausschaltest. Sonst automatisch spätestens zwei Tage nach dem letzten verfolgten Spiel oder sobald dein Gerät nicht mehr erreichbar ist. Du kannst die Einwilligung jederzeit widerrufen, auch in den Mitteilungs-Einstellungen deines Geräts.</p>
+  </section>
+
+  <section>
+    <h2>Schriften</h2>
+    <p>Die Schriften Inter und Barlow Condensed liegen auf unserem Server (SIL Open Font License). Es wird keine Verbindung zu Google Fonts aufgebaut.</p>
+  </section>
+
+  <section>
+    <h2>Deine Rechte</h2>
+    <p>Du hast das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch sowie auf Widerruf einer Einwilligung mit Wirkung für die Zukunft (Art. 15–21 DSGVO). Außerdem kannst du dich bei einer Datenschutz-Aufsichtsbehörde beschweren.</p>
+  </section>
+
+  <footer>Stand: Oktober 2026</footer>
+</main>
+</body>
+</html>

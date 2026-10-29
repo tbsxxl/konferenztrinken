@@ -15,10 +15,22 @@
   <title>Konferenztrinken</title>
   <meta name="description" content="Das Trinkspiel zur Bundesliga-Konferenz am Samstag um 15:30 Uhr: Live-Spieltag, Auslosung und automatischer Schluck-Zähler." />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍺</text></svg>" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="preload" href="/fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/fonts/barlow-condensed-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin />
   <style>
+    /* Schriften liegen auf dem eigenen Server (SIL Open Font License, siehe /fonts) – kein Abruf bei Google. */
+    @font-face { font-family: "Inter"; font-style: normal; font-weight: 400; font-display: swap; src: url(/fonts/inter-latin-400-normal.woff2) format("woff2"); }
+    @font-face { font-family: "Inter"; font-style: normal; font-weight: 500; font-display: swap; src: url(/fonts/inter-latin-500-normal.woff2) format("woff2"); }
+    @font-face { font-family: "Inter"; font-style: normal; font-weight: 600; font-display: swap; src: url(/fonts/inter-latin-600-normal.woff2) format("woff2"); }
+    @font-face { font-family: "Inter"; font-style: normal; font-weight: 700; font-display: swap; src: url(/fonts/inter-latin-700-normal.woff2) format("woff2"); }
+    @font-face { font-family: "Inter"; font-style: normal; font-weight: 800; font-display: swap; src: url(/fonts/inter-latin-800-normal.woff2) format("woff2"); }
+    @font-face { font-family: "Barlow Condensed"; font-style: normal; font-weight: 600; font-display: swap; src: url(/fonts/barlow-condensed-latin-600-normal.woff2) format("woff2"); }
+    @font-face { font-family: "Barlow Condensed"; font-style: normal; font-weight: 700; font-display: swap; src: url(/fonts/barlow-condensed-latin-700-normal.woff2) format("woff2"); }
+    @font-face { font-family: "Barlow Condensed"; font-style: normal; font-weight: 800; font-display: swap; src: url(/fonts/barlow-condensed-latin-800-normal.woff2) format("woff2"); }
+
+    /* Grundschriftgröße folgt auf iPhone/iPad der Einstellung „Textgröße“ (Dynamic Type). */
+    html { font-size: 17px; }
+    @supports (font: -apple-system-body) { html { font: -apple-system-body; } }
     /* iOS-Systemfarben, hell und dunkel */
     :root {
       color-scheme: light dark;
@@ -69,7 +81,7 @@
     [hidden] { display: none !important; }
     html { background: var(--bg); }
     body {
-      margin: 0; min-height: 100vh; color: var(--label); font: 17px/1.35 var(--font); letter-spacing: -0.01em;
+      margin: 0; min-height: 100vh; color: var(--label); font: 1rem/1.35 var(--font); letter-spacing: -0.01em;
       background:
         radial-gradient(120% 50% at 0% 0%, color-mix(in srgb, var(--accent) var(--glow), transparent), transparent 60%),
         radial-gradient(90% 40% at 100% 0%, color-mix(in srgb, var(--blue) 10%, transparent), transparent 60%),
@@ -84,11 +96,11 @@
 
     /* Großer Titel */
     .lt { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin: 22px 4px 18px; }
-    .lt h1 { margin: 0; font: 800 42px/1 var(--display); text-transform: uppercase; letter-spacing: 0.01em; }
-    .eyebrow { font-size: 13px; font-weight: 600; color: var(--secondary); text-transform: uppercase; letter-spacing: 0.02em; margin-bottom: 2px; }
+    .lt h1 { margin: 0; font: 800 2.471rem/1 var(--display); text-transform: uppercase; letter-spacing: 0.01em; }
+    .eyebrow { font-size: 0.7647rem; font-weight: 600; color: var(--secondary); text-transform: uppercase; letter-spacing: 0.02em; margin-bottom: 2px; }
     .eyebrow:empty::before { content: "Bundesliga"; }
     .pill {
-      flex: none; font-size: 13px; font-weight: 600; padding: 7px 13px; border-radius: 999px; margin-bottom: 4px;
+      flex: none; font-size: 0.7647rem; font-weight: 600; padding: 7px 13px; border-radius: 999px; margin-bottom: 4px;
       background: var(--glass); border: 0.5px solid var(--glass-edge); box-shadow: var(--glass-shadow);
       backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%); color: var(--secondary);
     }
@@ -97,15 +109,15 @@
     @keyframes pulse { 50% { opacity: 0.25; } }
 
     /* Gruppierte Listen */
-    h2.sec { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin: 26px 20px 7px; font: 700 15px/1.2 var(--display); letter-spacing: 0.06em; color: var(--secondary); text-transform: uppercase; letter-spacing: 0.01em; }
-    h2.sec small { text-transform: none; font-size: 13px; }
+    h2.sec { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin: 26px 20px 7px; font: 700 0.8824rem/1.2 var(--display); letter-spacing: 0.06em; color: var(--secondary); text-transform: uppercase; letter-spacing: 0.01em; }
+    h2.sec small { text-transform: none; font-size: 0.7647rem; }
     .lt + h2.sec { margin-top: 4px; }
     .list, .board, .game { background: var(--cell); border-radius: var(--r); overflow: hidden; }
-    .foot { margin: 7px 20px 0; font-size: 13px; color: var(--secondary); }
+    .foot { margin: 7px 20px 0; font-size: 0.7647rem; color: var(--secondary); }
     .cell { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 10px 18px; position: relative; width: 100%; background: none; border: 0; text-align: left; }
     .cell + .cell::before, .row + .row::before, .entry + .entry::before { content: ""; position: absolute; top: 0; right: 0; left: 18px; border-top: 0.5px solid var(--sep); }
     .cell.action { color: var(--accent-text); justify-content: center; font-weight: 500; }
-    .cell-sub { display: block; font-size: 13px; color: var(--secondary); margin-top: 1px; }
+    .cell-sub { display: block; font-size: 0.7647rem; color: var(--secondary); margin-top: 1px; }
     .cell.danger { color: var(--red); justify-content: center; }
     .cell .inline-input { width: 96px; flex: none; }
     .cell input[type="date"], .cell .inline-input { max-width: 60%; border: 0; background: var(--fill); border-radius: 10px; padding: 6px 10px; font: inherit; color: var(--label); text-align: right; }
@@ -114,8 +126,8 @@
     textarea:focus, input:focus { outline: none; }
     .add-row { display: flex; gap: 8px; padding: 8px 8px 8px 18px; align-items: center; }
     .add-row input { flex: 1; min-width: 0; border: 0; background: none; font: inherit; color: var(--label); padding: 8px 0; }
-    .empty { background: var(--cell); border-radius: var(--r); padding: 18px; color: var(--secondary); font-size: 15px; }
-    .error { color: var(--red); margin: 8px 20px 0; font-size: 13px; }
+    .empty { background: var(--cell); border-radius: var(--r); padding: 18px; color: var(--secondary); font-size: 0.8824rem; }
+    .error { color: var(--red); margin: 8px 20px 0; font-size: 0.7647rem; }
     .error:empty { display: none; }
 
     /* Eine Fläche für alles: dunkelblaue Tafel wie Spielstand und Ticker, in beiden Modi */
@@ -130,14 +142,14 @@
     /* Runde: Mitspieler-Schilder, Team-Wappen, Glücksrad */
     .btn.ghost { background: var(--fill); color: var(--label); box-shadow: none; margin-top: 10px; }
     .roster { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 14px 14px; }
-    .roster:empty::before { content: "Noch niemand. Name eintippen und Enter."; color: var(--secondary); font-size: 14px; padding: 4px; }
-    .rchip { display: inline-flex; align-items: center; gap: 8px; padding: 4px 6px 4px 4px; border-radius: 999px; background: var(--c); color: #fff; font-weight: 700; font-size: 15px; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); }
+    .roster:empty::before { content: "Noch niemand. Name eintippen und Enter."; color: var(--secondary); font-size: 0.8235rem; padding: 4px; }
+    .rchip { display: inline-flex; align-items: center; gap: 8px; padding: 4px 6px 4px 4px; border-radius: 999px; background: var(--c); color: #fff; font-weight: 700; font-size: 0.8824rem; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); }
     .rchip .ini { width: 28px; height: 28px; border-radius: 50%; background: #fff; color: var(--c); display: grid; place-items: center; font: 800 15px/1 var(--display); text-shadow: none; text-transform: uppercase; }
-    .rchip button { width: 26px; height: 26px; border: 0; border-radius: 50%; background: rgba(0, 0, 0, 0.25); color: #fff; font-size: 14px; line-height: 1; padding: 0; }
+    .rchip button { width: 26px; height: 26px; border: 0; border-radius: 50%; background: rgba(0, 0, 0, 0.25); color: #fff; font-size: 0.8235rem; line-height: 1; padding: 0; }
     .team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 10px 6px; padding: 14px; }
-    .team-grid:empty::before { content: "Noch keine Spiele geladen."; color: var(--secondary); font-size: 14px; grid-column: 1 / -1; }
-    .team-grid .t { display: grid; justify-items: center; gap: 4px; font: 700 12px/1 var(--display); letter-spacing: 0.04em; color: var(--secondary); }
-    .edit-teams summary { padding: 0 18px 14px; color: var(--accent-text); font-size: 14px; cursor: pointer; }
+    .team-grid:empty::before { content: "Noch keine Spiele geladen."; color: var(--secondary); font-size: 0.8235rem; grid-column: 1 / -1; }
+    .team-grid .t { display: grid; justify-items: center; gap: 4px; font: 700 0.7059rem/1 var(--display); letter-spacing: 0.04em; color: var(--secondary); }
+    .edit-teams summary { padding: 0 18px 14px; color: var(--accent-text); font-size: 0.8235rem; cursor: pointer; }
     .edit-teams textarea { border-top: 0.5px solid var(--sep) !important; }
     .turn { margin-top: 4px; border-radius: 20px; padding: 14px 18px; background: var(--c, var(--accent)); color: #fff; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2); }
     .turn .ini { width: 44px; height: 44px; border-radius: 50%; background: #fff; color: var(--c); display: grid; place-items: center; font: 800 24px/1 var(--display); text-transform: uppercase; }
@@ -150,12 +162,12 @@
     .hub:disabled { opacity: 0.85; }
     .hub:active { transform: scale(0.94); }
     .wheel-result { min-height: 64px; display: flex; justify-content: center; }
-    .wheel-result .won { display: inline-flex; align-items: center; gap: 10px; padding: 8px 16px 8px 8px; border-radius: 999px; background: #121212; color: #fff; font: 800 20px/1 var(--display); text-transform: uppercase; letter-spacing: 0.02em; animation: pop 0.45s cubic-bezier(0.3, 1.5, 0.6, 1); }
+    .wheel-result .won { display: inline-flex; align-items: center; gap: 10px; padding: 8px 16px 8px 8px; border-radius: 999px; background: #121212; color: #fff; font: 800 1.176rem/1 var(--display); text-transform: uppercase; letter-spacing: 0.02em; animation: pop 0.45s cubic-bezier(0.3, 1.5, 0.6, 1); }
     @keyframes pop { from { transform: scale(0.6); opacity: 0; } }
     .sofar { display: flex; align-items: center; gap: 10px; padding: 10px 14px; position: relative; }
     .sofar + .sofar::before { content: ""; position: absolute; top: 0; left: 14px; right: 0; border-top: 0.5px solid var(--sep); }
     .sofar .ini { width: 30px; height: 30px; border-radius: 50%; background: var(--c); color: #fff; display: grid; place-items: center; font: 800 16px/1 var(--display); text-transform: uppercase; flex: none; }
-    .sofar .nm { font: 800 17px/1 var(--display); text-transform: uppercase; min-width: 70px; }
+    .sofar .nm { font: 800 1rem/1 var(--display); text-transform: uppercase; min-width: 70px; }
     .sofar .cr { display: flex; gap: 4px; flex-wrap: wrap; }
 
     /* Regeln antippbar + Bearbeiten-Blatt */
@@ -168,14 +180,14 @@
     .sheet { width: min(560px, 100%); padding: 10px 20px calc(24px + env(safe-area-inset-bottom)); border-radius: 28px 28px 0 0; background: linear-gradient(180deg, #1f1f1f, #121212); color: #fff; animation: up 0.3s cubic-bezier(0.2, 1, 0.3, 1); --fill: rgba(255, 255, 255, 0.1); --label: #fff; }
     @keyframes up { from { transform: translateY(100%); } }
     .grabber { width: 38px; height: 5px; border-radius: 3px; background: rgba(255, 255, 255, 0.3); margin: 0 auto 14px; }
-    .sheet-title { font: 800 26px/1.1 var(--display); text-transform: uppercase; letter-spacing: 0.02em; text-align: center; }
-    .sheet-sub { text-align: center; color: rgba(255, 255, 255, 0.6); font-size: 14px; margin-top: 4px; }
+    .sheet-title { font: 800 1.529rem/1.1 var(--display); text-transform: uppercase; letter-spacing: 0.02em; text-align: center; }
+    .sheet-sub { text-align: center; color: rgba(255, 255, 255, 0.6); font-size: 0.8235rem; margin-top: 4px; }
     .sheet-value { display: grid; grid-template-columns: 64px 1fr 64px; align-items: center; gap: 12px; margin: 22px 0 16px; }
     .sheet-value button { height: 64px; border: 0; border-radius: 18px; background: var(--fill); color: #fff; font-size: 30px; font-weight: 600; }
     .sheet-value output { min-width: 0; text-align: center; font: 800 56px/1 var(--display); text-transform: uppercase; }
     .sheet-value output small { display: block; font: 700 14px/1.2 var(--display); letter-spacing: 0.08em; color: rgba(255, 255, 255, 0.6); margin-top: 4px; }
     .sheet-opts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-    .sheet-opts button { min-height: 46px; border: 0; border-radius: 14px; background: var(--fill); color: #fff; font-weight: 600; font-size: 15px; }
+    .sheet-opts button { min-height: 46px; border: 0; border-radius: 14px; background: var(--fill); color: #fff; font-weight: 600; font-size: 0.8824rem; }
     .sheet-opts button.on { background: #fff; color: #121212; }
 
     /* iOS-Schalter */
@@ -185,8 +197,8 @@
     input.switch:checked::before { transform: translateX(20px); }
 
     /* Buttons */
-    .btn { display: block; width: 100%; margin-top: 22px; min-height: 52px; border: 0; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font-weight: 700; font-size: 17px; box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 35%, transparent); }
-    .btn.small { width: auto; min-height: 36px; margin: 0; padding: 0 16px; font-size: 15px; box-shadow: none; }
+    .btn { display: block; width: 100%; margin-top: 22px; min-height: 52px; border: 0; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font-weight: 700; font-size: 1rem; box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 35%, transparent); }
+    .btn.small { width: auto; min-height: 36px; margin: 0; padding: 0 16px; font-size: 0.8824rem; box-shadow: none; }
 
     /* Anzeigetafel im TV-Stil: Vereinsfarbe links/rechts, Logos, dunkler Spielstand in der Mitte */
     .board { background: none; border-radius: 0; overflow: visible; display: grid; gap: 8px; }
@@ -231,11 +243,11 @@
     .row .s b.time { font-size: 19px; color: var(--secondary); }
     .avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--c); color: #fff; display: grid; place-items: center; font: 700 20px/1 var(--rounded); text-transform: uppercase; }
     .team-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
-    .team-chips span { font-size: 12px; font-weight: 500; padding: 3px 9px; border-radius: 999px; background: var(--fill); color: var(--label); }
+    .team-chips span { font-size: 0.7059rem; font-weight: 500; padding: 3px 9px; border-radius: 999px; background: var(--fill); color: var(--label); }
     .team-chips span.off { color: var(--tertiary); text-decoration: line-through; }
-    .warn { margin-top: 12px; border-radius: var(--r); padding: 14px 18px; background: color-mix(in srgb, var(--red) 14%, var(--cell)); border: 0.5px solid color-mix(in srgb, var(--red) 40%, transparent); font-size: 15px; }
+    .warn { margin-top: 12px; border-radius: var(--r); padding: 14px 18px; background: color-mix(in srgb, var(--red) 14%, var(--cell)); border: 0.5px solid color-mix(in srgb, var(--red) 40%, transparent); font-size: 0.8824rem; }
     .warn b { display: block; margin-bottom: 2px; }
-    .warn button { margin-top: 10px; border: 0; border-radius: 999px; padding: 8px 16px; background: var(--red); color: #fff; font-weight: 600; font-size: 15px; }
+    .warn button { margin-top: 10px; border: 0; border-radius: 999px; padding: 8px 16px; background: var(--red); color: #fff; font-weight: 600; font-size: 0.8824rem; }
 
     /* Gemeinsame Bausteine im Stil der Anzeigetafel */
     .crest-sm { flex: none; width: var(--sz, 30px); height: var(--sz, 30px); border-radius: 50%; background: var(--tc); display: inline-grid; place-items: center; overflow: hidden; color: #fff; font: 800 9px/1 var(--rounded); box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.25); }
@@ -249,14 +261,14 @@
 
     /* Zu verteilen */
     .todo { margin-top: 10px; border-radius: var(--r); overflow: hidden; box-shadow: inset 4px 0 0 var(--c, var(--accent)); }
-    .todo-head { display: flex; align-items: center; gap: 8px; padding: 10px 16px 10px 18px; background: #121212; color: #fff; font-size: 13px; font-weight: 600; }
+    .todo-head { display: flex; align-items: center; gap: 8px; padding: 10px 16px 10px 18px; background: #121212; color: #fff; font-size: 0.7647rem; font-weight: 600; }
     .todo-head > span:not(.crest-sm):not(.min) { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .todo-head .min { background: rgba(255, 255, 255, 0.12); }
-    .todo .what { display: flex; align-items: center; gap: 8px; padding: 14px 18px 0; font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+    .todo .what { display: flex; align-items: center; gap: 8px; padding: 14px 18px 0; font-size: 1.176rem; font-weight: 700; letter-spacing: -0.01em; }
     .todo .what .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c, var(--accent)); flex: none; }
     .todo .targets { padding: 0 18px 16px; }
     .todo .targets { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-    .todo .targets button { border: 0; border-radius: 999px; padding: 9px 18px; background: var(--accent); color: var(--accent-ink); font-weight: 600; font-size: 15px; }
+    .todo .targets button { border: 0; border-radius: 999px; padding: 9px 18px; background: var(--accent); color: var(--accent-ink); font-weight: 600; font-size: 0.8824rem; }
     .todo .targets button.person { background: var(--c); color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); }
     .todo .targets button.done { background: var(--fill); color: var(--label); }
 
@@ -268,14 +280,14 @@
     .p .rank { position: absolute; left: -4px; bottom: -4px; min-width: 22px; height: 22px; padding: 0 5px; border-radius: 999px; background: #121212; color: #fff; display: grid; place-items: center; font: 800 12px/1 var(--rounded); box-shadow: 0 0 0 2px var(--c); }
     .p .info { min-width: 0; }
     .p .who-line { display: flex; align-items: center; gap: 8px; min-width: 0; }
-    .p .name { font: 800 22px/1.1 var(--display); letter-spacing: 0.02em; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background: none; border: 0; padding: 0; color: #fff; text-align: left; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35); }
+    .p .name { font: 800 1.294rem/1.1 var(--display); letter-spacing: 0.02em; text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; background: none; border: 0; padding: 0; color: #fff; text-align: left; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35); }
     .p .name::after { content: "›"; display: inline-block; margin-left: 6px; opacity: 0.6; font-weight: 600; transition: transform 0.2s; }
     .p.open .name::after { transform: rotate(90deg); }
     .p .sub { display: flex; align-items: center; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
     .p .crests { display: flex; gap: 3px; margin: 0; }
     .p .cells { align-self: center; }
     .p .cells b.dim { color: rgba(255, 255, 255, 0.35); }
-    .pick-btn { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; border: 0; border-radius: 999px; padding: 4px 10px 4px 4px; background: rgba(0, 0, 0, 0.5); color: #fff; font-size: 13px; font-weight: 600; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+    .pick-btn { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; border: 0; border-radius: 999px; padding: 4px 10px 4px 4px; background: rgba(0, 0, 0, 0.5); color: #fff; font-size: 0.7647rem; font-weight: 600; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
     .pick-btn .crest-sm { --sz: 20px; }
     .pick-btn span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .pick-btn.add { padding: 4px 10px; color: rgba(255, 255, 255, 0.6); }
@@ -284,17 +296,17 @@
     @keyframes pickflash { 0% { background: var(--accent); color: var(--accent-ink); } }
     .p .panel { display: none; padding: 12px 14px 14px; background: #121212; }
     .p.open .panel { display: grid; gap: 10px; }
-    .stepper { display: flex; align-items: center; gap: 8px; font-size: 14px; color: rgba(255, 255, 255, 0.75); }
+    .stepper { display: flex; align-items: center; gap: 8px; font-size: 0.8235rem; color: rgba(255, 255, 255, 0.75); }
     .stepper span { flex: 1; }
-    .stepper button { width: 38px; height: 34px; border: 0; border-radius: 10px; background: rgba(255, 255, 255, 0.12); color: #fff; font-size: 20px; font-weight: 600; line-height: 1; }
+    .stepper button { width: 38px; height: 34px; border: 0; border-radius: 10px; background: rgba(255, 255, 255, 0.12); color: #fff; font-size: 1.176rem; font-weight: 600; line-height: 1; }
     .stepper button.plus { background: var(--accent); color: var(--accent-ink); }
     .panel .more { display: flex; flex-wrap: wrap; gap: 6px; }
     .panel .chip { background: rgba(255, 255, 255, 0.1); color: #fff; }
     .pick-input { display: flex; gap: 8px; }
-    .pick-input input { flex: 1; min-width: 0; border: 0; border-radius: 10px; background: rgba(255, 255, 255, 0.1); padding: 9px 12px; font: inherit; font-size: 15px; color: #fff; }
+    .pick-input input { flex: 1; min-width: 0; border: 0; border-radius: 10px; background: rgba(255, 255, 255, 0.1); padding: 9px 12px; font: inherit; font-size: 0.8824rem; color: #fff; }
     .pick-input input::placeholder { color: rgba(255, 255, 255, 0.4); }
     .pick-input button { border: 0; border-radius: 10px; padding: 0 16px; background: var(--accent); color: var(--accent-ink); font-weight: 700; }
-    .chip { border: 0; background: var(--fill); border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 500; color: var(--accent-text); }
+    .chip { border: 0; background: var(--fill); border-radius: 999px; padding: 6px 12px; font-size: 0.7647rem; font-weight: 500; color: var(--accent-text); }
 
     /* Ticker */
     .ticker { background: linear-gradient(180deg, #1f1f1f, #121212); color: #fff; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2); }
@@ -303,48 +315,48 @@
     .ticker .min { background: rgba(255, 255, 255, 0.1); }
     .entry { position: relative; display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 8px; padding: 12px 18px; }
     .entry .title { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-    .entry .time { color: var(--secondary); font-size: 13px; font-variant-numeric: tabular-nums; padding-top: 2px; }
-    .entry .title { font-weight: 600; font-size: 15px; }
-    .entry ul { list-style: none; margin: 2px 0 0; padding: 0; color: var(--secondary); font-size: 14px; }
-    .feed > .muted { padding: 16px 18px; color: var(--secondary); font-size: 15px; }
+    .entry .time { color: var(--secondary); font-size: 0.7647rem; font-variant-numeric: tabular-nums; padding-top: 2px; }
+    .entry .title { font-weight: 600; font-size: 0.8824rem; }
+    .entry ul { list-style: none; margin: 2px 0 0; padding: 0; color: var(--secondary); font-size: 0.8235rem; }
+    .feed > .muted { padding: 16px 18px; color: var(--secondary); font-size: 0.8824rem; }
 
     /* Spieltag */
     .game + .game { margin-top: 10px; }
-    .game .owners { padding: 0 18px 12px; font-size: 13px; color: var(--secondary); text-align: center; }
+    .game .owners { padding: 0 18px 12px; font-size: 0.7647rem; color: var(--secondary); text-align: center; }
     .game details { position: relative; }
     .game details::before { content: ""; position: absolute; top: 0; left: 18px; right: 0; border-top: 0.5px solid var(--sep); }
-    .game summary { padding: 13px 18px; color: var(--accent-text); font-size: 15px; font-weight: 500; cursor: pointer; list-style: none; display: flex; justify-content: space-between; }
+    .game summary { padding: 13px 18px; color: var(--accent-text); font-size: 0.8824rem; font-weight: 500; cursor: pointer; list-style: none; display: flex; justify-content: space-between; }
     .game summary::-webkit-details-marker { display: none; }
-    .game summary::after { content: "›"; color: var(--tertiary); font-size: 22px; line-height: 0.8; transition: transform 0.2s; }
+    .game summary::after { content: "›"; color: var(--tertiary); font-size: 1.294rem; line-height: 0.8; transition: transform 0.2s; }
     .game details[open] summary::after { transform: rotate(90deg); }
-    .lineups { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 0 18px 16px; font-size: 14px; }
-    .lineups h3 { font-size: 12px; margin: 0 0 6px; color: var(--secondary); text-transform: uppercase; font-weight: 600; letter-spacing: 0.02em; }
+    .lineups { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 0 18px 16px; font-size: 0.8235rem; }
+    .lineups h3 { font-size: 0.7059rem; margin: 0 0 6px; color: var(--secondary); text-transform: uppercase; font-weight: 600; letter-spacing: 0.02em; }
     .lineups ul { list-style: none; margin: 0; padding: 0; }
     .lineups li { padding: 3px 0; overflow-wrap: anywhere; }
     .lineups .out { color: var(--tertiary); text-decoration: line-through; }
     .lineups .in { color: var(--green); font-weight: 600; }
     .lineups .bench { color: var(--secondary); }
     .lineups .picked { font-weight: 700; }
-    .lineups .picked em { font-style: normal; font-weight: 600; font-size: 11px; color: var(--accent-ink); background: var(--accent); border-radius: 999px; padding: 1px 7px; margin-left: 2px; }
+    .lineups .picked em { font-style: normal; font-weight: 600; font-size: 0.6471rem; color: var(--accent-ink); background: var(--accent); border-radius: 999px; padding: 1px 7px; margin-left: 2px; }
 
     /* Regeln im Einstellungen-Stil */
     .rules { list-style: none; margin: 0; padding: 0; }
     .rules li { position: relative; display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: 14px; align-items: center; min-height: 52px; padding: 10px 18px; }
     .rules li + li::before { content: ""; position: absolute; top: 0; right: 0; left: 62px; border-top: 0.5px solid var(--sep); }
-    .rules .ico { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; font-size: 16px; background: var(--fill); }
+    .rules .ico { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; font-size: 0.9412rem; background: var(--fill); }
     .rules li:nth-child(5n+1) .ico { background: color-mix(in srgb, var(--accent) 22%, transparent); }
     .rules li:nth-child(5n+2) .ico { background: color-mix(in srgb, var(--blue) 18%, transparent); }
     .rules li:nth-child(5n+3) .ico { background: color-mix(in srgb, var(--green) 20%, transparent); }
     .rules li:nth-child(5n+4) .ico { background: color-mix(in srgb, var(--red) 18%, transparent); }
-    .rules .what { font-size: 16px; }
+    .rules .what { font-size: 0.9412rem; }
     .rules .what .auto-dot { margin-right: -13px; }
-    .rules .what small { display: block; color: var(--secondary); font-size: 13px; margin-top: 1px; }
-    .tag { font-size: 13px; font-weight: 600; border-radius: 999px; padding: 4px 10px; white-space: nowrap; background: var(--fill); color: var(--secondary); }
+    .rules .what small { display: block; color: var(--secondary); font-size: 0.7647rem; margin-top: 1px; }
+    .tag { font-size: 0.7647rem; font-weight: 600; border-radius: 999px; padding: 4px 10px; white-space: nowrap; background: var(--fill); color: var(--secondary); }
     .tag.give { background: color-mix(in srgb, var(--green) 16%, transparent); color: var(--green); }
     .tag.ex { background: color-mix(in srgb, var(--red) 14%, transparent); color: var(--red); }
     .auto-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); margin-left: 6px; vertical-align: 2px; }
     .values .cell input { width: 64px; border: 0; background: var(--fill); border-radius: 10px; padding: 6px 8px; font: inherit; color: var(--label); text-align: center; }
-    .values .cell label { font-size: 16px; }
+    .values .cell label { font-size: 0.9412rem; }
 
     /* Schwebende Tab-Leiste aus Glas */
     nav { position: fixed; left: 0; right: 0; bottom: calc(14px + env(safe-area-inset-bottom)); z-index: 10; display: flex; justify-content: center; pointer-events: none; }
@@ -366,12 +378,36 @@
       backdrop-filter: blur(30px) saturate(190%); -webkit-backdrop-filter: blur(30px) saturate(190%);
       animation: drop 0.4s cubic-bezier(0.3, 1.3, 0.6, 1);
     }
-    .toast::before { content: "🍺  KONFERENZTRINKEN · jetzt"; display: block; font-size: 12px; font-weight: 600; color: var(--secondary); margin-bottom: 4px; letter-spacing: 0.02em; }
+    .toast::before { content: "🍺  KONFERENZTRINKEN · jetzt"; display: block; font-size: 0.7059rem; font-weight: 600; color: var(--secondary); margin-bottom: 4px; letter-spacing: 0.02em; }
     .toast[hidden] { display: none; }
-    .toast strong { display: block; font-size: 15px; }
-    .toast ul { margin: 0 0 4px; padding: 0; list-style: none; font-size: 15px; color: var(--secondary); }
+    .toast strong { display: block; font-size: 0.8824rem; }
+    .toast ul { margin: 0 0 4px; padding: 0; list-style: none; font-size: 0.8824rem; color: var(--secondary); }
     @keyframes drop { from { transform: translateY(-40px) scale(0.96); opacity: 0; } }
-    footer { color: var(--secondary); font-size: 12px; text-align: center; margin-top: 28px; }
+    footer { color: var(--secondary); font-size: 0.7059rem; text-align: center; margin-top: 28px; }
+
+    /* Tippflächen mindestens 44 × 44 pt (Apple HIG). Negative Ränder halten das Layout gleich. */
+    .rchip { min-height: 44px; }
+    .rchip button { width: 44px; height: 44px; margin: -8px -4px -8px -8px; background: radial-gradient(circle, rgba(0, 0, 0, 0.25) 13px, transparent 13.5px); }
+    .pick-btn { min-height: 44px; margin: -8px 0; }
+    .p .name { padding: 10px 0; margin: -10px 0; }
+    .todo .targets button, .warn button, .btn.small, .chip, .pick-input button { min-height: 44px; }
+    .stepper button { width: 44px; height: 44px; }
+    .edit-teams summary { min-height: 44px; display: flex; align-items: center; padding: 0 18px 4px; }
+    .add-row input, .pick-input input, .cell input[type="date"], .cell .inline-input { min-height: 44px; }
+    .sheet-opts button, .ask-btns button { min-height: 50px; }
+
+    /* Eigene Abfrage-Fenster statt Browser-Dialogen */
+    .ask-input { width: 100%; min-height: 50px; margin-top: 16px; border: 0; border-radius: 14px; background: rgba(255, 255, 255, 0.1); color: #fff; padding: 0 14px; font: inherit; }
+    .ask-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+    .ask-btns button { border: 0; border-radius: 999px; background: rgba(255, 255, 255, 0.1); color: #fff; font: inherit; font-weight: 700; }
+    .ask-btns .btn { margin: 0; }
+    .ask-btns .btn.danger { background: var(--red); color: #fff; }
+    .legal { color: inherit; text-decoration: underline; text-underline-offset: 2px; display: inline-block; min-height: 44px; line-height: 44px; }
+
+    /* „Bewegung reduzieren“ in den iPhone-Einstellungen: keine Animationen */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+    }
   </style>
 </head>
 <body>
@@ -403,6 +439,7 @@
       <label class="cell"><span>Push-Nachrichten<small class="cell-sub" id="pushInfo">Tore, Karten, Halbzeit, Abpfiff aufs Handy</small></span><input type="checkbox" class="switch" id="pushToggle" /></label>
       <button class="cell action" id="autoPickNow">Fehlende Picks auslosen</button>
       <button class="cell danger" id="resetCounts">Zähler auf 0 setzen</button>
+      <a class="cell action" href="/datenschutz.html" style="text-decoration:none">Datenschutz</a>
     </div>
     <div class="error" id="pickError" role="alert"></div>
   </section>
@@ -504,8 +541,18 @@
       <li><span class="ico">🙈</span><span class="what">Keine Schalte in einer Halbzeit<small>für den Besitzer</small></span><span class="tag">doppelt</span></li>
     </ul></div>
 
-    <footer>Trinkt verantwortungsvoll · Wasser zwischendurch · Alkoholfrei zählt auch.<br />Spieldaten: ESPN &amp; OpenLigaDB, ohne Gewähr.</footer>
+    <footer>Trinkt verantwortungsvoll · Wasser zwischendurch · Alkoholfrei zählt auch.<br />Spieldaten: ESPN &amp; OpenLigaDB, ohne Gewähr.<br /><a class="legal" href="/datenschutz.html">Datenschutz</a></footer>
   </section>
+
+  <div class="sheet-backdrop" id="askSheet" hidden>
+    <div class="sheet" role="alertdialog" aria-modal="true" aria-labelledby="askTitle" aria-describedby="askText">
+      <div class="grabber"></div>
+      <div class="sheet-title" id="askTitle"></div>
+      <div class="sheet-sub" id="askText"></div>
+      <input type="text" class="ask-input" id="askInput" list="playerOptions" autocomplete="off" hidden />
+      <div class="ask-btns"><button id="askCancel">Abbrechen</button><button class="btn" id="askOk">OK</button></div>
+    </div>
+  </div>
 
   <div class="sheet-backdrop" id="ruleSheet" hidden>
     <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="ruleSheetTitle">
@@ -577,6 +624,36 @@
     window.scrollTo(0, 0);
   }
   tabs.forEach((t) => t.addEventListener('click', () => showTab(t.dataset.tab)));
+
+  // Eigenes Abfrage-Fenster statt prompt()/confirm(). Liefert true/false bzw. den eingegebenen Text oder null.
+  function ask({ title, text = '', input = false, value = '', ok = 'OK', danger = false }) {
+    return new Promise((resolve) => {
+      $('askTitle').textContent = title;
+      $('askText').textContent = text;
+      $('askInput').hidden = !input;
+      $('askInput').value = value;
+      $('askOk').textContent = ok;
+      $('askOk').classList.toggle('danger', danger);
+      $('askSheet').hidden = false;
+      setTimeout(() => (input ? $('askInput') : $('askOk')).focus(), 50);
+      const finish = (result) => {
+        $('askSheet').hidden = true;
+        $('askOk').removeEventListener('click', onOk);
+        $('askCancel').removeEventListener('click', onCancel);
+        $('askSheet').removeEventListener('click', onBackdrop);
+        document.removeEventListener('keydown', onKey);
+        resolve(result);
+      };
+      const onOk = () => finish(input ? $('askInput').value.trim() || null : true);
+      const onCancel = () => finish(input ? null : false);
+      const onBackdrop = (e) => { if (e.target === $('askSheet')) onCancel(); };
+      const onKey = (e) => { if (e.key === 'Enter' && input) onOk(); else if (e.key === 'Escape') onCancel(); };
+      $('askOk').addEventListener('click', onOk);
+      $('askCancel').addEventListener('click', onCancel);
+      $('askSheet').addEventListener('click', onBackdrop);
+      document.addEventListener('keydown', onKey);
+    });
+  }
 
   // ---------- Werte ----------
   // Jede Regel: wer betroffen ist trinkt („drink“) oder verteilt („give“); Wert = Anzahl, 'ex' oder 0 (aus).
@@ -659,10 +736,13 @@
     spieltag: 'https://api.openligadb.de/getcurrentgroup/bl1',
     spiele: 'https://api.openligadb.de/getmatchdata/bl1',
   };
+  // Vereinslogos über den eigenen Server laden, damit das Gerät nicht direkt bei ESPN anfragt.
+  const logoSrc = (url) => (url && location.protocol.startsWith('http') ? `/api/logo?u=${encodeURIComponent(url)}` : url);
   async function api(endpoint, params = {}) {
     const qs = new URLSearchParams(params).toString();
     const suffix = qs ? `?${qs}` : '';
-    const urls = location.protocol.startsWith('http') ? [`/api/${endpoint}${suffix}`, DIRECT[endpoint] + suffix] : [DIRECT[endpoint] + suffix];
+    // Online nur über den eigenen Server (keine direkte Verbindung zu ESPN/OpenLigaDB); lokal als Datei direkt.
+    const urls = location.protocol.startsWith('http') ? [`/api/${endpoint}${suffix}`] : [DIRECT[endpoint] + suffix];
     for (const url of urls) {
       try {
         const res = await fetch(url);
@@ -723,7 +803,7 @@
         away: away.team?.displayName || away.team?.name || '?',
         homeAbbr: home.team?.abbreviation, awayAbbr: away.team?.abbreviation,
         homeColor: home.team?.color, awayColor: away.team?.color,
-        homeLogo: home.team?.logo, awayLogo: away.team?.logo,
+        homeLogo: logoSrc(home.team?.logo), awayLogo: logoSrc(away.team?.logo),
         homeScore: home.score ?? '',
         awayScore: away.score ?? '',
         state: status.type?.state || 'pre',
@@ -753,7 +833,7 @@
         home: m.team1?.teamName || '?',
         away: m.team2?.teamName || '?',
         homeAbbr: m.team1?.shortName, awayAbbr: m.team2?.shortName,
-        homeLogo: m.team1?.teamIconUrl, awayLogo: m.team2?.teamIconUrl,
+        homeLogo: logoSrc(m.team1?.teamIconUrl), awayLogo: logoSrc(m.team2?.teamIconUrl),
         homeScore: String(last?.scoreTeam1 ?? final?.pointsTeam1 ?? (started ? 0 : '')),
         awayScore: String(last?.scoreTeam2 ?? final?.pointsTeam2 ?? (started ? 0 : '')),
         state: m.matchIsFinished ? 'post' : started ? 'in' : 'pre',
@@ -1088,7 +1168,8 @@
   let feed = store.get('kt-feed', []);
   let processed = new Set(store.get('kt-processed', []));
 
-  const PALETTE = ['#0a84ff', '#30d158', '#ff375f', '#bf5af2', '#ff9f0a', '#5ac8fa', '#5e5ce6', '#ffcc00', '#ff6482', '#a2845e'];
+  // Kräftig genug, dass weiße Schrift überall mindestens 4,5 : 1 Kontrast hat.
+  const PALETTE = ['#0a6ed1', '#18803c', '#d0103a', '#8e44c9', '#b85400', '#0b7285', '#4c4cdb', '#946800', '#c2185b', '#7a5a35'];
   const colorOf = (p) => PALETTE[Math.max(0, players.indexOf(p)) % PALETTE.length];
   function whoBadge(p) {
     const b = el('span', { className: 'who', textContent: p.name });
@@ -1432,12 +1513,12 @@
       input.addEventListener('keydown', (e) => { if (e.key === 'Enter') addPick(); });
       const more = el('div', { className: 'more' });
       for (const pick of p.picks) {
-        more.append(el('button', { className: 'chip', textContent: `⇄ ${pick.name}`, onclick: () => {
-          const next = prompt(`Wer kommt für ${pick.name}?`);
-          if (next && next.trim()) { pick.history = [...(pick.history || []), pick.name]; pick.name = next.trim(); renderAll(); }
+        more.append(el('button', { className: 'chip', textContent: `⇄ ${pick.name}`, onclick: async () => {
+          const next = await ask({ title: 'Auswechslung', text: `Wer kommt für ${pick.name}?`, input: true, ok: 'Wechseln' });
+          if (next) { pick.history = [...(pick.history || []), pick.name]; pick.name = next; renderAll(); }
         } }));
       }
-      if (p.picks.length) more.append(el('button', { className: 'chip', textContent: '✕ Picks löschen', onclick: () => { if (confirm(`Alle Picks von ${p.name} löschen?`)) { p.picks = []; renderAll(); } } }));
+      if (p.picks.length) more.append(el('button', { className: 'chip', textContent: '✕ Picks löschen', onclick: async () => { if (await ask({ title: 'Picks löschen?', text: `Alle Spieler-Picks von ${p.name} werden entfernt.`, ok: 'Löschen', danger: true })) { p.picks = []; renderAll(); } } }));
       const panel = el('div', { className: 'panel' },
         stepper('Schlucke', () => p.count, (v) => { p.count = v; }),
         stepper('Ex', () => p.ex || 0, (v) => { p.ex = v; }),
@@ -1527,7 +1608,7 @@
 
   // Prüft die Eingaben und verteilt fair: Paarungen bleiben zusammen und werden reihum vergeben,
   // so landen Heim und Gast eines Spiels nie bei derselben Person.
-  function planDraw() {
+  async function planDraw() {
     const names = [...roster];
     const teams = lines($('teams').value);
     store.set('kt-autopicks', $('autoPicks').checked);
@@ -1539,7 +1620,7 @@
     const perPlayer = raw === 'auto' || raw === '' ? Infinity : parseInt(raw, 10);
     if (Number.isNaN(perPlayer) || perPlayer < 1) return fail('Teams pro Person: „auto“ oder eine Zahl ab 1.');
     if (perPlayer !== Infinity && perPlayer * names.length > teams.length) return fail(`Für ${names.length} Personen mit je ${perPlayer} Teams braucht es ${perPlayer * names.length} Teams.`);
-    if (players.some((p) => p.count || p.ex) && !confirm('Neue Runde starten? Zähler und Ticker werden zurückgesetzt.')) return null;
+    if (players.some((p) => p.count || p.ex) && !(await ask({ title: 'Neue Runde starten?', text: 'Zähler und Ticker werden zurückgesetzt.', ok: 'Neue Runde', danger: true }))) return null;
 
     const pairs = [];
     for (const t of teams) {
@@ -1564,8 +1645,8 @@
     showTab('zaehler');
   }
 
-  $('draw').addEventListener('click', () => {
-    const plan = planDraw();
+  $('draw').addEventListener('click', async () => {
+    const plan = await planDraw();
     if (plan) startRound(plan.order, plan.steps);
   });
 
@@ -1624,8 +1705,8 @@
         el('span', { className: 'nm', textContent: name }), el('div', { className: 'cr' }, ...got.map((t) => crest(t, 26)))));
     }
   }
-  function openWheel() {
-    const plan = planDraw();
+  async function openWheel() {
+    const plan = await planDraw();
     if (!plan) return;
     Object.assign(wheel, { plan, step: 0, spinning: false });
     $('setupStage').hidden = true;
@@ -1643,7 +1724,8 @@
     // Ziel: Mitte des Feldes (mit etwas Zufall) landet unter dem Zeiger oben.
     const target = i * a + a / 2 + (Math.random() - 0.5) * a * 0.6;
     const delta = (((-target - wheel.rotation) % 360) + 360) % 360;
-    wheel.rotation += 360 * 5 + delta;
+    const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    wheel.rotation += (calm ? 0 : 360 * 5) + delta;
     wheel.spinning = true;
     $('spin').disabled = true;
     $('wheelResult').innerHTML = '';
@@ -1656,7 +1738,7 @@
       $('wheelResult').append(el('div', { className: 'won' }, crest(team, 40), `${person} ← ${team}`));
       drawWheel();
       renderWheelStage();
-    }, 4700);
+    }, calm ? 350 : 4700);
   }
   $('wheelStart').addEventListener('click', openWheel);
   $('spin').addEventListener('click', spin);
@@ -1679,8 +1761,8 @@
     renderAll();
   });
   $('newPlayer').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('addPlayer').click(); });
-  $('resetCounts').addEventListener('click', () => {
-    if (!confirm('Alle Schlucke und Ex auf 0 setzen?')) return;
+  $('resetCounts').addEventListener('click', async () => {
+    if (!(await ask({ title: 'Zähler auf 0?', text: 'Alle Schlucke und Ex werden auf 0 gesetzt.', ok: 'Zurücksetzen', danger: true }))) return;
     players.forEach((p) => { p.count = 0; p.ex = 0; });
     renderAll();
   });

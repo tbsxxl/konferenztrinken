@@ -11,6 +11,19 @@ const UPSTREAM = {
 };
 const ALLOWED_PARAMS = ['dates', 'event'];
 const MAX_SUBS = 300;
+// Bildquellen, deren Vereinslogos durchgereicht werden dürfen (ESPN, OpenLigaDB-Wappen).
+const LOGO_HOSTS = [/(^|\.)espncdn\.com$/, /^upload\.wikimedia\.org$/, /^i\.imgur\.com$/, /(^|\.)openligadb\.de$/];
+
+// Logos über den eigenen Server laden, damit Besucher nicht direkt mit ESPN & Co. verbunden werden.
+async function handleLogo(url) {
+  let target;
+  try { target = new URL(url.searchParams.get('u') || ''); } catch { return new Response('Bad request', { status: 400 }); }
+  if (target.protocol !== 'https:' || !LOGO_HOSTS.some((re) => re.test(target.hostname))) return new Response('Forbidden', { status: 403 });
+  const upstream = await fetch(target, { cf: { cacheTtl: 7 * 86400, cacheEverything: true } });
+  const type = upstream.headers.get('content-type') || '';
+  if (!upstream.ok || !type.startsWith('image/')) return new Response('Not found', { status: 404 });
+  return new Response(upstream.body, { headers: { 'content-type': type, 'cache-control': 'public, max-age=604800' } });
+}
 
 const json = (data, status = 200) =>
   new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json', 'cache-control': 'no-store' } });
@@ -43,6 +56,7 @@ async function handlePush(request, env, action) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (url.pathname === '/api/logo') return handleLogo(url);
     const push = url.pathname.match(/^\/api\/push\/(key|subscribe|unsubscribe)$/);
     if (push) return handlePush(request, env, push[1]);
 

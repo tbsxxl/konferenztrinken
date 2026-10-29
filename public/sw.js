@@ -81,7 +81,9 @@ self.addEventListener('push', (event) => {
   event.waitUntil((async () => {
     let msg = {};
     try { msg = event.data ? event.data.json() : {}; } catch {}
-    const { title, body } = describe(msg, await idbGet('round'));
+    // iOS entzieht Push-Abos, wenn eine Nachricht ohne sichtbare Mitteilung endet – daher immer etwas anzeigen.
+    let title = 'Konferenztrinken', body = 'Neues aus der Konferenz';
+    try { ({ title, body } = describe(msg, await idbGet('round'))); } catch {}
     await self.registration.showNotification(title, {
       body,
       icon: '/icon-192.png',
