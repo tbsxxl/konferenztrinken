@@ -149,8 +149,16 @@
     .covers { grid-template-columns: repeat(auto-fill, minmax(min(100%, 6.2em), 1fr)); gap: 16px 12px; }
     .cover { border-radius: 10px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4); }
     .covers .cover-card > b { margin-top: 7px; hyphens: auto; -webkit-hyphens: auto; text-align: center; font-size: 0.88rem; font-weight: 400; line-height: 1.25; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .badge-live { left: 6px; top: 6px; padding: 3px 7px; }
-    .badge-live::before { margin-right: 4px; }
+    /* Kachel-Inhalt wächst mit der Kachel (cqw), damit nichts zu groß wird oder überlappt */
+    .badge-live { left: 5cqw; top: 5cqw; padding: 1.6cqw 4cqw; font-size: max(11px, 7cqw); line-height: 1.1; }
+    .badge-live::before { width: 4.5cqw; height: 4.5cqw; margin-right: 2.5cqw; vertical-align: 0.1em; }
+    .art-konf .scoreboard { width: 64%; margin-top: 15cqw; gap: 2.5cqw; padding: 4cqw 4cqw 4.5cqw; border-radius: 6cqw; box-shadow: 0 3cqw 8cqw rgba(0, 0, 0, 0.35); }
+    .art-konf .scoreboard .shield { width: 9cqw; height: 10.5cqw; }
+    .art-konf .scoreboard .score { font-size: 16cqw; }
+    .art-konf .scoreboard .min { margin-top: 1.5cqw; padding: 0.8cqw 3cqw; font-size: max(9px, 6cqw); }
+    .ttt { gap: 3cqw; width: 64%; }
+    .ttt span { border-radius: 4cqw; }
+    .art-dumm .hearts { font-size: 9cqw; letter-spacing: 1cqw; bottom: 9%; }
     /* Listen frei auf dem Grund, Symbole in Akzentfarbe, Pfeile, eingerückte Trennlinien */
     main .list.rows, main .list.links { background: transparent !important; padding: 0 !important; border-radius: 0; }
     .prow .av { width: 44px; height: 44px; border-radius: 50%; font-size: 1.15rem; }
