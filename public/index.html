@@ -56,6 +56,11 @@
     .art-dumm .hearts { position: absolute; bottom: 10%; left: 0; right: 0; text-align: center; font-size: 1.05rem; letter-spacing: 4px; color: #ff6b8a; text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35); }
     .art-dumm .spark { position: absolute; font-size: 1.4rem; opacity: 0.85; }
 
+    .art-ttt { background: radial-gradient(110% 80% at 20% 0%, #5ee08a, transparent 60%), linear-gradient(160deg, #1fa855, #0b4d2a); }
+    .art-ttt::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.06) 0 14%, transparent 14% 28%); }
+    .ttt { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 66%; aspect-ratio: 1; }
+    .ttt span { display: grid; place-items: center; border-radius: 10px; background: rgba(0, 0, 0, 0.28); font: 800 1.7rem/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; color: #fff; }
+    .ttt span:nth-child(4n+1) { background: rgba(255, 255, 255, 0.92); color: #0b4d2a; }
     .art-soon { background: linear-gradient(160deg, #2c2c2e, #1c1c1e); color: rgba(235, 235, 245, 0.35); font-size: 2.6rem; }
 
     /* Mitspieler-Liste wie in Apple Music */
@@ -131,6 +136,13 @@
       </div>
       <b>Der Dümmste fliegt</b>
       <small>Quiz · 650 Fragen · Mehrspieler</small>
+    </a>
+    <a class="cover-card" href="/tictactoe/">
+      <div class="cover art-ttt">
+        <div class="ttt" aria-hidden="true"><span>X</span><span></span><span>O</span><span></span><span>X</span><span></span><span>O</span><span></span><span>X</span></div>
+      </div>
+      <b>Tic Tac Toe</b>
+      <small>Bundesliga · Quiz für zwei</small>
     </a>
   </div>
 

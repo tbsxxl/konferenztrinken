@@ -2,7 +2,7 @@
 
 Trinkspiele für deine Runde.
 
-Hub mit Trinkspielen: **Konferenztrinken** (`/konferenz.html`) und **Der Dümmste fliegt** (`/dumm.html`). Startseite `/` ist der Hub, das Design liegt gemeinsam in `public/app.css`, die Mitspielerliste gilt für alle Spiele.
+Hub mit Trinkspielen: **Konferenztrinken** (`/konferenz.html`), **Der Dümmste fliegt** (`/dumm.html`) und **Bundesliga Tic Tac Toe** (`/tictactoe/`, übernommen aus `tbsxxl/bundesliga-tictactoe`; API in `src/tictactoe.js`: `/api/tm`, `/api/names`, `/api/img`). Startseite `/` ist der Hub, das Design liegt gemeinsam in `public/app.css`, die Mitspielerliste gilt für alle Spiele.
 
 ## Der Dümmste fliegt
 

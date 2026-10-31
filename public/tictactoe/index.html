@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Bundesliga Tic Tac Toe · Klirr</title>
+  <meta name="description" content="Fußball-Quiz für zwei: Nenne Spieler, die für beide Bundesliga-Vereine gespielt haben – und hol dir drei in einer Reihe." />
+  <meta name="theme-color" content="#14121f" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="darkreader-lock" />
+  <script src="/tictactoe/theme.js"></script>
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Klirr" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta property="og:title" content="Bundesliga Tic Tac Toe" />
+  <meta property="og:description" content="Wer hat für beide Vereine gespielt? Das Fußball-Quiz für zwei." />
+  <meta property="og:image" content="/icon-512.png" />
+
+  <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+
+  <link rel="stylesheet" href="/tictactoe/style.css" />
+
+  <script src="/tictactoe/logos.js" defer></script>
+  <script src="/tictactoe/main.js" defer></script>
+</head>
+
+<body class="ios">
+  <!-- Icons: eigene Strichgrafiken im Stil von SF Symbols (SF Symbols selbst dürfen im Web nicht genutzt werden). -->
+  <header class="topbar">
+    <div class="topbar__titles">
+      <a class="back-link" href="/">‹ Alle Spiele</a>
+      <p class="eyebrow">Bundesliga</p>
+      <h1 class="large-title">Tic Tac Toe</h1>
+      <p id="gameStats" class="game-stats" aria-live="off">
+        <span id="movesStat">0 Züge</span><span aria-hidden="true">·</span><span id="timeStat">00:00</span>
+      </p>
+    </div>
+    <div class="topbar__actions">
+      <button type="button" id="themeBtn" class="glass-btn" hidden aria-label="Dark Mode einschalten" aria-pressed="false">
+        <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>
+        <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></svg>
+      </button>
+      <button type="button" id="rulesBtn" class="glass-btn" aria-label="Einstellungen und Regeln">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6" class="fill"/><circle cx="12" cy="12" r="1.6" class="fill"/><circle cx="19" cy="12" r="1.6" class="fill"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <div class="status-row">
+      <p id="currentPlayer" class="turn-pill" aria-live="polite">Spieler X ist am Zug</p>
+      <div class="scoreboard glass" id="scoreboard" aria-label="Spielstand">
+        <div class="scoreboard__side scoreboard__side--x is-turn" id="sideX">
+          <span class="scoreboard__mark">X</span>
+          <span class="scoreboard__score" id="scoreX">0</span>
+        </div>
+        <span class="scoreboard__sep" aria-hidden="true">:</span>
+        <div class="scoreboard__side scoreboard__side--o" id="sideO">
+          <span class="scoreboard__score" id="scoreO">0</span>
+          <span class="scoreboard__mark">O</span>
+        </div>
+      </div>
+    </div>
+
+    <section class="board-card">
+      <div id="grid" class="grid" role="grid" aria-label="Spielfeld"></div>
+    </section>
+
+    <section class="result" aria-live="polite">
+      <p id="result" class="result__text"></p>
+    </section>
+
+    <section class="group">
+      <h2 class="group__header">Trinkregeln</h2>
+      <div class="group__body drink-rules">
+        <p><b>Passen</b> (kein Spieler eingefallen) → 1 Schluck</p>
+        <p><b>Verloren</b> → Ex 🍺</p>
+        <p><b>Unentschieden</b> → beide trinken 2</p>
+      </div>
+    </section>
+
+    <section class="group">
+      <h2 class="group__header">Genannt</h2>
+      <div class="group__body used-players">
+        <span id="usedPlayersList" class="used-players__list">–</span>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <a href="/datenschutz.html">Datenschutz</a>
+    </footer>
+  </main>
+
+  <!-- Schwebende Glas-Leiste wie die Tab-Leiste in iOS -->
+  <nav class="toolbar glass" aria-label="Aktionen">
+    <button class="toolbar__btn" type="button" id="undoBtn" disabled title="Rückgängig (Strg/⌘ + Z)">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>
+      <span>Zurück</span>
+    </button>
+    <button class="toolbar__btn" type="button" id="skipBtn">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5v14l10-7z"/><path d="M19 5v14"/></svg>
+      <span>Passen</span>
+    </button>
+    <button class="toolbar__btn toolbar__btn--tint" type="button" id="newRoundBtn">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66L20 8.5"/><path d="M20 3.5v5h-5"/></svg>
+      <span>Neue Runde</span>
+    </button>
+  </nav>
+
+  <div id="rulesModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal-card settings-sheet" role="dialog" aria-modal="true" aria-labelledby="rulesTitle">
+      <div class="modal-grabber" aria-hidden="true"></div>
+      <div class="sheet-nav">
+        <span class="sheet-nav__spacer" aria-hidden="true"></span>
+        <h2 id="rulesTitle" class="sheet-nav__title">Einstellungen</h2>
+        <button type="button" class="sheet-nav__btn sheet-nav__btn--bold" id="rulesClose">Fertig</button>
+      </div>
+
+      <section class="group">
+        <h3 class="group__header" id="sizeLabel">Spielfeld</h3>
+        <div class="segmented" role="radiogroup" aria-labelledby="sizeLabel">
+          <button class="segmented__btn is-active" type="button" data-size="3" role="radio" aria-checked="true">3×3</button>
+          <button class="segmented__btn" type="button" data-size="4" role="radio" aria-checked="false">4×4</button>
+          <button class="segmented__btn" type="button" data-size="5" role="radio" aria-checked="false">5×5</button>
+        </div>
+      </section>
+
+      <section class="group">
+        <div class="group__body">
+          <label class="list-row">
+            <span>Nur Logos anzeigen</span>
+            <span class="ios-switch">
+              <input type="checkbox" id="logoOnly" />
+              <span class="ios-switch__track" aria-hidden="true"></span>
+              <span class="ios-switch__thumb" aria-hidden="true"></span>
+            </span>
+          </label>
+        </div>
+      </section>
+
+      <section class="group">
+        <h3 class="group__header">Regeln</h3>
+        <div class="group__body">
+          <ul class="rules-list">
+            <li>Tippe ein Feld an und nenne einen Spieler, der für <strong>beide</strong> Vereine (Zeile &amp; Spalte) im Profibereich gespielt hat.</li>
+            <li>Jeder Spieler darf pro Runde nur einmal genannt werden.</li>
+            <li>Jugendvereine und Nationalmannschaften zählen nicht als Profiverein.</li>
+            <li><strong>Prüfen</strong> verifiziert den Spieler automatisch über Transfermarkt.</li>
+            <li><strong>Direkt bestätigen</strong> übernimmt einen Treffer ohne Fact-Check – wenn ihr euch einig seid.</li>
+            <li>Wer zuerst eine komplette Reihe, Spalte oder Diagonale hat, gewinnt. Ist das Feld voll, endet die Runde unentschieden.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="group">
+        <div class="group__body">
+          <button type="button" class="list-row list-row--button list-row--destructive" id="resetScoreBtn">Punktestand zurücksetzen</button>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div id="nameModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-grabber" aria-hidden="true"></div>
+      <div class="sheet-nav">
+        <button type="button" class="sheet-nav__btn" id="modalCancel">Abbrechen</button>
+        <h2 id="modalTitle" class="sheet-nav__title">Spieler nennen</h2>
+        <span class="sheet-nav__spacer" aria-hidden="true"></span>
+      </div>
+
+      <p class="modal-sub">
+        <span id="modalTeamA" class="modal-team"></span>
+        <span class="modal-vs">&amp;</span>
+        <span id="modalTeamB" class="modal-team"></span>
+      </p>
+      <p class="modal-hint">Wer hat für beide Vereine gespielt?</p>
+
+      <div class="player-search-wrap">
+        <svg class="icon search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="playerInput" class="modal-input" type="search" placeholder="Spieler suchen …" autocomplete="off" autocapitalize="words" spellcheck="false" enterkeyhint="search" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="playerSuggestionList" />
+        <span id="searchSpinner" class="search-spinner" aria-hidden="true"></span>
+        <div id="playerSuggestionList" class="player-suggestions" role="listbox" aria-label="Spielervorschläge"></div>
+      </div>
+
+      <p id="modalFeedback" class="modal-feedback" aria-live="polite"></p>
+      <div id="matchSummary" class="match-summary" aria-live="polite"></div>
+
+      <div id="transferHistory" class="transfer-history">
+        <button type="button" id="careerToggle" class="career-toggle" aria-expanded="true">Vereinskarriere <svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 15 6-6 6 6"/></svg></button>
+        <div id="careerBody">
+          <ul id="transferHistoryList" class="transfer-history__list"></ul>
+        </div>
+      </div>
+
+      <a id="transfermarktLink" class="modal-tm-link" href="#" target="_blank" rel="noopener">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        „<span id="tmLinkName">Name</span>“ auf Transfermarkt nachschlagen
+      </a>
+
+      <label id="manualConfirmRow" class="switch-row modal-manual">
+        <span class="switch-row__label">Laut Historie oben bestätigen</span>
+        <span class="ios-switch">
+          <input type="checkbox" id="manualConfirm" />
+          <span class="ios-switch__track" aria-hidden="true"></span>
+          <span class="ios-switch__thumb" aria-hidden="true"></span>
+        </span>
+      </label>
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" id="modalDirect">Direkt bestätigen</button>
+        <button type="button" class="btn btn-secondary" id="modalCheck">Prüfen</button>
+        <button type="button" class="btn btn-primary" id="modalConfirm" disabled>Feld setzen</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="confirmModal" class="modal-overlay modal-overlay--center" aria-hidden="true">
+    <div class="alert glass" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmText">
+      <div class="alert__content">
+        <h2 id="confirmTitle" class="alert__title"></h2>
+        <p id="confirmText" class="alert__text"></p>
+      </div>
+      <div class="alert__actions">
+        <button type="button" class="alert__btn" id="confirmCancel">Abbrechen</button>
+        <button type="button" class="alert__btn alert__btn--bold" id="confirmOk">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <noscript><p class="noscript">Bitte JavaScript aktivieren, um zu spielen.</p></noscript>
+</body>
+</html>

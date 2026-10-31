@@ -2,6 +2,7 @@
 // und verschickt Push-Nachrichten: Abos unter /api/push/…, Prüfung der Spiele jede Minute per Cron.
 import { getVapid, isPushEndpoint } from './push.js';
 import { pollAndPush } from './live.js';
+import { handleTicTacToe } from './tictactoe.js';
 export { Room } from './room.js';
 
 // Erlaubte Wettbewerbe (ESPN-Kürzel): Bundesliga und Champions League.
@@ -76,8 +77,10 @@ async function handlePush(request, env, action) {
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    const ttt = handleTicTacToe(request, env, ctx, url);
+    if (ttt) return ttt;
     if (url.pathname === '/api/logo') return handleLogo(url);
     if (url.pathname.startsWith('/api/room/')) return handleRoom(request, env, url);
     const push = url.pathname.match(/^\/api\/push\/(key|subscribe|unsubscribe)$/);
