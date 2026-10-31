@@ -10,7 +10,7 @@ Zwei Spielarten:
 
 Gespielt wird auf **einem Handy** (Abstimmen durch Weitergeben) oder mit **mehreren Handys**: Der Quizmaster erstellt einen Raum (Code + Link), alle treten auf ihrem Handy bei, sehen die Fragen live, stimmen geheim ab und bekommen „Du trinkst …“ angezeigt. Technisch: Das Handy des Quizmasters rechnet das Spiel und schickt den Stand an einen Cloudflare-Durable-Object-Raum (`src/room.js`), der ihn per WebSocket an alle verteilt und Beitritte/Stimmen an den Quizmaster weiterleitet. Räume werden 12 Stunden nach der letzten Aktivität gelöscht. Die Bindung `ROOMS` und die Migration stehen in `wrangler.jsonc` und werden beim Deploy angelegt.
 
-Einstellbar: Leben, Fragen pro Runde, Schlucke/Ex bei falscher Antwort, Verteilen bei richtiger Antwort, Ex beim Rausfliegen, Countdown, Kategorien. Fragen in `public/dumm-fragen.js`.
+Einstellbar: Leben, Fragen pro Runde, Schlucke/Ex bei falscher Antwort, Verteilen bei richtiger Antwort, Ex beim Rausfliegen, Countdown, Kategorien. 650 Fragen in 13 Kategorien in `public/dumm-fragen.js`.
 
 # Konferenztrinken 🍺⚽
 
@@ -59,6 +59,10 @@ Der Worker prüft jede Minute (Cron) die Spiele, für die jemand Push eingeschal
 - Abos und Spielstände liegen im KV-Namespace mit der Bindung `PUSH`. Wrangler legt ihn beim Deploy selbst an. Falls der Build daran scheitert: im Cloudflare-Dashboard unter *Storage & Databases → KV* einen Namespace anlegen und dessen ID in `wrangler.jsonc` bei `kv_namespaces` als `"id"` eintragen.
 - Die VAPID-Schlüssel erzeugt der Worker beim ersten Bedarf selbst und speichert sie im KV.
 - iPhone/iPad (ab iOS 16.4): Seite in Safari öffnen → Teilen → *Zum Home-Bildschirm* → App von dort öffnen → im Live-Tab *Push-Nachrichten* einschalten.
+
+## Design
+
+Apple-Look angelehnt an Apple Sports (`public/apple.css`, wird zuletzt geladen): schwarzer Grund, graue Karten, SF Pro, iOS-Segment-Schalter. Vereins- und Personen-Banner bleiben farbig.
 
 ## Datenschutz & Barrierefreiheit
 

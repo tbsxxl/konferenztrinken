@@ -1,0 +1,108 @@
+/* Apple-Look, angelehnt an Apple Sports: schwarzer Grund, ruhige graue Karten, SF Pro,
+   Satzschreibung, iOS-Bedienelemente. Wird als letztes Stylesheet geladen. */
+
+:root {
+  color-scheme: dark;
+  --bg: #000000;
+  --cell: #1c1c1e;
+  --cell2: #2c2c2e;
+  --fill: rgba(118, 118, 128, 0.24);
+  --label: #ffffff;
+  --secondary: rgba(235, 235, 245, 0.6);
+  --tertiary: rgba(235, 235, 245, 0.3);
+  --sep: rgba(84, 84, 88, 0.65);
+  --accent: #ff453a;
+  --accent-ink: #ffffff;
+  --accent-text: #ff453a;
+  --red: #ff453a;
+  --green: #30d158;
+  --display: -apple-system, BlinkMacSystemFont, "SF Pro Display", Inter, system-ui, sans-serif;
+  --r: 22px;
+  --board-1: #1c1c1e;
+  --board-2: #1c1c1e;
+  --edge: transparent;
+}
+
+html, body { background: #000; }
+body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, system-ui, sans-serif; letter-spacing: -0.015em; }
+body::before { display: none; }
+
+/* Karten: flach und ruhig wie in iOS */
+.list, .empty, .game, .ticker, .todo, .surface, .sheet, .game-tile + .soon {
+  --label: #ffffff; --secondary: rgba(235, 235, 245, 0.6); --tertiary: rgba(235, 235, 245, 0.3);
+  --sep: rgba(84, 84, 88, 0.65); --fill: rgba(118, 118, 128, 0.24); --accent-text: #ff453a;
+  background: var(--cell) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+.sheet { border-radius: 14px 14px 0 0; }
+.todo-head { background: var(--cell2); }
+.p .panel { background: var(--cell); }
+.min, .ticker .min, .todo-head .min { background: var(--fill); }
+
+/* Typografie: SF Pro, große Titel, Satzschreibung */
+.lt h1 { font: 700 2.125rem/1.15 var(--display); text-transform: none; letter-spacing: 0.005em; text-shadow: none; }
+#game .lt h1, #end .lt h1 { font-size: 1.75rem; }
+.eyebrow { color: var(--secondary); text-transform: none; letter-spacing: 0; font-weight: 600; font-size: 0.95rem; }
+h2.sec { margin: 30px 4px 10px; font: 700 1.3rem/1.2 var(--display); text-transform: none; letter-spacing: 0; color: var(--label); }
+h2.sec::before { display: none; }
+h2.sec small { font: 500 0.9rem/1.2 var(--display); color: var(--secondary); text-transform: none; letter-spacing: 0; }
+.foot, .mode-info { color: var(--secondary); }
+
+.p .name, .dp b, .turn b, .verdict b, .winner b, .vote h3, .qanswer, .sheet-title, .todo .what, .rank .nm,
+.game-tile b, .bar span:first-child, .sofar .nm, .vote .grid button, .judge button, .qcat, .seg.big button,
+.room .code, .code-input, .fx b, .sheet-value output, .stepper-cell output, .rules .what {
+  text-transform: none; font-family: var(--display); letter-spacing: -0.01em;
+}
+.p .name { font-weight: 700; font-size: 1.25rem; line-height: 24px; min-height: 44px; }
+.dp b { font-weight: 700; font-size: 1rem; }
+.turn b { font-weight: 700; font-size: 1.3rem; }
+.verdict b { font-weight: 800; font-size: 1.75rem; }
+.winner b { font-weight: 800; font-size: 2rem; }
+.vote h3 { font-weight: 700; font-size: 1.45rem; }
+.qanswer { font-weight: 700; font-size: 1.5rem; }
+.qcat { font-weight: 600; font-size: 0.8rem; letter-spacing: 0; }
+.sheet-title { font-weight: 700; font-size: 1.35rem; }
+.game-tile b { font-weight: 800; font-size: 1.55rem; letter-spacing: -0.02em; }
+.vote .grid button, .judge button { font-weight: 700; font-size: 1.15rem; }
+.room .code, .code-input { font-weight: 800; letter-spacing: 0.2em; }
+.fx b { font-weight: 800; font-size: 1.6rem; }
+.rank .nm { font-weight: 600; font-size: 1.05rem; }
+.stepper-cell output { font-weight: 600; font-size: 1.05rem; }
+.cells span, .cells b { font-family: var(--display); }
+
+/* Knöpfe: flach, iOS-Rundung */
+.btn { background: var(--accent); box-shadow: none; border-radius: 14px; font-weight: 600; letter-spacing: -0.01em; min-height: 50px; }
+.btn.ghost { background: var(--cell); border: 0; color: var(--accent); }
+.btn.small { border-radius: 999px; box-shadow: none; }
+.judge button, .vote .grid button, .verdict, .winner, .turn, .dp, .p, .row, .rchip, .game-tile { box-shadow: none; }
+.judge .right { background: #248a3d; }
+.judge .wrong { background: #d70015; }
+.mini button { background: var(--cell); color: var(--accent); }
+
+/* Segment-Schalter wie in iOS */
+.seg { background: var(--fill); border-radius: 9px; padding: 2px; gap: 2px; }
+.seg button { border-radius: 7px; color: #fff; font-weight: 500; }
+.seg button[aria-pressed="true"] { background: #636366; color: #fff; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12), 0 3px 1px rgba(0, 0, 0, 0.04); font-weight: 600; }
+.seg.big button { min-height: 52px; font-size: 1rem; font-weight: 600; }
+.seg.big button small { opacity: 0.7; }
+.cats button { background: var(--fill); color: #fff; font-weight: 500; }
+.cats button[aria-pressed="true"] { background: var(--accent); }
+
+/* Navigation */
+.back-link { background: none; border: 0; padding: 0; margin: 0 0 -8px -2px; color: var(--accent); font-weight: 400; font-size: 1.06rem; }
+.pill { background: var(--cell); border: 0; box-shadow: none; color: var(--secondary); -webkit-backdrop-filter: none; backdrop-filter: none; }
+.tabbar { background: rgba(28, 28, 30, 0.78); border: 0.5px solid rgba(255, 255, 255, 0.12); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
+.tabbar button { color: rgba(235, 235, 245, 0.6); }
+.tabbar button[aria-selected="true"] { background: rgba(255, 255, 255, 0.1); color: var(--accent); }
+
+/* Banner: Glanz und Raster zurücknehmen, nur Farbe */
+.turn::before, .dp::before { background: none; }
+.game-tile::before { opacity: 0.55; }
+.you { background: var(--cell); }
+.waiting { color: var(--secondary); }
+.warn { background: var(--cell); border: 0; }
+.qanswer { background: var(--fill); border: 0; }
+.toast { background: rgba(44, 44, 46, 0.92); border: 0; }
+footer { color: var(--tertiary); }
+.game-tile .live { font: 600 0.8rem/1.2 var(--display); text-transform: none; letter-spacing: 0; }

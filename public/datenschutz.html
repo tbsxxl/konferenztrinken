@@ -4,30 +4,26 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="darkreader-lock" />
-  <meta name="color-scheme" content="light dark" />
+  <meta name="color-scheme" content="dark" />
   <title>Datenschutz · Trinkspiele</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍺</text></svg>" />
   <style>
-    @font-face { font-family: "Inter"; font-weight: 400; font-display: swap; src: url(/fonts/inter-latin-400-normal.woff2) format("woff2"); }
-    @font-face { font-family: "Inter"; font-weight: 700; font-display: swap; src: url(/fonts/inter-latin-700-normal.woff2) format("woff2"); }
-    @font-face { font-family: "Barlow Condensed"; font-weight: 800; font-display: swap; src: url(/fonts/barlow-condensed-latin-800-normal.woff2) format("woff2"); }
     html { font-size: 17px; }
     @supports (font: -apple-system-body) { html { font: -apple-system-body; } }
-    :root { --bg: #f2f2f2; --text: #111; --muted: #555; --card: linear-gradient(180deg, #1f1f1f, #121212); --accent: #d20515; }
-    @media (prefers-color-scheme: dark) { :root { --bg: #000; --text: #fff; --muted: rgba(255, 255, 255, 0.65); } }
     * { box-sizing: border-box; }
-    body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, Inter, system-ui, sans-serif; font-size: 1rem; line-height: 1.5; }
-    main { max-width: 680px; margin: 0 auto; padding: calc(env(safe-area-inset-top) + 24px) 16px calc(env(safe-area-inset-bottom) + 40px); }
+    body { margin: 0; background: #000; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, system-ui, sans-serif; font-size: 1rem; line-height: 1.5; letter-spacing: -0.015em; }
+    main { max-width: 680px; margin: 0 auto; padding: calc(env(safe-area-inset-top) + 20px) 16px calc(env(safe-area-inset-bottom) + 40px); }
     a { color: inherit; }
-    .back { display: inline-flex; align-items: center; min-height: 44px; font-weight: 700; text-decoration: none; color: var(--accent); }
-    h1 { font: 800 2.5rem/1 "Barlow Condensed", "Arial Narrow", sans-serif; text-transform: uppercase; margin: 8px 0 20px; }
-    section { background: var(--card); color: #fff; border-radius: 20px; padding: 16px 18px; margin-bottom: 12px; }
-    h2 { font: 800 1.25rem/1.2 "Barlow Condensed", "Arial Narrow", sans-serif; text-transform: uppercase; letter-spacing: 0.03em; margin: 0 0 6px; }
-    p, li { color: rgba(255, 255, 255, 0.82); margin: 6px 0; }
+    .back { display: inline-flex; align-items: center; min-height: 44px; text-decoration: none; color: #ff453a; font-size: 1.06rem; }
+    h1 { font: 700 2.125rem/1.15 -apple-system, "SF Pro Display", Inter, system-ui, sans-serif; margin: 6px 0 20px; }
+    section { background: #1c1c1e; border-radius: 22px; padding: 16px 18px; margin-bottom: 12px; }
+    h2 { font: 700 1.2rem/1.25 -apple-system, "SF Pro Display", Inter, system-ui, sans-serif; margin: 0 0 6px; }
+    p, li { color: rgba(235, 235, 245, 0.75); margin: 6px 0; }
     ul { padding-left: 20px; margin: 6px 0; }
-    .todo { color: #ffb4b8; font-weight: 700; }
-    footer { color: var(--muted); font-size: 0.8rem; text-align: center; margin-top: 20px; }
+    .todo { color: #ff6961; font-weight: 600; }
+    footer { color: rgba(235, 235, 245, 0.3); font-size: 0.8rem; text-align: center; margin-top: 20px; }
   </style>
+  <link rel="stylesheet" href="/apple.css" />
 </head>
 <body>
 <main>
