@@ -29,37 +29,40 @@
     .shelf-title span { color: rgba(235, 235, 245, 0.6); font-weight: 600; }
 
     /* Cover-Kacheln wie Alben */
-    .covers { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 14px; }
+    /* Zwei Spalten bei normaler Schrift, eine bei großer (Dynamic Type) */
+    .covers { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.6em), 1fr)); gap: 18px 14px; }
+    .cover { container-type: inline-size; }
+    .covers .cover-card b, .covers .cover-card small { white-space: normal; }
     .cover-card { color: #fff; text-decoration: none; min-width: 0; }
     .cover-card:active .cover { transform: scale(0.97); }
     .cover { position: relative; aspect-ratio: 1; border-radius: 14px; overflow: hidden; display: grid; place-items: center; transition: transform 0.2s; box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45); }
     .cover::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.18); pointer-events: none; }
     .cover-card b { display: block; margin-top: 8px; font-size: 0.95rem; font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .cover-card small { display: block; color: rgba(235, 235, 245, 0.6); font-size: 0.85rem; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .badge-live { position: absolute; left: 10px; top: 10px; z-index: 2; padding: 4px 9px; border-radius: 999px; background: rgba(0, 0, 0, 0.45); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.02em; }
+    .badge-live { position: absolute; left: 10px; top: 10px; z-index: 2; padding: 4px 9px; border-radius: 999px; background: rgba(0, 0, 0, 0.55); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); font-size: max(11px, 6.5cqw); font-weight: 700; letter-spacing: 0.02em; }
     .badge-live::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 8px var(--amber-2); margin-right: 5px; vertical-align: 1px; }
 
     /* Cover-Motive */
     .art-konf { background: radial-gradient(120% 80% at 20% 0%, #ff8a4c, transparent 60%), linear-gradient(160deg, #ff3b30, #a5001f); }
     .art-konf::before { content: ""; position: absolute; inset: -20%; background: repeating-radial-gradient(circle at 50% 120%, transparent 0 22px, rgba(255, 255, 255, 0.07) 22px 24px); }
     .scoreboard { position: relative; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 6px; width: 74%; padding: 10px 10px 12px; border-radius: 14px; background: rgba(0, 0, 0, 0.55); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35); text-align: center; }
-    .scoreboard .team { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.05em; color: rgba(255, 255, 255, 0.75); }
+    .scoreboard .team { font-size: 6.5cqw; font-weight: 700; letter-spacing: 0.05em; color: rgba(255, 255, 255, 0.75); }
     /* Neutrale Wappen statt echter Vereine */
     .scoreboard .shield { width: 20px; height: 23px; display: block; margin: 0 auto; fill: #fff; }
     .scoreboard .shield.alt { fill: none; stroke: rgba(255, 255, 255, 0.85); stroke-width: 2.2; }
-    .scoreboard .score { font: 800 1.9rem/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; font-variant-numeric: tabular-nums; }
-    .scoreboard .min { grid-column: 1 / -1; justify-self: center; margin-top: 4px; padding: 2px 8px; border-radius: 999px; background: #ff453a; font-size: 0.68rem; font-weight: 700; }
+    .scoreboard .score { font: 800 17cqw/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; font-variant-numeric: tabular-nums; }
+    .scoreboard .min { grid-column: 1 / -1; justify-self: center; margin-top: 4px; padding: 2px 8px; border-radius: 999px; background: #ff453a; font-size: 6.5cqw; font-weight: 700; }
     .art-konf .ball { position: absolute; right: -14%; bottom: -14%; width: 52%; aspect-ratio: 1; opacity: 0.22; }
 
     .art-dumm { background: radial-gradient(110% 80% at 80% 0%, #b69cff, transparent 60%), linear-gradient(160deg, #7c3aed, #2e1065); }
-    .art-dumm .q { font: 800 7.2rem/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; color: #fff; text-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); transform: rotate(-8deg); }
-    .art-dumm .hearts { position: absolute; bottom: 10%; left: 0; right: 0; text-align: center; font-size: 1.05rem; letter-spacing: 4px; color: #ff6b8a; text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35); }
-    .art-dumm .spark { position: absolute; font-size: 1.4rem; opacity: 0.85; }
+    .art-dumm .q { font: 800 64cqw/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; color: #fff; text-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); transform: rotate(-8deg); }
+    .art-dumm .hearts { position: absolute; bottom: 10%; left: 0; right: 0; text-align: center; font-size: 10cqw; letter-spacing: 4px; color: #ff6b8a; text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35); }
+    .art-dumm .spark { position: absolute; font-size: 12cqw; opacity: 0.85; }
 
     .art-ttt { background: radial-gradient(110% 80% at 20% 0%, #5ee08a, transparent 60%), linear-gradient(160deg, #1fa855, #0b4d2a); }
     .art-ttt::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.06) 0 14%, transparent 14% 28%); }
     .ttt { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 66%; aspect-ratio: 1; }
-    .ttt span { display: grid; place-items: center; border-radius: 10px; background: rgba(0, 0, 0, 0.28); font: 800 1.7rem/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; color: #fff; }
+    .ttt span { display: grid; place-items: center; border-radius: 10px; background: rgba(0, 0, 0, 0.28); font: 800 15cqw/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; color: #fff; }
     .ttt span:nth-child(4n+1) { background: rgba(255, 255, 255, 0.92); color: #0b4d2a; }
     /* Cover = Spiel-Icon im Klirr-Stil (quadratisch, die Kachel rundet die Ecken) */
     .art-icon img { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -101,6 +104,7 @@
     footer { margin-top: 28px; }
   </style>
   <link rel="stylesheet" href="/apple.css" />
+  <script src="/klirr.js" defer></script>
   <style>
     /* Hub = Marke pur: Bernstein als einziger Akzent */
     :root { --accent: var(--amber); --accent-ink: #1a1206; --tint: var(--amber); }
@@ -190,7 +194,7 @@
   const el = (tag, props = {}, ...children) => { const n = Object.assign(document.createElement(tag), props); n.append(...children.filter(Boolean)); return n; };
   const read = (k, f = null) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : f; } catch { return f; } };
   const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
-  const PALETTE = ['#0a6ed1', '#18803c', '#d0103a', '#8e44c9', '#b85400', '#0b7285', '#4c4cdb', '#946800', '#c2185b', '#7a5a35'];
+  const PALETTE = ['#0a6ed1', '#8e44c9', '#b85400', '#0b7285', '#4c4cdb', '#946800', '#c2185b', '#7a5a35']; // ohne Rot/Grün: die bedeuten „trinken“/„verteilen“
   const norm = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 
   // Laufende Runden auf diesem Gerät
@@ -246,7 +250,7 @@
   function render() {
     const box = $('players');
     box.replaceChildren(...roster.map((name, i) => {
-      const x = el('button', { textContent: '×', onclick: () => { roster.splice(i, 1); save(); } });
+      const x = el('button', { textContent: '×', onclick: () => { roster.splice(i, 1); save(); Klirr.undoToast(`${name} entfernt`, () => { roster.splice(Math.min(i, roster.length), 0, name); save(); }); } });
       x.setAttribute('aria-label', `${name} entfernen`);
       return el('div', { className: 'prow' },
         el('span', { className: 'av', style: `--c: ${PALETTE[i % PALETTE.length]}`, textContent: [...name][0] || '?' }),
@@ -262,7 +266,7 @@
     });
     box.append(el('label', { className: 'prow add' }, el('span', { className: 'av', textContent: '+' }), input, el('span')));
     $('count').textContent = roster.length ? roster.length : '';
-    $('heroSub').textContent = roster.length ? `Trinkspiele für deine Runde · ${roster.length} dabei` : 'Trinkspiele für deine Runde.';
+    
   }
   render();
   // Bereits installiert? Dann keinen Installationshinweis zeigen.

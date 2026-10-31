@@ -125,10 +125,46 @@ footer { color: var(--secondary); } /* tertiary (2.4:1) war zu schwach für Text
 ::view-transition-new(root) { animation: kl-in 0.38s cubic-bezier(0.32, 0.72, 0, 1) both; }
 @keyframes kl-out { to { opacity: 0; scale: 0.985; } }
 @keyframes kl-in { from { opacity: 0; translate: 0 14px; } }
-:where(button, .btn, .glass-btn, .cover, .prow, .chip, a.back-link) { transition: scale 0.22s cubic-bezier(0.3, 1.5, 0.6, 1), background-color 0.2s, opacity 0.2s; }
-:where(button, .btn, .glass-btn, .chip):not(:disabled):active { scale: 0.96; }
+/* Federn nur bei Kacheln und Hauptknöpfen – häufige Bedienelemente (Stepper, Wertung) bleiben ruhig */
+:where(.btn, .glass-btn, .cover) { transition: scale 0.22s cubic-bezier(0.3, 1.5, 0.6, 1), background-color 0.2s, opacity 0.2s; }
+:where(.btn, .glass-btn):not(:disabled):active { scale: 0.96; }
 @keyframes kl-rise { from { opacity: 0; translate: 0 16px; } }
 @media (prefers-reduced-motion: reduce) {
   @view-transition { navigation: none; }
-  :where(button, .btn, .glass-btn, .chip):active { scale: none; }
+  :where(.btn, .glass-btn):active { scale: none; }
 }
+
+/* ---------- Rückgängig-Hinweis ---------- */
+.kl-undo { position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom)); z-index: 60; display: flex; align-items: center; gap: 14px; max-width: calc(100% - 32px); padding: 6px 6px 6px 18px; border-radius: 999px; background: rgba(40, 37, 58, 0.82); -webkit-backdrop-filter: blur(20px) saturate(170%); backdrop-filter: blur(20px) saturate(170%); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 0 0 0.5px rgba(255, 255, 255, 0.16); color: #fff; font-weight: 600; translate: -50% 20px; opacity: 0; transition: translate 0.35s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.2s; }
+.kl-undo.is-open { translate: -50% 0; opacity: 1; }
+.kl-undo span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kl-undo button { flex: none; min-height: 44px; padding: 0 16px; border: 0; border-radius: 999px; background: rgba(255, 255, 255, 0.14); color: var(--amber); font: inherit; font-weight: 700; }
+
+/* ---------- Klirr-Moment ---------- */
+.kl-moment { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; pointer-events: none; }
+.kl-moment svg { width: min(56vw, 260px); overflow: visible; filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.5)); }
+.kl-moment .a, .kl-moment .b { transform-box: fill-box; transform-origin: center; }
+.kl-moment circle.a { animation: kl-a 1.05s cubic-bezier(0.3, 1.4, 0.5, 1) both; }
+.kl-moment .b { animation: kl-b 1.05s cubic-bezier(0.3, 1.4, 0.5, 1) both; }
+.kl-moment .lens { animation: kl-lens 1.05s ease-out both; filter: drop-shadow(0 0 14px #ff7a1a); }
+.kl-moment .p1 { animation: kl-p 1.05s 0.25s ease-out both; }
+.kl-moment .p2 { animation: kl-p 1.05s 0.35s ease-out both; }
+@keyframes kl-a { 0% { translate: -60px 40px; opacity: 0; } 35% { translate: 0 0; opacity: 1; } 45% { translate: 4px -3px; } 85% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes kl-b { 0% { translate: 60px -40px; opacity: 0; } 35% { translate: 0 0; opacity: 1; } 45% { translate: -4px 3px; } 85% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes kl-lens { 0%, 30% { opacity: 0; } 40% { opacity: 1; scale: 1.06; } 85% { opacity: 1; scale: 1; } 100% { opacity: 0; } }
+@keyframes kl-p { 0% { opacity: 0; translate: -10px 10px; } 30% { opacity: 1; } 100% { opacity: 0; translate: 14px -26px; } }
+.kl-moment.is-still circle.a, .kl-moment.is-still .b, .kl-moment.is-still .p1, .kl-moment.is-still .p2 { animation: kl-fade 0.7s ease both; }
+.kl-moment.is-still .lens { animation: kl-fade 0.7s ease both; }
+@keyframes kl-fade { 0%, 100% { opacity: 0; } 25%, 75% { opacity: 1; } }
+
+/* ---------- Transparenz reduzieren / Kontrast erhöhen ---------- */
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  .glass, .nowplaying, .cta-bar, .tabbar, .kl-undo, .sheet { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; background: #1b1926 !important; }
+}
+@media (prefers-contrast: more) {
+  :root { --secondary: rgba(235, 235, 245, 0.85); --tertiary: rgba(235, 235, 245, 0.6); --sep: rgba(235, 235, 245, 0.35); }
+  .glass, .nowplaying, .tabbar, .kl-undo, .list, .surface { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4) !important; }
+}
+
+/* Tab-Leiste: aktives Symbol gefüllt (Apple: „Prefer filled symbols“) */
+.tabbar button[aria-selected="true"]:not([data-tab="zaehler"]) svg :is(rect, circle, path:first-of-type) { fill: currentColor; fill-opacity: 0.3; }

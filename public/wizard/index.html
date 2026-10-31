@@ -44,7 +44,6 @@
 
   <header class="topbar">
     <div class="brand">
-      <img src="/wizard/icon.svg" alt="" width="40" height="40" class="brand__logo" />
       <div class="brand__text">
         <a class="klirr-back" href="/">‹ Alle Spiele</a>
         <h1>Wizard</h1>
@@ -240,5 +239,9 @@
       <button id="ioPrimary" class="btn btn--primary" type="button">Kopieren</button>
     </div>
   </dialog>
+  <script>
+    // Safari (iPhone) kann nicht vibrieren – Schalter nur zeigen, wenn das Gerät es kann.
+    if (!("vibrate" in navigator)) { var h = document.getElementById("hapticToggle"); if (h) h.closest("label").hidden = true; }
+  </script>
 </body>
 </html>

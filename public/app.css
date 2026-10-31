@@ -105,8 +105,8 @@ h2.sec small { text-transform: none; font-size: 0.7647rem; }
 .list textarea { display: block; width: 100%; min-height: 128px; border: 0; background: none; padding: 14px 18px; font: inherit; color: var(--label); resize: vertical; }
 .list textarea::placeholder, input::placeholder { color: var(--tertiary); }
 textarea:focus, input:focus { outline: none; }
-.add-row { display: flex; gap: 8px; padding: 8px 8px 8px 18px; align-items: center; }
-.add-row input { flex: 1; min-width: 0; border: 0; background: none; font: inherit; color: var(--label); padding: 8px 0; }
+.add-row { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 8px 8px 18px; align-items: center; }
+.add-row input { flex: 1 1 8em; min-width: 0; border: 0; background: none; font: inherit; color: var(--label); padding: 8px 0; }
 .empty { background: var(--cell); border-radius: var(--r); padding: 18px; color: var(--secondary); font-size: 0.8824rem; }
 .error { color: var(--red); margin: 8px 20px 0; font-size: 0.7647rem; }
 .error:empty { display: none; }
@@ -283,8 +283,8 @@ input.switch:checked::before { transform: translateX(20px); }
 .stepper button.plus { background: var(--accent); color: var(--accent-ink); }
 .panel .more { display: flex; flex-wrap: wrap; gap: 6px; }
 .panel .chip { background: rgba(255, 255, 255, 0.1); color: #fff; }
-.pick-input { display: flex; gap: 8px; }
-.pick-input input { flex: 1; min-width: 0; border: 0; border-radius: 10px; background: rgba(255, 255, 255, 0.1); padding: 9px 12px; font: inherit; font-size: 0.8824rem; color: #fff; }
+.pick-input { display: flex; flex-wrap: wrap; gap: 8px; }
+.pick-input input { flex: 1 1 8em; min-width: 0; border: 0; border-radius: 10px; background: rgba(255, 255, 255, 0.1); padding: 9px 12px; font: inherit; font-size: 0.8824rem; color: #fff; }
 .pick-input input::placeholder { color: rgba(255, 255, 255, 0.4); }
 .pick-input button { border: 0; border-radius: 10px; padding: 0 16px; background: var(--accent); color: var(--accent-ink); font-weight: 700; }
 .chip { border: 0; background: var(--fill); border-radius: 999px; padding: 6px 12px; font-size: 0.7647rem; font-weight: 500; color: var(--accent-text); }

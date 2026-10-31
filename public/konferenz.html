@@ -18,7 +18,19 @@
   <link rel="preload" href="/fonts/barlow-condensed-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="/app.css" />
   <link rel="stylesheet" href="/apple.css" />
-  <style>:root { --accent-fill: #d92d20; } /* Rot mit 4.8:1 für weiße Knopfschrift */</style>
+  <style>
+    /* Rot bedeutet hier nur „trinken“ und „live“. Bedienelemente sind neutral weiß (18:1), wie in Apple Sports. */
+    :root { --accent: #f2f2f7; --accent-fill: #f2f2f7; --accent-ink: #0a0a10; --tint: #ffffff; }
+    .btn { color: #0a0a10; }
+    .hub { color: #0a0a10; }
+    /* Ohne Farbakzent bleiben Aktionen über Gewicht und Pfeil erkennbar */
+    .edit-teams summary, .game summary, .cell.action, .chip { font-weight: 600; }
+    .edit-teams summary { list-style: none; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding-bottom: 4px; }
+    .edit-teams summary::-webkit-details-marker { display: none; }
+    .edit-teams summary::after { content: "›"; color: var(--secondary); font-size: 1.2em; transition: rotate 0.2s; }
+    .edit-teams[open] summary::after { rotate: 90deg; }
+  </style>
+  <script src="/klirr.js" defer></script>
 </head>
 <body>
 <main>
@@ -822,7 +834,7 @@
   let processed = new Set(store.get('kt-processed', []));
 
   // Kräftig genug, dass weiße Schrift überall mindestens 4,5 : 1 Kontrast hat.
-  const PALETTE = ['#0a6ed1', '#18803c', '#d0103a', '#8e44c9', '#b85400', '#0b7285', '#4c4cdb', '#946800', '#c2185b', '#7a5a35'];
+  const PALETTE = ['#0a6ed1', '#8e44c9', '#b85400', '#0b7285', '#4c4cdb', '#946800', '#c2185b', '#7a5a35']; // ohne Rot/Grün: die bedeuten „trinken“/„verteilen“
   const colorOf = (p) => PALETTE[Math.max(0, players.indexOf(p)) % PALETTE.length];
   function whoBadge(p) {
     const b = el('span', { className: 'who', textContent: p.name });
@@ -1023,6 +1035,8 @@
     }
     if (entries.length > 3) t.append(el('div', { textContent: `+ ${entries.length - 3} weitere im Ticker` }));
     t.hidden = false;
+    // Klirr-Moment, wenn jemand trinken oder exen muss
+    if (entries.some((e) => e.lines.some((l) => / trinkt | muss exen/.test(l)))) window.Klirr?.moment();
     try { navigator.vibrate?.([200, 100, 200]); } catch {}
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => { t.hidden = true; }, 8000);
@@ -1229,7 +1243,7 @@
     const box = $('roster');
     box.innerHTML = '';
     roster.forEach((name, i) => {
-      const remove = el('button', { textContent: '✕', onclick: () => { roster.splice(i, 1); saveRoster(); } });
+      const remove = el('button', { textContent: '✕', onclick: () => { roster.splice(i, 1); saveRoster(); window.Klirr?.undoToast(`${name} entfernt`, () => { roster.splice(Math.min(i, roster.length), 0, name); saveRoster(); }); } });
       remove.setAttribute('aria-label', `${name} entfernen`);
       box.append(el('span', { className: 'rchip', style: `--c: ${rosterColor(i)}` }, el('span', { className: 'ini', textContent: [...name][0] }), name, remove));
     });

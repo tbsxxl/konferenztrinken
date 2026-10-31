@@ -282,5 +282,9 @@
   <noscript><p class="panel">Bitte JavaScript aktivieren, um den Punktezähler zu nutzen.</p></noscript>
 
   <!-- Kein eigener Service Worker: /sw.js gehört in Klirr den Push-Nachrichten. -->
+  <script>
+    // Safari (iPhone) kann nicht vibrieren – Schalter nur zeigen, wenn das Gerät es kann.
+    if (!("vibrate" in navigator)) { var h = document.getElementById("hapticsRow"); if (h) h.hidden = true; }
+  </script>
 </body>
 </html>

@@ -25,9 +25,12 @@ body {
 ::view-transition-new(root) { animation: kl-in 0.38s cubic-bezier(0.32, 0.72, 0, 1) both; }
 @keyframes kl-out { to { opacity: 0; scale: 0.985; } }
 @keyframes kl-in { from { opacity: 0; translate: 0 14px; } }
-:where(button):not(:disabled):active { scale: 0.96; }
-:where(button) { transition: scale 0.22s cubic-bezier(0.3, 1.5, 0.6, 1); }
+
 @media (prefers-reduced-motion: reduce) {
   @view-transition { navigation: none; }
-  :where(button):active { scale: none; }
+}
+
+/* Transparenz reduzieren / Kontrast erhöhen: Glas-Leisten deckend */
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  .glass, .toolbar, .bottombar__row, .toast, .sheet { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; background: #1b1926 !important; }
 }
