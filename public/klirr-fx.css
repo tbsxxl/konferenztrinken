@@ -7,6 +7,10 @@
 
 /* ---------- Klirr-Moment ---------- */
 .kl-moment { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; pointer-events: none; }
+/* Sanfte Abdunklung hinter dem Moment, damit er nicht über dem Inhalt „schwimmt“ */
+.kl-moment::before { content: ""; position: absolute; inset: 0; background: radial-gradient(60% 45% at 50% 50%, rgba(10, 10, 16, 0.78), rgba(10, 10, 16, 0.35) 70%, transparent); animation: kl-dim 1.05s ease both; }
+.kl-moment svg { position: relative; }
+@keyframes kl-dim { 0% { opacity: 0; } 20%, 80% { opacity: 1; } 100% { opacity: 0; } }
 .kl-moment svg { width: min(56vw, 260px); overflow: visible; filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.5)); }
 .kl-moment .a, .kl-moment .b { transform-box: fill-box; transform-origin: center; }
 .kl-moment circle.a { animation: kl-a 1.05s cubic-bezier(0.3, 1.4, 0.5, 1) both; }
@@ -27,7 +31,7 @@
 }
 
 /* Trink-Hinweis oben */
-.kl-note { position: fixed; left: 50%; top: calc(12px + env(safe-area-inset-top)); z-index: 70; max-width: calc(100% - 32px); padding: 12px 18px; border-radius: 18px; background: rgba(40, 37, 58, 0.9); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 0 0 0.5px rgba(255, 255, 255, 0.16); color: #fff; font: 600 1rem/1.35 -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, system-ui, sans-serif; text-align: center; translate: -50% -20px; opacity: 0; pointer-events: none; transition: translate 0.35s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.2s; }
+.kl-note { position: fixed; left: 50%; top: calc(12px + env(safe-area-inset-top)); z-index: 70; width: max-content; max-width: calc(100vw - 32px); padding: 12px 18px; border-radius: 18px; background: rgba(40, 37, 58, 0.9); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 0 0 0.5px rgba(255, 255, 255, 0.16); color: #fff; font: 600 1rem/1.35 -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, system-ui, sans-serif; text-align: center; translate: -50% -20px; opacity: 0; pointer-events: none; transition: translate 0.35s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.2s; }
 .kl-note.is-open { translate: -50% 0; opacity: 1; }
 @media (prefers-reduced-motion: reduce) { .kl-note, .kl-undo { transition: opacity 0.2s; } }
 @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) { .kl-note { -webkit-backdrop-filter: none; backdrop-filter: none; background: #1b1926; } }

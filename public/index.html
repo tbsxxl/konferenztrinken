@@ -109,7 +109,19 @@
     /* Hub = Marke pur: Bernstein als einziger Akzent */
     :root { --accent: var(--amber); --accent-ink: #1a1206; --tint: var(--amber); }
     .brand { display: flex; align-items: center; gap: 12px; margin: 0 4px 2px; }
-    .brand img { width: 52px; height: 52px; flex: none; border-radius: 12px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45), inset 0 0 0 0.5px rgba(255, 255, 255, 0.18); }
+    /* Logo = Trinkmodus-Schalter. Aus: Kreise getrennt, nichts leuchtet. An: Kreise stoßen an, Schnittmenge leuchtet. */
+    .brand-mark { flex: none; width: 56px; height: 56px; padding: 0; border: 0; border-radius: 13px; overflow: hidden; background: none; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45), inset 0 0 0 0.5px rgba(255, 255, 255, 0.18); }
+    .brand-mark svg { display: block; width: 100%; height: 100%; }
+    .brand-mark .bm-move { transform: translate(150px, -150px); transition: transform 0.6s cubic-bezier(0.3, 1.45, 0.5, 1); }
+    .brand-mark .bm-lens, .brand-mark .bm-glow { opacity: 0; transition: opacity 0.35s 0.25s; }
+    .brand-mark .bm-perls { fill: rgba(255, 255, 255, 0.35); }
+    .brand-mark[aria-pressed="true"] .bm-move { transform: none; }
+    .brand-mark[aria-pressed="true"] .bm-lens, .brand-mark[aria-pressed="true"] .bm-glow { opacity: 1; }
+    .brand-mark[aria-pressed="true"] .bm-perls { fill: #ffb340; }
+    .brand-mark .bm-perls { transition: fill 0.35s 0.25s, transform 0.6s cubic-bezier(0.3, 1.45, 0.5, 1); }
+    .wordmark .perl { transition: background 0.35s, box-shadow 0.35s; }
+    html:not([data-drink-all="on"]) .wordmark .perl { background: rgba(255, 255, 255, 0.3); box-shadow: none; }
+    @media (prefers-reduced-motion: reduce) { .brand-mark .bm-move, .brand-mark .bm-perls { transition: none; } }
     .brand .hero-title { margin: 0; }
     /* Wortmarke: gerundete Schrift, Bernstein-Perle als Schlusspunkt */
     .wordmark { font-family: "SF Pro Rounded", ui-rounded, -apple-system, Inter, system-ui, sans-serif; font-weight: 800; font-size: 2.6rem; letter-spacing: -0.02em; }
@@ -124,7 +136,22 @@
     </a>
   </div>
   <div class="brand">
-    <img src="/icon.svg" alt="" width="52" height="52" />
+    <button type="button" class="brand-mark" id="drinkMark" aria-pressed="false" aria-label="Trinkmodus einschalten">
+      <svg viewBox="0 0 1024 1024" aria-hidden="true">
+        <defs>
+          <linearGradient id="bmBg" x1="0.1" y1="0" x2="0.9" y2="1"><stop offset="0" stop-color="#2a2540"/><stop offset=".5" stop-color="#14121f"/><stop offset="1" stop-color="#0a0a10"/></linearGradient>
+          <linearGradient id="bmGl" x1=".15" y1="0" x2=".85" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity=".14"/></linearGradient>
+          <clipPath id="bmClip"><circle cx="450" cy="585" r="260"/></clipPath>
+          <filter id="bmGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="30"/></filter>
+        </defs>
+        <rect width="1024" height="1024" fill="url(#bmBg)"/>
+        <g class="bm-glow" clip-path="url(#bmClip)"><circle class="bm-move" cx="623" cy="412" r="161" fill="#ff7a1a" filter="url(#bmGlow)" opacity=".55"/></g>
+        <circle cx="450" cy="585" r="260" fill="url(#bmGl)" stroke="#fff" stroke-opacity=".45" stroke-width="6"/>
+        <g class="bm-move"><circle cx="623" cy="412" r="161" fill="url(#bmGl)" stroke="#fff" stroke-opacity=".45" stroke-width="6"/></g>
+        <g class="bm-lens" clip-path="url(#bmClip)"><circle class="bm-move" cx="623" cy="412" r="161" fill="#ffb340"/></g>
+        <g class="bm-move bm-perls"><circle cx="789" cy="246" r="44"/><circle cx="878" cy="157" r="22" opacity=".75"/></g>
+      </svg>
+    </button>
     <h1 class="hero-title wordmark">Klirr<span class="perl" aria-hidden="true"></span></h1>
   </div>
   <p class="hero-sub" id="heroSub">Trinkspiele für deine Runde.</p>
@@ -269,6 +296,25 @@
     
   }
   render();
+  // Trinkmodus über das Logo: gilt für Tic Tac Toe, Wizard und Flip 7 (in deren Menüs einzeln änderbar).
+  const DRINK_GAMES = ['tictactoe', 'wizard', 'flip7'];
+  const drinkAll = () => { try { return localStorage.getItem('klirr-drink:all') === '1'; } catch { return false; } };
+  function showDrink(on) {
+    const m = $('drinkMark');
+    m.setAttribute('aria-pressed', String(on));
+    m.setAttribute('aria-label', on ? 'Trinkmodus an – zum Ausschalten tippen' : 'Trinkmodus aus – zum Einschalten tippen');
+    document.documentElement.dataset.drinkAll = on ? 'on' : 'off';
+    $('heroSub').textContent = on ? 'Trinkmodus an · Prost!' : 'Tipp aufs Logo, um anzustoßen.';
+  }
+  showDrink(drinkAll());
+  $('drinkMark').addEventListener('click', () => {
+    const on = !drinkAll();
+    try { localStorage.setItem('klirr-drink:all', on ? '1' : '0'); DRINK_GAMES.forEach((g) => localStorage.setItem(`klirr-drink:${g}`, on ? '1' : '0')); } catch {}
+    showDrink(on);
+    if (on) { setTimeout(() => window.Klirr?.moment(), 250); window.Klirr?.note('Trinkmodus an'); }
+    else window.Klirr?.note('Trinkmodus aus');
+  });
+
   // Bereits installiert? Dann keinen Installationshinweis zeigen.
   if (navigator.standalone || matchMedia('(display-mode: standalone)').matches) $('installRow').hidden = true;
   document.querySelectorAll('.cover-card').forEach((c, i) => c.style.setProperty('--i', i));
