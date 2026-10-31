@@ -76,7 +76,12 @@
 
     /* Optionen */
     .stepper-cell .sub { display: block; color: var(--secondary); font-size: 0.8rem; margin-top: 2px; }
-    .stepper-cell output { width: 4.6rem; flex: none; text-align: center; white-space: nowrap; font: 800 1.15rem/1 var(--display); text-transform: uppercase; }
+    /* Startknopf bleibt beim Scrollen durch die Einstellungen unten sichtbar (wie eine iOS-Aktionsleiste) */
+    .cta-bar { position: sticky; bottom: 0; z-index: 5; margin: 18px -16px 0; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: linear-gradient(transparent, rgba(10, 10, 16, 0.85) 30%); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+    .cta-bar .btn { margin-top: 0; }
+    .cta-bar .btn + .btn { margin-top: 8px; }
+    .stepper-cell > span:first-child { flex: 1; min-width: 0; }
+    .stepper-cell output { width: 3.6rem; flex: none; text-align: center; white-space: nowrap; font: 800 1.15rem/1 var(--display); text-transform: uppercase; }
     .stepper-cell .ctl { display: flex; flex: none; align-items: center; gap: 6px; }
     .stepper-cell button { flex: none; width: 44px; height: 44px; border: 0; border-radius: 12px; background: var(--fill); color: var(--label); font-size: 1.3rem; font-weight: 600; }
     .cell.wrap { flex-wrap: wrap; row-gap: 10px; }
@@ -189,8 +194,10 @@
     <h2 class="sec">Kategorien <small id="qCount"></small></h2>
     <div class="list"><div class="cats" id="cats"></div></div>
 
-    <button class="btn" id="start">🧠 Spiel starten</button>
-    <button class="btn ghost" id="resume" hidden>Laufendes Spiel fortsetzen</button>
+    <div class="cta-bar">
+      <button class="btn" id="start">Spiel starten</button>
+      <button class="btn ghost" id="resume" hidden>Laufendes Spiel fortsetzen</button>
+    </div>
     <button class="btn ghost" id="joinOther">Einem Raum beitreten</button>
     <div class="error" id="setupError" role="alert"></div>
   </section>

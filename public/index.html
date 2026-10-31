@@ -80,7 +80,14 @@
 
     .links .prow { grid-template-columns: 30px minmax(0, 1fr) 20px; min-height: 52px; text-decoration: none; color: #fff; }
     .links .prow + .prow::before { left: 44px; }
-    .links .ico { font-size: 1.2rem; text-align: center; }
+    .links .ico { width: 30px; height: 30px; border-radius: 8px; background: var(--t); display: grid; place-items: center; }
+    .links .ico svg { width: 19px; height: 19px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .links .prow small { display: block; }
+    .nowplaying .mini-art.art-icon img { position: static; width: 100%; height: 100%; }
+    /* Einblenden der Kacheln, leicht gestaffelt */
+    .covers .cover-card { animation: kl-rise 0.5s cubic-bezier(0.32, 0.72, 0, 1) both; animation-delay: calc(var(--i, 0) * 45ms); }
+    .nowplaying:not([hidden]) { animation: kl-rise 0.45s 0.15s cubic-bezier(0.32, 0.72, 0, 1) both; }
+    @media (prefers-reduced-motion: reduce) { .covers .cover-card, .nowplaying { animation: none !important; } }
     .links .chev { color: rgba(235, 235, 245, 0.3); font-size: 1.3rem; }
 
     /* „Läuft gerade“ als Glas-Kapsel wie der Mini-Player */
@@ -141,6 +148,7 @@
     </a>
     <a class="cover-card" href="/tictactoe/">
       <div class="cover art-ttt">
+        <span class="badge-live" id="liveTtt" hidden>Läuft</span>
         <div class="ttt" aria-hidden="true"><span>X</span><span></span><span>O</span><span></span><span>X</span><span></span><span>O</span><span></span><span>X</span></div>
       </div>
       <b>Tic Tac Toe</b>
@@ -151,12 +159,12 @@
   <h2 class="shelf-title">Kartenspiele</h2>
   <div class="covers">
     <a class="cover-card" href="/wizard/">
-      <div class="cover art-icon"><img src="/wizard/icon.svg" alt="" /></div>
+      <div class="cover art-icon"><span class="badge-live" id="liveWizard" hidden>Läuft</span><img src="/wizard/icon.svg" alt="" /></div>
       <b>Wizard</b>
       <small>Punktezähler</small>
     </a>
     <a class="cover-card" href="/flip7/">
-      <div class="cover art-icon"><img src="/flip7/icon.svg" alt="" /></div>
+      <div class="cover art-icon"><span class="badge-live" id="liveFlip" hidden>Läuft</span><img src="/flip7/icon.svg" alt="" /></div>
       <b>Flip 7</b>
       <small>Punktezähler</small>
     </a>
@@ -168,8 +176,8 @@
 
   <h2 class="shelf-title">Mehr</h2>
   <div class="list links" style="padding: 0 14px">
-    <a class="prow" href="/datenschutz.html"><span class="ico" aria-hidden="true">🔒</span><span>Datenschutz</span><span class="chev" aria-hidden="true">›</span></a>
-    <div class="prow"><span class="ico" aria-hidden="true">📲</span><span>Als App nutzen: in Safari auf Teilen → „Zum Home-Bildschirm“</span><span></span></div>
+    <a class="prow" href="/datenschutz.html"><span class="ico" style="--t:#636366" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></svg></span><span>Datenschutz</span><span class="chev" aria-hidden="true">›</span></a>
+    <div class="prow" id="installRow"><span class="ico" style="--t:#0a84ff" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.5v11M8 7.5l4-4 4 4"/><path d="M7 11H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-1"/></svg></span><span>Zum Home-Bildschirm<small>In Safari über „Teilen“</small></span><span></span></div>
   </div>
 
   <footer>Trinkt verantwortungsvoll · Wasser zwischendurch · Alkoholfrei zählt auch.</footer>
@@ -190,12 +198,35 @@
   const ktRunning = Array.isArray(kt) && kt.length > 0;
   const dumm = read('dumm-state');
   const dummRunning = !!(dumm && !dumm.finished && dumm.phase && dumm.phase !== 'lobby');
+  const ttt = read('bttt_state_v1');
+  const tttRunning = !!(ttt && Array.isArray(ttt.moveHistory) && ttt.moveHistory.length && !ttt.gameLocked);
+  const wiz = read('wizard_state_v2');
+  const wizRunning = !!(wiz && wiz.started && !wiz.finished);
+  const flip = read('flip7_game_v2');
+  const flipRunning = !!(flip && flip.game && Array.isArray(flip.game.rounds) && flip.game.rounds.length);
   $('liveKonferenz').hidden = !ktRunning;
   $('liveDumm').hidden = !dummRunning;
+  $('liveTtt').hidden = !tttRunning;
+  $('liveWizard').hidden = !wizRunning;
+  $('liveFlip').hidden = !flipRunning;
 
   // Glas-Kapsel „Läuft gerade“ (bevorzugt das zuletzt aktive Quiz, sonst die Konferenz)
   const np = $('nowPlaying');
   const playIcon = () => { const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); s.setAttribute('viewBox', '0 0 24 24'); s.innerHTML = '<path d="M8 5.5v13l10.5-6.5z"/>'; return s; };
+  const icoGames = [
+    [tttRunning, '/tictactoe/', 'Tic Tac Toe', 'Spiel läuft', 'art-ttt', '#'],
+    [wizRunning, '/wizard/', 'Wizard', 'Spiel läuft', 'art-icon', '/wizard/icon.svg'],
+    [flipRunning, '/flip7/', 'Flip 7', 'Spiel läuft', 'art-icon', '/flip7/icon.svg'],
+  ].find((g) => g[0]);
+  if (!dummRunning && !ktRunning && icoGames) {
+    const [, href, title, sub, cls, src] = icoGames;
+    np.href = href;
+    const art = el('span', { className: `mini-art ${cls}` });
+    art.append(src === '#' ? el('span', { textContent: '✕○', style: 'font:800 .8rem/1 -apple-system,ui-rounded,sans-serif' }) : el('img', { src, alt: '' }));
+    np.append(art, el('span', {}, el('small', { textContent: sub }), el('b', { textContent: title })), el('span', { className: 'play' }, playIcon()));
+    np.setAttribute('aria-label', `Weiterspielen: ${title}`);
+    np.hidden = false;
+  }
   if (dummRunning || ktRunning) {
     const quiz = dummRunning;
     np.href = quiz ? '/dumm.html' : '/konferenz.html';
@@ -234,6 +265,9 @@
     $('heroSub').textContent = roster.length ? `Trinkspiele für deine Runde · ${roster.length} dabei` : 'Trinkspiele für deine Runde.';
   }
   render();
+  // Bereits installiert? Dann keinen Installationshinweis zeigen.
+  if (navigator.standalone || matchMedia('(display-mode: standalone)').matches) $('installRow').hidden = true;
+  document.querySelectorAll('.cover-card').forEach((c, i) => c.style.setProperty('--i', i));
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('/sw.js').catch(() => {});
 </script>
 </body>

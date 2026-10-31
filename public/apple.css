@@ -117,3 +117,18 @@ h2.sec small { font: 500 0.9rem/1.2 var(--display); color: var(--secondary); tex
 .toast { background: rgba(44, 44, 46, 0.92); border: 0; }
 footer { color: var(--secondary); } /* tertiary (2.4:1) war zu schwach für Text */
 .game-tile .live { font: 600 0.8rem/1.2 var(--display); text-transform: none; letter-spacing: 0; }
+
+/* ---------- Bewegung & Haptik-Gefühl (Klirr) ----------
+   Seitenwechsel wie ein iOS-Push, Federn beim Antippen. Alles aus bei „Bewegung reduzieren“. */
+@view-transition { navigation: auto; }
+::view-transition-old(root) { animation: kl-out 0.28s cubic-bezier(0.32, 0.72, 0, 1) both; }
+::view-transition-new(root) { animation: kl-in 0.38s cubic-bezier(0.32, 0.72, 0, 1) both; }
+@keyframes kl-out { to { opacity: 0; scale: 0.985; } }
+@keyframes kl-in { from { opacity: 0; translate: 0 14px; } }
+:where(button, .btn, .glass-btn, .cover, .prow, .chip, a.back-link) { transition: scale 0.22s cubic-bezier(0.3, 1.5, 0.6, 1), background-color 0.2s, opacity 0.2s; }
+:where(button, .btn, .glass-btn, .chip):not(:disabled):active { scale: 0.96; }
+@keyframes kl-rise { from { opacity: 0; translate: 0 16px; } }
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+  :where(button, .btn, .glass-btn, .chip):active { scale: none; }
+}
