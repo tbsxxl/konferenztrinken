@@ -1,3 +1,11 @@
+# Trinkspiele 🍺
+
+Hub mit Trinkspielen: **Konferenztrinken** (`/konferenz.html`) und **Der Dümmste fliegt** (`/dumm.html`). Startseite `/` ist der Hub, das Design liegt gemeinsam in `public/app.css`, die Mitspielerliste gilt für alle Spiele.
+
+## Der Dümmste fliegt
+
+Quiz reihum: Eine Person liest vor, tippt „Auflösen“ und dann „Richtig“ oder „Falsch“. Falsch kostet ein Leben und Schlucke (einstellbar, auch Ex), wer keine Leben mehr hat, fliegt (optional mit Ex). Richtig darf optional Schlucke verteilen. Countdown (aus/10–30 s) und Kategorien wählbar, Fragen in `public/dumm-fragen.js`.
+
 # Konferenztrinken 🍺⚽
 
 Das Trinkspiel zur Bundesliga-Konferenz am Samstag um 15:30 Uhr – als kleine Website mit:

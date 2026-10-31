@@ -1,7 +1,7 @@
 {
-  "name": "Konferenztrinken",
-  "short_name": "Konferenz",
-  "description": "Das Trinkspiel zur Bundesliga-Konferenz",
+  "name": "Trinkspiele",
+  "short_name": "Trinkspiele",
+  "description": "Trinkspiel-Hub: Konferenztrinken und Der Dümmste fliegt",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

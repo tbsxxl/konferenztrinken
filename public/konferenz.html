@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#f2f2f2" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+  <meta name="darkreader-lock" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Konferenz" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <title>Konferenztrinken</title>
+  <meta name="description" content="Das Trinkspiel zur Bundesliga-Konferenz am Samstag um 15:30 Uhr: Live-Spieltag, Auslosung und automatischer Schluck-Zähler." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍺</text></svg>" />
+  <link rel="preload" href="/fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/fonts/barlow-condensed-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/app.css" />
+</head>
+<body>
+<main>
+  <a class="back-link" href="/">‹ Alle Spiele</a>
+  <!-- LIVE -->
+  <section id="zaehler" hidden>
+    <header class="lt">
+      <div><div class="eyebrow" id="matchday"></div><h1>Live</h1></div>
+      <span class="pill" id="status">Lade …</span>
+    </header>
+    <h2 class="sec">Konferenz</h2>
+    <div class="board" id="board"></div>
+
+    <div id="mismatch"></div>
+    <div id="todos"></div>
+
+    <h2 class="sec">Tabelle <small>Spieler antippen, wenn der Name fällt</small></h2>
+    <div class="players" id="players"></div>
+
+    <h2 class="sec">Ticker</h2>
+    <div class="list ticker"><div class="feed" id="feed"></div></div>
+
+    <h2 class="sec">Runde</h2>
+    <div class="list">
+      <div class="add-row">
+        <input type="text" id="newPlayer" placeholder="Person hinzufügen" aria-label="Person hinzufügen" />
+        <button class="btn small" id="addPlayer">Hinzufügen</button>
+      </div>
+      <label class="cell"><span>Push-Nachrichten<small class="cell-sub" id="pushInfo">Tore, Karten, Halbzeit, Abpfiff aufs Handy</small></span><input type="checkbox" class="switch" id="pushToggle" /></label>
+      <button class="cell action" id="autoPickNow">Fehlende Picks auslosen</button>
+      <button class="cell danger" id="resetCounts">Zähler auf 0 setzen</button>
+      <a class="cell action" href="/datenschutz.html" style="text-decoration:none">Datenschutz</a>
+    </div>
+    <div class="error" id="pickError" role="alert"></div>
+  </section>
+
+  <!-- SPIELTAG -->
+  <section id="spieltag" hidden>
+    <header class="lt"><div><div class="eyebrow" id="matchday2"></div><h1>Spieltag</h1></div></header>
+    <div class="list">
+      <div class="cell"><label for="gameDate">Datum</label><input type="date" id="gameDate" /></div>
+      <label class="cell"><span>Nur 15:30-Konferenz</span><input type="checkbox" class="switch" id="only1530" checked /></label>
+      <button class="cell action" id="loadGames">Neu laden</button>
+    </div>
+    <div class="error" id="gamesError" role="alert"></div>
+    <h2 class="sec">Spiele <small id="gamesInfo"></small></h2>
+    <div id="games"></div>
+  </section>
+
+  <!-- RUNDE -->
+  <section id="auslosung" hidden>
+    <header class="lt"><div><div class="eyebrow">Vor Anpfiff</div><h1>Neue Runde</h1></div></header>
+
+    <div id="setupStage">
+      <h2 class="sec">Mitspieler <small id="rosterCount"></small></h2>
+      <div class="list">
+        <div class="add-row">
+          <input type="text" id="rosterInput" placeholder="Name eingeben …" aria-label="Mitspieler hinzufügen" autocomplete="off" enterkeyhint="done" />
+          <button class="btn small" id="rosterAdd">Hinzufügen</button>
+        </div>
+        <div class="roster" id="roster"></div>
+      </div>
+      <textarea id="names" hidden aria-hidden="true"></textarea>
+
+      <h2 class="sec">Teams <small id="teamsCount"></small></h2>
+      <div class="list">
+        <div class="team-grid" id="teamGrid"></div>
+        <details class="edit-teams"><summary>Teams bearbeiten</summary>
+          <textarea id="teams" placeholder="Ein Team pro Zeile" aria-label="Teams"></textarea>
+        </details>
+      </div>
+
+      <h2 class="sec">Optionen</h2>
+      <div class="list">
+        <div class="cell"><label for="perPlayer">Teams pro Person</label><input type="text" class="inline-input" id="perPlayer" inputmode="numeric" value="auto" /></div>
+        <label class="cell"><span>Spieler-Picks auslosen</span><input type="checkbox" class="switch" id="autoPicks" checked /></label>
+      </div>
+      <p class="foot">„auto“ verteilt alle Teams gleichmäßig. Niemand bekommt beide Teams eines Spiels.</p>
+
+      <button class="btn" id="wheelStart">🎡 Glücksrad drehen</button>
+      <button class="btn ghost" id="draw">Sofort auslosen</button>
+      <div class="error" id="drawError" role="alert"></div>
+    </div>
+
+    <div id="wheelStage" hidden>
+      <div class="turn" id="turnBanner"></div>
+      <div class="wheel-wrap">
+        <div class="pointer" aria-hidden="true"></div>
+        <svg id="wheel" viewBox="-110 -110 220 220" role="img" aria-label="Glücksrad mit den Vereinen"></svg>
+        <button class="hub" id="spin">DREH</button>
+      </div>
+      <div class="wheel-result" id="wheelResult" aria-live="polite"></div>
+      <h2 class="sec">Bisher</h2>
+      <div class="list" id="wheelSoFar"></div>
+      <button class="btn" id="wheelDone" hidden>Los geht’s</button>
+      <button class="btn ghost" id="wheelSkip">Rest sofort auslosen</button>
+      <button class="btn ghost" id="wheelCancel">Abbrechen</button>
+    </div>
+  </section>
+
+  <!-- REGELN -->
+  <section id="regeln" hidden>
+    <header class="lt"><div><div class="eyebrow">So geht’s</div><h1>Regeln</h1></div></header>
+    <div class="list"><div class="cell" style="font-size:15px;color:var(--secondary);display:block;padding:14px 18px">
+      Vor Anpfiff werden die Teams der 15:30-Spiele verlost, und jede Person bekommt einen Spieler gepickt. Alles mit <span class="auto-dot" style="margin:0 2px"></span> rechnet der Live-Tab selbst. <b style="color:var(--label)">Tippe auf eine Regel, um den Wert zu ändern.</b>
+    </div></div>
+
+    <h2 class="sec">Tore &amp; Karten</h2>
+    <div class="list"><ul class="rules">
+      <li data-rule="teamGoal"><span class="ico">⚽</span><span class="what">Tor für dein Team<span class="auto-dot"></span></span><span class="tag"></span></li>
+      <li data-rule="conceded"><span class="ico">🥅</span><span class="what">Gegentor<span class="auto-dot"></span></span><span class="tag"></span></li>
+      <li data-rule="pickGoal"><span class="ico">🎯</span><span class="what">Dein Spieler trifft<span class="auto-dot"></span></span><span class="tag"></span></li>
+      <li data-rule="red"><span class="ico">🟥</span><span class="what">Rote Karte<span class="auto-dot"></span><small>für deinen Spieler oder dein Team</small></span><span class="tag"></span></li>
+      <li data-rule="penalty"><span class="ico">📹</span><span class="what">Elfmeter, VAR-Check<small>für dein Team</small></span><span class="tag"></span></li>
+    </ul></div>
+
+    <h2 class="sec">Halbzeit &amp; Abpfiff</h2>
+    <div class="list"><ul class="rules">
+      <li data-rule="halftime"><span class="ico">⏸️</span><span class="what">Halbzeit, du liegst hinten<span class="auto-dot"></span></span><span class="tag"></span></li>
+      <li data-rule="win"><span class="ico">🏆</span><span class="what">Sieg<span class="auto-dot"></span></span><span class="tag"></span></li>
+      <li data-rule="draw"><span class="ico">🤝</span><span class="what">Unentschieden<span class="auto-dot"></span><small>beide</small></span><span class="tag"></span></li>
+      <li data-rule="loss"><span class="ico">💀</span><span class="what">Niederlage<span class="auto-dot"></span></span><span class="tag"></span></li>
+    </ul></div>
+
+    <h2 class="sec">Während des Spiels</h2>
+    <div class="list"><ul class="rules">
+      <li data-rule="schalte"><span class="ico">📺</span><span class="what">Schalte zu deinem Spiel</span><span class="tag"></span></li>
+      <li data-rule="name"><span class="ico">🗣️</span><span class="what">Name deines Spielers fällt<small>im Live-Tab antippen</small></span><span class="tag"></span></li>
+      <li><span class="ico">🔁</span><span class="what">Auswechslung<span class="auto-dot"></span><small>der Eingewechselte zählt</small></span><span></span></li>
+      <li><span class="ico">🎙️</span><span class="what">„Tor in …“<small>bevor klar ist, wo</small></span><span class="tag">alle</span></li>
+      <li><span class="ico">🙈</span><span class="what">Keine Schalte in einer Halbzeit<small>für den Besitzer</small></span><span class="tag">doppelt</span></li>
+    </ul></div>
+
+    <footer>Trinkt verantwortungsvoll · Wasser zwischendurch · Alkoholfrei zählt auch.<br />Spieldaten: ESPN &amp; OpenLigaDB, ohne Gewähr.<br /><a class="legal" href="/datenschutz.html">Datenschutz</a></footer>
+  </section>
+
+  <div class="sheet-backdrop" id="askSheet" hidden>
+    <div class="sheet" role="alertdialog" aria-modal="true" aria-labelledby="askTitle" aria-describedby="askText">
+      <div class="grabber"></div>
+      <div class="sheet-title" id="askTitle"></div>
+      <div class="sheet-sub" id="askText"></div>
+      <input type="text" class="ask-input" id="askInput" list="playerOptions" autocomplete="off" hidden />
+      <div class="ask-btns"><button id="askCancel">Abbrechen</button><button class="btn" id="askOk">OK</button></div>
+    </div>
+  </div>
+
+  <div class="sheet-backdrop" id="ruleSheet" hidden>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="ruleSheetTitle">
+      <div class="grabber"></div>
+      <div class="sheet-title" id="ruleSheetTitle"></div>
+      <div class="sheet-sub" id="ruleSheetSub"></div>
+      <div class="sheet-value">
+        <button id="ruleMinus" aria-label="weniger">−</button>
+        <output id="ruleValue"></output>
+        <button id="rulePlus" aria-label="mehr">+</button>
+      </div>
+      <div class="sheet-opts">
+        <button id="ruleEx">🍺 Ex</button>
+        <button id="ruleOff">Aus</button>
+        <button id="ruleReset">Standard</button>
+      </div>
+      <button class="btn" id="ruleDone">Fertig</button>
+    </div>
+  </div>
+</main>
+
+<nav>
+  <div class="tabbar" role="tablist">
+    <button role="tab" data-tab="zaehler" aria-selected="true">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/><path d="M8.1 8.1a5.5 5.5 0 0 0 0 7.8M15.9 8.1a5.5 5.5 0 0 1 0 7.8M5.3 5.3a9.5 9.5 0 0 0 0 13.4M18.7 5.3a9.5 9.5 0 0 1 0 13.4"/></svg>Live
+    </button>
+    <button role="tab" data-tab="spieltag" aria-selected="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Spieltag
+    </button>
+    <button role="tab" data-tab="auslosung" aria-selected="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8.5" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.6"/><path d="M16.3 14.1A5 5 0 0 1 21.5 19"/></svg>Runde
+    </button>
+    <button role="tab" data-tab="regeln" aria-selected="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5.5A2.5 2.5 0 0 1 7.5 3H19v14.5H7.5A2.5 2.5 0 0 0 5 20z"/><path d="M5 20a2.5 2.5 0 0 0 2.5 1.5H19"/></svg>Regeln
+    </button>
+  </div>
+</nav>
+
+<div class="toast" id="toast" hidden role="status" aria-live="assertive"></div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const el = (tag, props = {}, ...children) => { const n = Object.assign(document.createElement(tag), props); n.append(...children); return n; };
+  const store = {
+    get(key, fallback) {
+      try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; }
+    },
+    set(key, value) {
+      try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+    }
+  };
+  const norm = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+  const shuffle = (arr) => {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+  const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+
+  // Tabs
+  const tabs = document.querySelectorAll('nav [data-tab]');
+  function showTab(name) {
+    tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.tab === name)));
+    document.querySelectorAll('main > section').forEach((s) => { s.hidden = s.id !== name; });
+    store.set('kt-tab', name);
+    window.scrollTo(0, 0);
+  }
+  tabs.forEach((t) => t.addEventListener('click', () => showTab(t.dataset.tab)));
+
+  // Eigenes Abfrage-Fenster statt prompt()/confirm(). Liefert true/false bzw. den eingegebenen Text oder null.
+  function ask({ title, text = '', input = false, value = '', ok = 'OK', danger = false }) {
+    return new Promise((resolve) => {
+      $('askTitle').textContent = title;
+      $('askText').textContent = text;
+      $('askInput').hidden = !input;
+      $('askInput').value = value;
+      $('askOk').textContent = ok;
+      $('askOk').classList.toggle('danger', danger);
+      $('askSheet').hidden = false;
+      setTimeout(() => (input ? $('askInput') : $('askOk')).focus(), 50);
+      const finish = (result) => {
+        $('askSheet').hidden = true;
+        $('askOk').removeEventListener('click', onOk);
+        $('askCancel').removeEventListener('click', onCancel);
+        $('askSheet').removeEventListener('click', onBackdrop);
+        document.removeEventListener('keydown', onKey);
+        resolve(result);
+      };
+      const onOk = () => finish(input ? $('askInput').value.trim() || null : true);
+      const onCancel = () => finish(input ? null : false);
+      const onBackdrop = (e) => { if (e.target === $('askSheet')) onCancel(); };
+      const onKey = (e) => { if (e.key === 'Enter' && input) onOk(); else if (e.key === 'Escape') onCancel(); };
+      $('askOk').addEventListener('click', onOk);
+      $('askCancel').addEventListener('click', onCancel);
+      $('askSheet').addEventListener('click', onBackdrop);
+      document.addEventListener('keydown', onKey);
+    });
+  }
+
+  // ---------- Werte ----------
+  // Jede Regel: wer betroffen ist trinkt („drink“) oder verteilt („give“); Wert = Anzahl, 'ex' oder 0 (aus).
+  const RULES = {
+    teamGoal: { type: 'give', def: 3, title: 'Tor für dein Team' },
+    conceded: { type: 'drink', def: 2, title: 'Gegentor' },
+    pickGoal: { type: 'give', def: 'ex', title: 'Dein Spieler trifft' },
+    red: { type: 'drink', def: 'ex', title: 'Rote Karte' },
+    penalty: { type: 'drink', def: 1, title: 'Elfmeter, VAR-Check' },
+    halftime: { type: 'drink', def: 1, title: 'Halbzeit, du liegst hinten' },
+    win: { type: 'give', def: 'ex', title: 'Sieg' },
+    draw: { type: 'drink', def: 1, title: 'Unentschieden' },
+    loss: { type: 'drink', def: 'ex', title: 'Niederlage' },
+    schalte: { type: 'drink', def: 1, title: 'Schalte zu deinem Spiel' },
+    name: { type: 'drink', def: 1, title: 'Name deines Spielers fällt' },
+  };
+  const DEFAULT_VALUES = Object.fromEntries(Object.entries(RULES).map(([k, r]) => [k, r.def]));
+  const values = { ...DEFAULT_VALUES, ...store.get('kt-values', {}) };
+  const ruleLabel = (key) => {
+    const v = values[key], give = RULES[key].type === 'give';
+    if (!v) return 'aus';
+    if (v === 'ex') return give ? 'Ex verteilen' : 'Exen';
+    return `${v} ${give ? 'verteilen' : 'trinken'}`;
+  };
+  // Effekt einer Regel für eine Person (null = Regel aus).
+  function effect(person, key) {
+    const v = values[key], give = RULES[key].type === 'give';
+    if (!v) return null;
+    if (v === 'ex') return { person, kind: give ? 'giveEx' : 'ex' };
+    return { person, kind: give ? 'give' : 'drink', amount: v };
+  }
+  const effects = (people, key) => people.map((p) => effect(p, key)).filter(Boolean);
+  function showValues() {
+    document.querySelectorAll('li[data-rule]').forEach((li) => {
+      const key = li.dataset.rule, v = values[key];
+      const tag = li.querySelector('.tag');
+      tag.textContent = ruleLabel(key);
+      tag.className = 'tag ' + (!v ? 'off' : RULES[key].type === 'give' ? 'give' : v === 'ex' ? 'ex' : 'drink');
+    });
+  }
+
+  // Bearbeiten-Blatt für eine Regel
+  let editing = null;
+  function renderSheet() {
+    const v = values[editing];
+    $('ruleSheetTitle').textContent = RULES[editing].title;
+    $('ruleSheetSub').textContent = RULES[editing].type === 'give' ? 'Wie viel darf man verteilen?' : 'Wie viel muss man trinken?';
+    $('ruleValue').replaceChildren(!v ? 'Aus' : v === 'ex' ? 'Ex' : String(v), ...(typeof v === 'number' && v > 0 ? [el('small', { textContent: v === 1 ? 'Schluck' : 'Schlucke' })] : []));
+    $('ruleEx').classList.toggle('on', v === 'ex');
+    $('ruleOff').classList.toggle('on', !v);
+  }
+  function setRule(v) {
+    values[editing] = v;
+    store.set('kt-values', values);
+    showValues();
+    renderSheet();
+    save();
+  }
+  document.querySelectorAll('li[data-rule]').forEach((li) => li.addEventListener('click', () => {
+    editing = li.dataset.rule;
+    renderSheet();
+    $('ruleSheet').hidden = false;
+  }));
+  $('rulePlus').addEventListener('click', () => { const v = values[editing]; setRule(v === 'ex' ? 1 : Math.min(20, (v || 0) + 1)); });
+  $('ruleMinus').addEventListener('click', () => { const v = values[editing]; setRule(v === 'ex' ? 1 : Math.max(0, (v || 0) - 1)); });
+  $('ruleEx').addEventListener('click', () => setRule('ex'));
+  $('ruleOff').addEventListener('click', () => setRule(0));
+  $('ruleReset').addEventListener('click', () => setRule(RULES[editing].def));
+  const closeSheet = () => { $('ruleSheet').hidden = true; };
+  $('ruleDone').addEventListener('click', closeSheet);
+  $('ruleSheet').addEventListener('click', (e) => { if (e.target === $('ruleSheet')) closeSheet(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet(); });
+  showValues();
+
+  // ---------- Live-Daten ----------
+  // Über den eigenen Worker (/api/…), lokal als Datei geöffnet direkt bei der Quelle.
+  const DIRECT = {
+    scoreboard: 'https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/scoreboard',
+    summary: 'https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/summary',
+    spieltag: 'https://api.openligadb.de/getcurrentgroup/bl1',
+    spiele: 'https://api.openligadb.de/getmatchdata/bl1',
+  };
+  // Vereinslogos über den eigenen Server laden, damit das Gerät nicht direkt bei ESPN anfragt.
+  const logoSrc = (url) => (url && location.protocol.startsWith('http') ? `/api/logo?u=${encodeURIComponent(url)}` : url);
+  async function api(endpoint, params = {}) {
+    const qs = new URLSearchParams(params).toString();
+    const suffix = qs ? `?${qs}` : '';
+    // Online nur über den eigenen Server (keine direkte Verbindung zu ESPN/OpenLigaDB); lokal als Datei direkt.
+    const urls = location.protocol.startsWith('http') ? [`/api/${endpoint}${suffix}`] : [DIRECT[endpoint] + suffix];
+    for (const url of urls) {
+      try {
+        const res = await fetch(url);
+        if (res.ok && (res.headers.get('content-type') || '').includes('json')) return await res.json();
+      } catch {}
+    }
+    throw new Error(`Keine Daten von ${endpoint}`);
+  }
+
+  const berlinDate = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Berlin' });
+  const berlinTime = new Intl.DateTimeFormat('de-DE', { timeZone: 'Europe/Berlin', hour: '2-digit', minute: '2-digit' });
+  const didSub = (v) => (v && typeof v === 'object' ? v.didSub !== false : !!v);
+
+  function nextSaturday() {
+    const d = new Date();
+    d.setDate(d.getDate() + ((6 - d.getDay() + 7) % 7));
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+  // Gewähltes Datum und Filter merken; ein vergangenes Datum springt auf den nächsten Samstag.
+  const today = berlinDate.format(new Date());
+  const savedDate = store.get('kt-date', '');
+  $('gameDate').value = savedDate && savedDate >= today ? savedDate : nextSaturday();
+  $('only1530').checked = store.get('kt-only1530', true);
+
+  let games = [];          // [{id, home, away, homeScore, awayScore, state, halftime, detail, kickoff, events}]
+  const lineups = {};      // eventId -> {teams: [{name, players}], subs: Map(norm(raus) -> rein), out: Set(norm(raus))}
+  const openDetails = new Set();
+  let refreshTimer = null;
+  let lastScores = {};
+
+  // Tor/Rot eines Spielers: {kind: 'goal' | 'red', player, team, minute}
+  function eventKind(text, { scoringPlay, ownGoal, redCard, shootout } = {}) {
+    if (redCard || /red card/i.test(text)) return 'red';
+    if (ownGoal || shootout || /own goal|disallowed|missed|saved/i.test(text)) return null;
+    if (scoringPlay || /goal|penalty - scored/i.test(text)) return 'goal';
+    return null;
+  }
+
+  function parseScoreboard(data) {
+    return (data.events || []).map((ev) => {
+      const comp = ev.competitions?.[0] || {};
+      const side = (where) => (comp.competitors || []).find((c) => c.homeAway === where) || {};
+      const home = side('home'), away = side('away');
+      const teamById = {};
+      for (const c of comp.competitors || []) teamById[c.team?.id ?? c.id] = c.team?.displayName || '';
+      const status = comp.status || ev.status || {};
+      const detail = status.type?.shortDetail || status.type?.detail || '';
+      const events = (comp.details || []).map((d) => {
+        const kind = eventKind(d.type?.text || '', d);
+        const a = d.athletesInvolved?.[0] || d.participants?.[0]?.athlete || {};
+        const player = a.displayName || a.fullName || a.shortName || '';
+        return kind && player ? { kind, player, team: teamById[d.team?.id] || '', minute: d.clock?.displayValue || '' } : null;
+      }).filter(Boolean);
+      return {
+        id: ev.id,
+        kickoff: new Date(ev.date),
+        home: home.team?.displayName || home.team?.name || '?',
+        away: away.team?.displayName || away.team?.name || '?',
+        homeAbbr: home.team?.abbreviation, awayAbbr: away.team?.abbreviation,
+        homeColor: home.team?.color, awayColor: away.team?.color,
+        homeLogo: logoSrc(home.team?.logo), awayLogo: logoSrc(away.team?.logo),
+        homeScore: home.score ?? '',
+        awayScore: away.score ?? '',
+        state: status.type?.state || 'pre',
+        halftime: status.type?.name === 'STATUS_HALFTIME' || /^(HT|Halftime)$/i.test(detail),
+        detail,
+        clock: typeof status.clock === 'number' ? status.clock : null,
+        displayClock: status.displayClock || '',
+        period: status.period || 0,
+        fetchedAt: Date.now(),
+        events,
+      };
+    });
+  }
+
+  // OpenLigaDB: zweite Quelle für Torschützen, und Ersatz für Spiele/Stände, falls ESPN ausfällt.
+  function parseOpenLigaDB(matches) {
+    return matches.map((m) => {
+      const goals = [...(m.goals || [])].sort((a, b) => (a.goalID || 0) - (b.goalID || 0));
+      const last = goals.at(-1);
+      const final = (m.matchResults || []).find((r) => r.resultTypeID === 2);
+      const kickoff = new Date(m.matchDateTimeUTC || m.matchDateTime);
+      const started = Date.now() >= kickoff.getTime();
+      return {
+        id: `oldb-${m.matchID}`,
+        source: 'oldb',
+        kickoff,
+        home: m.team1?.teamName || '?',
+        away: m.team2?.teamName || '?',
+        homeAbbr: m.team1?.shortName, awayAbbr: m.team2?.shortName,
+        homeLogo: logoSrc(m.team1?.teamIconUrl), awayLogo: logoSrc(m.team2?.teamIconUrl),
+        homeScore: String(last?.scoreTeam1 ?? final?.pointsTeam1 ?? (started ? 0 : '')),
+        awayScore: String(last?.scoreTeam2 ?? final?.pointsTeam2 ?? (started ? 0 : '')),
+        state: m.matchIsFinished ? 'post' : started ? 'in' : 'pre',
+        halftime: false,
+        detail: m.matchIsFinished ? 'Ende' : '',
+        events: goals.filter((x) => x.goalGetterName && !x.isOwnGoal)
+          .map((x) => ({ kind: 'goal', player: x.goalGetterName, team: '', minute: x.matchMinute != null ? `${x.matchMinute}'` : '' })),
+      };
+    });
+  }
+  // Gleiches Spiel in beiden Quellen: gleiche Anstoßzeit und ein gemeinsamer Vereinsname-Bestandteil.
+  const GENERIC = new Set(['fc', 'sv', 'vfb', 'vfl', 'tsg', 'fsv', 'sc', 'rb', 'sg', 'bsc', 'borussia', 'bayer', 'eintracht', 'hertha', 'union', 'st', '1', '04', '05', '07', '09', '1846', '1899', '1900', '1910', 'munich', 'munchen']);
+  const ALIAS = { cologne: 'koln', hamburger: 'hamburg', nuremberg: 'nurnberg', monchengladbach: 'gladbach', dusseldorf: 'dusseldorf', hanover: 'hannover' };
+  const clubTokens = (name) => norm(name).replace(/[^a-z0-9 ]/g, ' ').split(' ').filter((t) => t && !GENERIC.has(t)).map((t) => ALIAS[t] || t);
+  // "FC Cologne" (ESPN) und "1. FC Köln" (OpenLigaDB) → beide "koln".
+  const clubKey = (name) => clubTokens(name).at(-1) || norm(name);
+  // Kürzel und Vereinsfarben wie in der TV-Grafik; ESPN-Werte nur als Ersatz.
+  // Kürzel, Vereinsfarbe und Hintergrundform wie in der TV-Grafik; ESPN-Werte nur als Ersatz.
+  const CLUBS = {
+    frankfurt: ['SGE', '#1c1c1c', 'circle'], koln: ['KOE', '#e3000f', 'blob'], berlin: ['FCU', '#e2001a', 'steps'], dortmund: ['BVB', '#fde100', 'circle'],
+    bremen: ['SVW', '#1d9a5f', 'diamond'], paderborn: ['SCP', '#1f7ccc', 'circle'], augsburg: ['FCA', '#145a3c', 'arch'], schalke: ['S04', '#0a4fa3', 'circle'],
+    mainz: ['M05', '#e3000f', 'circle'], leipzig: ['RBL', '#e2e2e2', 'blob'], elversberg: ['SVE', '#c9b47a', 'circle'], hamburg: ['HSV', '#1460aa', 'rect'],
+    stuttgart: ['VFB', '#d9d9d9', 'shield'], bayern: ['FCB', '#dc052d', 'circle'], leverkusen: ['B04', '#e32221', 'blob'], gladbach: ['BMG', '#1a1a1a', 'diamond'],
+    freiburg: ['SCF', '#e2001a', 'oval'], wolfsburg: ['WOB', '#65b32e', 'shield'], hoffenheim: ['TSG', '#1a5fb4', 'shield'], heidenheim: ['FCH', '#c8102e', 'shield'],
+    pauli: ['STP', '#5c4033', 'shield'], bochum: ['BOC', '#005ca9', 'circle'], kiel: ['KSV', '#004c9b', 'shield'], darmstadt: ['D98', '#004e9e', 'circle'],
+    dusseldorf: ['F95', '#da251d', 'rect'], hannover: ['H96', '#00873e', 'circle'], nurnberg: ['FCN', '#a41d21', 'circle'], karlsruher: ['KSC', '#00519e', 'circle'],
+    'hertha bsc': ['BSC', '#005ca9', 'rect'], kaiserslautern: ['FCK', '#c8102e', 'circle'], magdeburg: ['FCM', '#004c97', 'circle'], munster: ['SCM', '#00843d', 'shield'],
+  };
+  const club = (name) => CLUBS[clubKey(name)] || [];
+  const teamAbbr = (g, side) => club(g[side])[0] || (g[side + 'Abbr'] || clubKey(g[side]).slice(0, 3)).toUpperCase();
+  const teamColor = (g, side) => club(g[side])[1] || (/^#?[0-9a-f]{6}$/i.test(g[side + 'Color'] || '') ? `#${g[side + 'Color'].replace('#', '')}` : '#3a3a3c');
+
+  // Hintergrund im TV-Stil: die Form des Wappens mehrfach ineinander, mit Schatten (geprägt) und Punktraster.
+  function shade(hex, amt) {
+    const n = parseInt(hex.slice(1), 16);
+    const mix = (c) => Math.round(amt < 0 ? c * (1 + amt) : c + (255 - c) * amt);
+    return `rgb(${mix(n >> 16)},${mix((n >> 8) & 255)},${mix(n & 255)})`;
+  }
+  function shapePath(shape, cx, cy, R, i, dir) {
+    const f = (n) => n.toFixed(1);
+    switch (shape) {
+      case 'diamond': { const r = R * 1.15; return `M${f(cx)} ${f(cy - r)}L${f(cx + r)} ${f(cy)}L${f(cx)} ${f(cy + r)}L${f(cx - r)} ${f(cy)}Z`; }
+      case 'rect': { const w = R * 1.25, h = R * 0.95; return `M${f(cx - w)} ${f(cy - h)}h${f(2 * w)}v${f(2 * h)}h${f(-2 * w)}Z`; }
+      case 'steps': { const w = R * 1.3, h = R * 0.8, x = cx + dir * i * 10, y = cy - i * 6; return `M${f(x - w)} ${f(y - h)}h${f(2 * w)}v${f(2 * h)}h${f(-2 * w)}Z`; }
+      case 'shield': {
+        const w = R * 0.9, top = cy - R * 0.9;
+        return `M${f(cx - w)} ${f(top)}Q${f(cx - w / 2)} ${f(top + R * 0.12)} ${f(cx)} ${f(top - R * 0.08)}Q${f(cx + w / 2)} ${f(top + R * 0.12)} ${f(cx + w)} ${f(top)}`
+          + `L${f(cx + w)} ${f(cy + R * 0.15)}Q${f(cx + w)} ${f(cy + R * 0.75)} ${f(cx)} ${f(cy + R * 1.1)}Q${f(cx - w)} ${f(cy + R * 0.75)} ${f(cx - w)} ${f(cy + R * 0.15)}Z`;
+      }
+      case 'hex': {
+        let d = '';
+        for (let k = 0; k < 6; k++) {
+          const t = (Math.PI / 3) * k;
+          d += `${k ? 'L' : 'M'}${f(cx + R * 1.1 * Math.cos(t))} ${f(cy + R * 1.1 * Math.sin(t))}`;
+        }
+        return d + 'Z';
+      }
+      case 'oval': { const rx = R * 0.78, ry = R * 1.05; return `M${f(cx - rx)} ${f(cy)}a${f(rx)} ${f(ry)} 0 1 0 ${f(2 * rx)} 0a${f(rx)} ${f(ry)} 0 1 0 ${f(-2 * rx)} 0Z`; }
+      case 'arch': { const w = R * 0.95, top = cy - R; return `M${f(cx - w)} ${f(top)}h${f(2 * w)}v${f(R * 0.9)}a${f(w)} ${f(w)} 0 0 1 ${f(-2 * w)} 0Z`; }
+      case 'blob': {
+        let d = '';
+        for (let k = 0; k <= 60; k++) {
+          const t = (k / 60) * Math.PI * 2;
+          const r = R * (1 + 0.1 * Math.sin(3 * t + i) + 0.06 * Math.sin(5 * t - i * 0.7));
+          d += `${k ? 'L' : 'M'}${f(cx + r * Math.cos(t))} ${f(cy + r * Math.sin(t))}`;
+        }
+        return d + 'Z';
+      }
+      default: return `M${f(cx - R)} ${f(cy)}a${f(R)} ${f(R)} 0 1 0 ${f(2 * R)} 0a${f(R)} ${f(R)} 0 1 0 ${f(-2 * R)} 0Z`;
+    }
+  }
+  const bannerCache = new Map();
+  function bannerBackground(color, shape, side) {
+    const key = `${color}|${shape}|${side}`;
+    if (bannerCache.has(key)) return bannerCache.get(key);
+    const W = 1800, H = 200, cx = side === 'home' ? 88 : W - 88, cy = 100, dir = side === 'home' ? 1 : -1;
+    let layers = '';
+    for (let i = 7; i >= 0; i--) {
+      layers += `<path d="${shapePath(shape, cx, cy, 72 + i * 34, i, dir)}" fill="${shade(color, -0.02 * i)}" filter="url(#s)"/>`;
+    }
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`
+      + `<defs><filter id="s" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000" flood-opacity="0.28"/></filter></defs>`
+      + `<rect width="${W}" height="${H}" fill="${shade(color, -0.17)}"/>${layers}</svg>`;
+    const css = `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+    bannerCache.set(key, css);
+    return css;
+  }
+  const teamShape = (name) => club(name)[2] || 'circle';
+  const sameClub = (a, b) => clubKey(a) === clubKey(b);
+  const sameMatch = (g, o) => Math.abs(g.kickoff - o.kickoff) < 10 * 60e3 && (sameClub(g.home, o.home) || sameClub(g.away, o.away));
+  // Quellenunabhängiger Schlüssel, damit ein Ereignis nie doppelt zählt, auch wenn die Quelle wechselt.
+  const gameKey = (g) => `${berlinDate.format(g.kickoff)}-${clubKey(g.home)}-${clubKey(g.away)}`;
+
+  // Auswechslungen aus Kader-Flags und Spielereignissen ("Substitution, Team. A replaces B.") lesen.
+  function parseSummary(data) {
+    const subs = new Map();
+    const out = new Set();
+    const teams = (data.rosters || []).map((r) => {
+      const players = (r.roster || []).map((p) => {
+        const name = p.athlete?.displayName || p.athlete?.fullName || '';
+        const player = { name, jersey: p.jersey || '', starter: !!p.starter, subbedIn: didSub(p.subbedIn), subbedOut: didSub(p.subbedOut) };
+        if (player.subbedOut) out.add(norm(name));
+        const replacement = p.subbedOutFor?.athlete?.displayName;
+        if (player.subbedOut && replacement) subs.set(norm(name), replacement);
+        const replaced = p.subbedInFor?.athlete?.displayName;
+        if (player.subbedIn && replaced) subs.set(norm(replaced), name);
+        return player;
+      }).filter((p) => p.name);
+      return { name: r.team?.displayName || '', players };
+    });
+    const texts = [...(data.keyEvents || []), ...(data.commentary || []), ...(data.plays || [])].map((e) => e?.text || '');
+    for (const text of texts) {
+      const m = text.match(/^Substitution,.*\.\s+(.+?) replaces (.+?)(?: because of an injury)?\.?\s*$/);
+      if (m) { subs.set(norm(m[2]), m[1]); out.add(norm(m[2])); }
+    }
+    // Ersatzquelle für Tore/Karten, falls das Scoreboard keine Details liefert.
+    const events = (data.keyEvents || []).map((e) => {
+      const kind = eventKind(e.type?.text || '', e);
+      const a = e.participants?.[0]?.athlete || e.athletesInvolved?.[0] || {};
+      const player = a.displayName || a.fullName || a.shortName || '';
+      return kind && player ? { kind, player, team: e.team?.displayName || '', minute: e.clock?.displayValue || '' } : null;
+    }).filter(Boolean);
+    return { teams, subs, out, events };
+  }
+
+  function setStatus(text, live = false) {
+    $('status').textContent = text;
+    $('status').classList.toggle('live', live);
+  }
+
+  async function loadGames({ quiet = false } = {}) {
+    if (!quiet) { $('gamesError').textContent = ''; setStatus('Lade …'); }
+    api('spieltag').then((g) => {
+      if (g?.groupName) { $('matchday').textContent = g.groupName; $('matchday2').textContent = g.groupName; }
+    }).catch(() => {});
+    try {
+      const date = $('gameDate').value;
+      const [espn, oldb] = await Promise.allSettled([api('scoreboard', { dates: date.replaceAll('-', '') }), api('spiele')]);
+      const oldbGames = oldb.status === 'fulfilled' && Array.isArray(oldb.value) ? parseOpenLigaDB(oldb.value) : [];
+      let all;
+      if (espn.status === 'fulfilled') {
+        all = parseScoreboard(espn.value);
+      } else if (oldbGames.length) {
+        all = oldbGames.filter((g) => berlinDate.format(g.kickoff) === date);
+      } else {
+        throw new Error('Keine Spieldaten');
+      }
+      games = $('only1530').checked ? all.filter((g) => berlinTime.format(g.kickoff) === '15:30') : all;
+      await Promise.all(games.map(async (g) => {
+        if (g.source === 'oldb') return;
+        try { lineups[g.id] = parseSummary(await api('summary', { event: g.id })); } catch {}
+        if (!g.events.length && lineups[g.id]) g.events = lineups[g.id].events;
+        const twin = oldbGames.find((o) => sameMatch(g, o));
+        if (twin) g.events = [...g.events, ...twin.events];
+      }));
+      if (games.length && (store.get('kt-teams-auto', true) || !lines($('teams').value).length)) {
+        $('teams').value = games.flatMap((g) => [g.home, g.away]).join('\n');
+        store.set('kt-teams', $('teams').value);
+        store.set('kt-teams-auto', true);
+      }
+      const live = games.some((g) => g.state === 'in');
+      const now = berlinTime.format(new Date());
+      setStatus(!games.length ? 'Keine Spiele' : live ? `Live · ${now}` : games.every((g) => g.state === 'post') ? 'Abgepfiffen' : `Anpfiff ${berlinTime.format(games[0].kickoff)}`, live);
+      $('gamesInfo').textContent = !all.length ? 'keine Spiele an dem Tag' : !games.length ? 'keine um 15:30' : `Stand ${now}`;
+      updatePlayerOptions();
+      applySubstitutions();
+      if (store.get('kt-autopick-pending', false)) autoPick({ quiet: true });
+      processEvents();
+      renderAll();
+      scheduleRefresh();
+      syncPush().catch(() => {});
+    } catch {
+      setStatus('Offline');
+      if (!quiet) $('gamesError').textContent = 'Spieldaten gerade nicht erreichbar. Neuer Versuch in einer Minute, Teams und Spieler gehen auch von Hand.';
+      clearTimeout(refreshTimer);
+      refreshTimer = setTimeout(() => loadGames({ quiet: true }), 60e3);
+    }
+  }
+
+  // Während der Spiele alle 30 Sekunden neu laden, vorher alle 10 Minuten (Aufstellungen).
+  function scheduleRefresh() {
+    clearTimeout(refreshTimer);
+    if (!games.length || games.every((g) => g.state === 'post')) return;
+    const hot = games.some((g) => g.state === 'in' || g.kickoff - Date.now() < 30 * 60e3);
+    refreshTimer = setTimeout(() => loadGames({ quiet: true }), hot ? 30e3 : 10 * 60e3);
+  }
+
+  // Eine Zeile der Anzeigetafel: Heim | Stand | Gast, darunter die Besitzer.
+  // Aktuelle Spielminute: zählt zwischen den Abrufen selbst weiter, Nachspielzeit als 45+2'.
+  function liveMinute(g) {
+    if (g.halftime) return 'Halbzeit';
+    const elapsed = (Date.now() - (g.fetchedAt || Date.now())) / 1000;
+    let minute, extra = 0;
+    if (g.clock != null && g.clock > 0) {
+      minute = Math.floor((g.clock + elapsed) / 60) + 1;
+    } else {
+      const m = String(g.displayClock || g.detail || '').match(/(\d+)'?\s*(?:\+\s*(\d+))?/);
+      if (!m) return g.detail || 'LIVE';
+      minute = Number(m[1]) + Math.floor(elapsed / 60);
+      extra = Number(m[2] || 0);
+    }
+    const cap = g.period === 1 ? 45 : g.period >= 2 ? 90 : minute <= 45 ? 45 : 90;
+    const total = minute + extra;
+    return total > cap ? `${cap}+${total - cap}'` : `${minute}'`;
+  }
+  setInterval(() => {
+    document.querySelectorAll('[data-live-minute]').forEach((node) => {
+      const g = games.find((x) => x.id === node.dataset.liveMinute);
+      if (g && g.state === 'in') node.textContent = liveMinute(g);
+    });
+  }, 5000);
+
+  // Wappen-Kreis in Vereinsfarbe; Logo aus den Spieldaten, sonst Kürzel.
+  function crest(team, size = 30) {
+    const g = games.find((x) => sameClub(x.home, team) || sameClub(x.away, team));
+    const side = g && (sameClub(g.home, team) ? 'home' : 'away');
+    const color = g ? teamColor(g, side) : club(team)[1] || '#3a3a3c';
+    const node = el('span', { className: 'crest-sm', title: team });
+    node.style.setProperty('--tc', color);
+    node.style.setProperty('--sz', `${size}px`);
+    const abbr = g ? teamAbbr(g, side) : (club(team)[0] || clubKey(team).slice(0, 3).toUpperCase());
+    const logo = g && g[side + 'Logo'];
+    if (logo) {
+      const img = el('img', { src: logo, alt: '', loading: 'lazy', referrerPolicy: 'no-referrer' });
+      img.onerror = () => img.replaceWith(abbr);
+      node.append(img);
+    } else {
+      node.append(abbr);
+    }
+    return node;
+  }
+
+  function scoreRow(g) {
+    const key = `${g.homeScore}:${g.awayScore}`;
+    const changed = lastScores[g.id] !== undefined && lastScores[g.id] !== key;
+    lastScores[g.id] = key;
+    const pre = g.state === 'pre';
+    const status = pre ? `Anpfiff ${berlinTime.format(g.kickoff)}` : g.state === 'in' ? liveMinute(g) : 'Ende';
+    const half = (side) => {
+      const name = g[side];
+      const box = el('div', { className: `half ${side}`, title: name });
+      const color = teamColor(g, side);
+      box.style.setProperty('--tc', color);
+      box.style.backgroundImage = `radial-gradient(rgba(0, 0, 0, 0.13) 0.7px, transparent 1.1px), ${/^#[0-9a-f]{6}$/i.test(color) ? bannerBackground(color, teamShape(name), side) : 'none'}`;
+      box.style.backgroundSize = '4px 4px, auto 100%';
+      box.style.backgroundRepeat = 'repeat, no-repeat';
+      box.style.backgroundPosition = `0 0, ${side === 'home' ? 'left' : 'right'} center`;
+      const crest = () => el('div', { className: 'crest', textContent: teamAbbr(g, side) });
+      if (g[side + 'Logo']) {
+        const img = el('img', { src: g[side + 'Logo'], alt: name, loading: 'lazy', referrerPolicy: 'no-referrer' });
+        img.onerror = () => img.replaceWith(crest());
+        box.append(img);
+      } else {
+        box.append(crest());
+      }
+      const owners = ownersOf(name);
+      if (owners.length) box.append(el('div', { className: 'own' }, ...owners.map(whoBadge)));
+      return box;
+    };
+    const row = el('div', { className: 'row' + (g.state === 'in' ? ' live' : '') + (changed ? ' flash' : '') },
+      half('home'), half('away'),
+      el('div', { className: 'mid' },
+        el('div', { className: 'cells' },
+          el('span', { textContent: teamAbbr(g, 'home') }), el('span', { textContent: teamAbbr(g, 'away') }),
+          el('b', { className: pre ? 'dim' : '', textContent: pre ? '–' : g.homeScore }), el('b', { className: pre ? 'dim' : '', textContent: pre ? '–' : g.awayScore })),
+        el('div', { className: 'st', textContent: status })));
+    const st = row.querySelector('.st');
+    if (g.state === 'in') st.dataset.liveMinute = g.id;
+    row.setAttribute('aria-label', `${g.home} ${pre ? 'gegen' : key} ${g.away}, ${status}`);
+    return row;
+  }
+
+  function renderBoard() {
+    const board = $('board');
+    board.innerHTML = '';
+    if (!games.length) {
+      board.className = '';
+      board.append(el('div', { className: 'empty', textContent: 'Noch keine Spiele geladen. Sie kommen automatisch, sonst im Tab Spieltag.' }));
+      return;
+    }
+    board.className = 'board';
+    games.forEach((g) => board.append(scoreRow(g)));
+  }
+
+  function renderGames() {
+    const box = $('games');
+    box.innerHTML = '';
+    if (!games.length) { box.append(el('div', { className: 'empty', textContent: 'Keine Spiele für diese Auswahl.' })); return; }
+    for (const g of games) {
+      const card = el('div', { className: 'game' });
+      card.append(scoreRow(g));
+      const lu = lineups[g.id];
+      if (lu?.teams.some((t) => t.players.length)) {
+        const det = el('details', { open: openDetails.has(g.id) }, el('summary', { textContent: 'Aufstellungen' }));
+        det.addEventListener('toggle', () => (det.open ? openDetails.add(g.id) : openDetails.delete(g.id)));
+        const grid = el('div', { className: 'lineups' });
+        for (const t of lu.teams) {
+          const ul = el('ul');
+          const ordered = [
+            ...t.players.filter((p) => p.starter),
+            ...t.players.filter((p) => !p.starter && p.subbedIn),
+            ...t.players.filter((p) => !p.starter && !p.subbedIn),
+          ];
+          for (const p of ordered) {
+            const isOut = p.subbedOut || lu.out.has(norm(p.name));
+            const pickedBy = pickersOf(p.name).map((x) => x.name);
+            const li = el('li', {
+              className: [isOut ? 'out' : p.subbedIn ? 'in' : p.starter ? '' : 'bench', pickedBy.length ? 'picked' : ''].join(' '),
+              textContent: `${p.jersey ? p.jersey + ' ' : ''}${p.name}${p.subbedIn ? ' ↑' : ''}${isOut ? ' ↓' : ''} `,
+            });
+            if (pickedBy.length) li.append(el('em', { textContent: pickedBy.join(', ') }));
+            ul.append(li);
+          }
+          grid.append(el('div', {}, el('h3', { textContent: t.name }), ul));
+        }
+        det.append(grid);
+        card.append(det);
+      } else if (g.state === 'pre') {
+        card.append(el('div', { className: 'owners', textContent: 'Aufstellungen kommen ca. 1 Std. vor Anpfiff' }));
+      }
+      box.append(card);
+    }
+  }
+
+  $('loadGames').addEventListener('click', () => loadGames());
+  $('gameDate').addEventListener('change', () => { store.set('kt-date', $('gameDate').value); loadGames(); });
+  $('only1530').addEventListener('change', () => { store.set('kt-only1530', $('only1530').checked); loadGames(); });
+
+  // ---------- Spieler & Picks ----------
+  // player = { name, teams, count, ex, picks: [{ name: aktuell, orig: gepickt, history: [frühere] }] }
+  let players = store.get('kt-players', []).map((p) => ({ picks: [], ex: 0, ...p }));
+  let feed = store.get('kt-feed', []);
+  let processed = new Set(store.get('kt-processed', []));
+
+  // Kräftig genug, dass weiße Schrift überall mindestens 4,5 : 1 Kontrast hat.
+  const PALETTE = ['#0a6ed1', '#18803c', '#d0103a', '#8e44c9', '#b85400', '#0b7285', '#4c4cdb', '#946800', '#c2185b', '#7a5a35'];
+  const colorOf = (p) => PALETTE[Math.max(0, players.indexOf(p)) % PALETTE.length];
+  function whoBadge(p) {
+    const b = el('span', { className: 'who', textContent: p.name });
+    b.style.setProperty('--c', colorOf(p));
+    return b;
+  }
+  const ownersOf = (team) => players.filter((p) => (p.teams || []).some((t) => sameClub(t, team)));
+  const pickNames = (pick) => [pick.orig, ...(pick.history || []), pick.name];
+  const pickersOf = (name) => players.filter((p) => p.picks.some((k) => pickNames(k).some((n) => norm(n) === norm(name))));
+
+  // OpenLigaDB schreibt Torschützen oft nur mit Nachnamen ("Thielmann"), ESPN mit vollem Namen.
+  const lastName = (name) => norm(name).replace(/[^a-z0-9 -]/g, '').split(' ').filter(Boolean).at(-1) || '';
+  function scorerPickers(g, scorer) {
+    const exact = pickersOf(scorer);
+    if (exact.length) return exact;
+    const ln = lastName(scorer);
+    const inGame = (n) => !lineups[g.id] || lineups[g.id].teams.some((t) => t.players.some((x) => norm(x.name) === norm(n)));
+    return players.filter((p) => p.picks.some((k) => pickNames(k).some((n) => lastName(n) === ln && inGame(n))));
+  }
+
+  const allLineupPlayers = () =>
+    Object.values(lineups).flatMap((lu) => lu.teams.flatMap((t) => t.players.map((p) => ({ ...p, team: t.name }))));
+
+  function updatePlayerOptions() {
+    let dl = $('playerOptions');
+    if (!dl) { dl = el('datalist', { id: 'playerOptions' }); document.body.append(dl); }
+    dl.innerHTML = '';
+    for (const p of allLineupPlayers()) dl.append(el('option', { value: p.name, label: p.team }));
+  }
+
+  // Wechselkette: A raus für B, später B raus für C → [A, B, C].
+  function subChain(name) {
+    const chain = [name];
+    const seen = new Set([norm(name)]);
+    for (;;) {
+      const next = Object.values(lineups).map((lu) => lu.subs.get(norm(chain.at(-1)))).find(Boolean);
+      if (!next || seen.has(norm(next))) return chain;
+      seen.add(norm(next));
+      chain.push(next);
+    }
+  }
+  const isOutWithoutReplacement = (name) =>
+    Object.values(lineups).some((lu) => lu.out.has(norm(name)) && !lu.subs.has(norm(name)));
+
+  function applySubstitutions() {
+    for (const p of players) for (const pick of p.picks) {
+      const chain = subChain(pick.name);
+      if (chain.length > 1) {
+        pick.history = [...(pick.history || []), ...chain.slice(0, -1)];
+        pick.name = chain.at(-1);
+      }
+    }
+  }
+
+  // Lost jeder Person ohne Pick einen Startelf-Spieler aus einem fremden Team aus.
+  function autoPick({ quiet = false } = {}) {
+    $('pickError').textContent = '';
+    const pool = allLineupPlayers().filter((p) => p.starter && !p.subbedOut);
+    if (!pool.length) {
+      if (!quiet) $('pickError').textContent = 'Noch keine Aufstellungen da. Die Picks werden automatisch ausgelost, sobald sie kommen.';
+      store.set('kt-autopick-pending', true);
+      return;
+    }
+    const used = new Set(players.flatMap((p) => p.picks.flatMap(pickNames).map(norm)));
+    for (const p of shuffle(players)) {
+      if (p.picks.length) continue;
+      const choice = shuffle(pool).find((x) => !used.has(norm(x.name)) && !ownersOf(x.team).includes(p));
+      if (!choice) continue;
+      used.add(norm(choice.name));
+      p.picks.push({ name: choice.name, orig: choice.name, history: [] });
+    }
+    store.set('kt-autopick-pending', false);
+    renderAll();
+  }
+
+  // ---------- Regel-Engine ----------
+  // Jedes Ereignis bekommt einen festen Schlüssel und wird nur einmal verbucht, auch nach Neuladen.
+  function emit(key, icon, title, effects, { always = false } = {}) {
+    if (processed.has(key)) return null;
+    processed.add(key);
+    return record(key, icon, title, effects, always);
+  }
+  function record(key, icon, title, effects, always = false) {
+    if (!effects.length && !always) return null;
+    const entry = { id: key, time: berlinTime.format(new Date()), icon, title, lines: [], gives: [] };
+    for (const e of effects) {
+      const p = e.person;
+      if (e.kind === 'drink') { p.count += e.amount; entry.lines.push(`${p.name} trinkt ${e.amount}`); }
+      if (e.kind === 'ex') { p.ex = (p.ex || 0) + 1; entry.lines.push(`${p.name} muss exen 🍺`); }
+      if (e.kind === 'give') { entry.lines.push(`${p.name} verteilt ${e.amount}`); entry.gives.push({ from: p.name, kind: 'sip', left: e.amount }); }
+      if (e.kind === 'giveEx') { entry.lines.push(`${p.name} verteilt ein Ex`); entry.gives.push({ from: p.name, kind: 'ex', left: 1 }); }
+    }
+    feed.unshift(entry);
+    feed = feed.slice(0, 60);
+    return entry;
+  }
+
+  // Runden aus älteren Versionen speicherten Ereignisse unter der ESPN-Spiel-ID.
+  // Einmal übernehmen, damit nach dem Update nichts doppelt verbucht wird.
+  function migrateKeys(g, gk) {
+    if (processed.has(`${gk}:v2`)) return;
+    processed.add(`${gk}:v2`);
+    const had = (k) => processed.has(`${g.id}:${k}`);
+    for (const side of ['home', 'away']) for (let n = 1; n <= 30; n++) if (had(`goal:${side}:${n}`)) processed.add(`${gk}:goal:${side}:${n}`);
+    for (const k of ['ht', 'ft']) if (had(k)) processed.add(`${gk}:${k}`);
+    for (const ev of g.events) {
+      if (!had(`${ev.kind}:${norm(ev.player)}:${ev.minute}`)) continue;
+      const base = `${gk}:${ev.kind === 'goal' ? 'scorer' : 'red'}:${lastName(ev.player)}:${parseInt(ev.minute, 10) || 0}`;
+      processed.add(base);
+      // Rote Karten wurden damals schon an Team-Besitzer verbucht.
+      if (ev.kind === 'red') ownersOf(ev.team).forEach((p) => processed.add(`${base}:${norm(p.name)}`));
+    }
+  }
+
+  function processEvents() {
+    if (!players.length) return;
+    const fresh = [];
+    const add = (entry, teams = [], minute = '') => { if (entry) { entry.teams = teams; entry.minute = minute; fresh.push(entry); } };
+    for (const g of games) {
+      if (g.state === 'pre') continue;
+      const gk = gameKey(g);
+      migrateKeys(g, gk);
+      const score = { home: parseInt(g.homeScore, 10) || 0, away: parseInt(g.awayScore, 10) || 0 };
+      for (const side of ['home', 'away']) {
+        const team = g[side], opp = g[side === 'home' ? 'away' : 'home'];
+        for (let n = 1; n <= score[side]; n++) {
+          add(emit(`${gk}:goal:${side}:${n}`, '⚽', `Tor für ${team}`, [
+            ...effects(ownersOf(team), 'teamGoal'),
+            ...effects(ownersOf(opp), 'conceded'),
+          ]), [team]);
+        }
+      }
+      // Tore und Karten erscheinen immer im Ticker. Wer den Spieler erst später pickt,
+      // bekommt sein Ex trotzdem, pro Person aber nur einmal.
+      for (const ev of g.events) {
+        const m = parseInt(ev.minute, 10) || 0, ln = lastName(ev.player);
+        const kind = ev.kind === 'goal' ? 'scorer' : 'red';
+        const near = [0, -1, 1, -2, 2, -3, 3].find((d) => processed.has(`${gk}:${kind}:${ln}:${m + d}`));
+        const base = `${gk}:${kind}:${ln}:${near === undefined ? m : m + near}`;
+        const hit = ev.kind === 'goal' ? scorerPickers(g, ev.player) : [...new Set([...scorerPickers(g, ev.player), ...ownersOf(ev.team)])];
+        const due = hit.filter((p) => !processed.has(`${base}:${norm(p.name)}`));
+        due.forEach((p) => processed.add(`${base}:${norm(p.name)}`));
+        const fx = effects(due, ev.kind === 'goal' ? 'pickGoal' : 'red');
+        const title = ev.kind === 'goal' ? `${ev.player} trifft ${ev.minute}` : `Rot für ${ev.player} ${ev.minute}`;
+        const icon = ev.kind === 'goal' ? '🎯' : '🟥';
+        if (near === undefined) {
+          processed.add(base);
+          add(record(base, icon, title, fx, true), [ev.team].filter(Boolean), ev.minute);
+        } else if (fx.length) {
+          add(record(base, icon, `${title} (nachträglich)`, fx), [ev.team].filter(Boolean), ev.minute);
+        }
+      }
+      const behind = score.home === score.away ? null : score.home < score.away ? g.home : g.away;
+      if (g.halftime && behind) {
+        add(emit(`${gk}:ht`, '⏸️', `Halbzeit ${g.home} ${score.home}:${score.away} ${g.away}`, effects(ownersOf(behind), 'halftime')), [g.home, g.away], 'HZ');
+      }
+      if (g.state === 'post') {
+        const title = `Abpfiff ${g.home} ${score.home}:${score.away} ${g.away}`;
+        if (!behind) {
+          add(emit(`${gk}:ft`, '🤝', title, effects([...ownersOf(g.home), ...ownersOf(g.away)], 'draw')), [g.home, g.away], 'Ende');
+        } else {
+          const winner = behind === g.home ? g.away : g.home;
+          add(emit(`${gk}:ft`, '🏁', title, [
+            ...effects(ownersOf(behind), 'loss'),
+            ...effects(ownersOf(winner), 'win'),
+          ]), [g.home, g.away], 'Ende');
+        }
+      }
+    }
+    save();
+    if (fresh.length) notify(fresh);
+  }
+
+  // Kopie der Runde für den Service Worker (der kann kein localStorage lesen).
+  function idbSet(key, value) {
+    try {
+      const req = indexedDB.open('kt', 1);
+      req.onupgradeneeded = () => req.result.createObjectStore('kv');
+      req.onsuccess = () => { try { req.result.transaction('kv', 'readwrite').objectStore('kv').put(value, key); } catch {} };
+    } catch {}
+  }
+
+  function save() {
+    idbSet('round', JSON.parse(JSON.stringify({ players, values })));
+    store.set('kt-players', players);
+    store.set('kt-feed', feed);
+    store.set('kt-processed', [...processed]);
+  }
+
+  let toastTimer = null;
+  function notify(entries) {
+    const t = $('toast');
+    t.innerHTML = '';
+    for (const e of entries.slice(0, 3)) {
+      const ul = el('ul');
+      e.lines.forEach((line) => ul.append(el('li', { textContent: line })));
+      t.append(el('strong', { textContent: `${e.icon} ${e.title}` }), ul);
+    }
+    if (entries.length > 3) t.append(el('div', { textContent: `+ ${entries.length - 3} weitere im Ticker` }));
+    t.hidden = false;
+    try { navigator.vibrate?.([200, 100, 200]); } catch {}
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { t.hidden = true; }, 8000);
+  }
+  $('toast').addEventListener('click', () => { $('toast').hidden = true; showTab('zaehler'); });
+
+  // ---------- Darstellung Live ----------
+  // Offene Verteil-Aufgaben pro Person zusammengefasst: eine Karte statt einer pro Tor.
+  function renderTodos() {
+    const box = $('todos');
+    box.innerHTML = '';
+    const open = feed.flatMap((entry) => entry.gives.filter((g) => g.left > 0).map((give) => ({ entry, give }))).reverse();
+    const groups = new Map();
+    for (const item of open) {
+      const key = `${item.give.from}|${item.give.kind}`;
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(item);
+    }
+    if (groups.size) box.append(el('h2', { className: 'sec', textContent: 'Zu verteilen' }));
+    for (const items of groups.values()) {
+      const { from: fromName, kind } = items[0].give;
+      const total = items.reduce((n, i) => n + i.give.left, 0);
+      const what = kind === 'ex'
+        ? `${fromName} verteilt ${total === 1 ? 'ein Ex' : `${total} Ex`}`
+        : `${fromName} verteilt ${plural(total, 'Schluck', 'Schlucke')}`;
+      const titles = [...new Set(items.map((i) => i.entry.title))];
+      const reason = items.length === 1 ? `${items[0].entry.icon} ${items[0].entry.title}` : `${items.length}× · ${titles.join(' · ')}`;
+      const teams = [...new Set(items.flatMap((i) => i.entry.teams || []))].slice(0, 3);
+      const minute = items.length === 1 ? items[0].entry.minute : '';
+
+      const targets = el('div', { className: 'targets' });
+      for (const target of players.filter((p) => p.name !== fromName)) {
+        targets.append(el('button', {
+          className: 'person',
+          style: `--c: ${colorOf(target)}`,
+          textContent: target.name,
+          onclick: () => {
+            const next = items.find((i) => i.give.left > 0);
+            if (!next) return;
+            if (kind === 'ex') target.ex = (target.ex || 0) + 1; else target.count++;
+            next.give.left--;
+            next.entry.lines.push(`→ ${target.name} ${kind === 'ex' ? 'muss exen 🍺' : 'trinkt 1'}`);
+            renderAll();
+          },
+        }));
+      }
+      targets.append(el('button', { className: 'done', textContent: 'Fertig', onclick: () => { items.forEach((i) => { i.give.left = 0; }); renderAll(); } }));
+      const from = players.find((p) => p.name === fromName);
+      const card = el('div', { className: 'todo' },
+        el('div', { className: 'todo-head' }, ...teams.map((t) => crest(t, 24)),
+          el('span', { textContent: reason }), minute ? el('span', { className: 'min', textContent: minute }) : ''),
+        el('div', { className: 'what' }, el('span', { className: 'dot' }), what),
+        targets);
+      if (from) card.style.setProperty('--c', colorOf(from));
+      box.append(card);
+    }
+  }
+
+  function renderFeed() {
+    const box = $('feed');
+    box.innerHTML = '';
+    if (!feed.length) {
+      box.append(el('div', { className: 'muted small', textContent: 'Noch nichts passiert. Tore, Karten, Halbzeit und Abpfiff landen hier automatisch.' }));
+      return;
+    }
+    for (const entry of feed) {
+      const ul = el('ul');
+      entry.lines.forEach((line) => ul.append(el('li', { textContent: line })));
+      box.append(el('div', { className: 'entry' },
+        el('div', { className: 'when' }, el('span', { className: 'min', textContent: entry.minute || entry.time })),
+        el('div', {}, el('div', { className: 'title' }, ...(entry.teams || []).slice(0, 2).map((t) => crest(t, 20)), el('span', { textContent: `${entry.icon} ${entry.title}` })), ul)));
+    }
+  }
+
+  // Tabelle wie eine TV-Einblendung: sortiert nach Schlucken, Details per Antippen aufklappbar.
+  const openRows = new Set();
+  function renderPlayers(flash) {
+    const list = $('players');
+    list.innerHTML = '';
+    if (!players.length) {
+      list.append(el('div', { className: 'empty' }, 'Noch keine Runde. ',
+        el('a', { href: '#', textContent: 'Jetzt Mitspieler eintragen →', style: 'color:var(--accent-text)', onclick: (e) => { e.preventDefault(); showTab('auslosung'); } })));
+      return;
+    }
+    const ranked = [...players].sort((a, b) => b.count - a.count || (b.ex || 0) - (a.ex || 0));
+    ranked.forEach((p, idx) => {
+      const isOpen = openRows.has(p.name);
+      const toggle = () => { isOpen ? openRows.delete(p.name) : openRows.add(p.name); renderAll(); };
+
+      // Picks als kleine Knöpfe: antippen = Name gefallen = ein Schluck.
+      const pickButtons = p.picks.map((pick) => {
+        const unknown = isOutWithoutReplacement(pick.name);
+        const team = allLineupPlayers().find((x) => norm(x.name) === norm(pick.name))?.team;
+        const btn = el('button', { className: 'pick-btn' + (unknown ? ' unknown' : '') + (flash === pick ? ' flash' : ''), onclick: () => {
+          const fx = effect(p, 'name');
+          if (fx?.kind === 'ex') p.ex = (p.ex || 0) + 1; else if (fx) p.count += fx.amount;
+          renderAll(pick);
+        } },
+          ...(team ? [crest(team, 20)] : []), el('span', { textContent: `🗣 ${pick.name}${norm(pick.orig) !== norm(pick.name) ? ` (für ${pick.orig})` : ''}` }));
+        btn.title = unknown ? 'Ausgewechselt, Ersatz unbekannt: aufklappen → Wechsel' : 'Antippen, wenn der Name fällt';
+        btn.setAttribute('aria-label', `${pick.name} wurde genannt: ein Schluck für ${p.name}`);
+        return btn;
+      });
+      if (!p.picks.length) pickButtons.push(el('button', { className: 'pick-btn add', textContent: '+ Spieler picken', onclick: () => { openRows.add(p.name); renderAll(); setTimeout(() => list.querySelector(`[data-pick-for="${CSS.escape(p.name)}"]`)?.focus(), 0); } }));
+
+      const crests = el('div', { className: 'crests' }, ...(p.teams || []).map((t) => {
+        const c = crest(t, 22);
+        if (games.length && !games.some((g) => sameClub(g.home, t) || sameClub(g.away, t))) c.classList.add('off');
+        return c;
+      }));
+      const nameBtn = el('button', { className: 'name', textContent: p.name, onclick: toggle });
+      nameBtn.setAttribute('aria-expanded', String(isOpen));
+      const rank = ranked.findIndex((x) => x.count === p.count && (x.ex || 0) === (p.ex || 0)) + 1;
+      const disc = el('div', { className: 'disc', textContent: [...p.name][0] || '?' }, el('span', { className: 'rank', textContent: rank }));
+      const main = el('div', { className: 'row-main' },
+        disc,
+        el('div', { className: 'info' }, el('div', { className: 'who-line' }, nameBtn), el('div', { className: 'sub' }, crests, ...pickButtons)),
+        el('div', { className: 'cells' },
+          el('span', { textContent: 'SCHL.' }), el('span', { textContent: 'EX' }),
+          el('b', { className: p.count ? '' : 'dim', textContent: p.count }), el('b', { className: p.ex ? 'hot' : 'dim', textContent: p.ex || 0 })));
+
+      // Aufklappbereich: Zähler von Hand, Picks verwalten.
+      const stepper = (label, get, set) => {
+        const minus = el('button', { textContent: '−', onclick: () => { set(Math.max(0, get() - 1)); renderAll(); } });
+        const plus = el('button', { className: 'plus', textContent: '+', onclick: () => { set(get() + 1); renderAll(); } });
+        minus.setAttribute('aria-label', `${label} für ${p.name} −1`);
+        plus.setAttribute('aria-label', `${label} für ${p.name} +1`);
+        return el('div', { className: 'stepper' }, el('span', { textContent: label }), minus, plus);
+      };
+      const input = el('input', { type: 'text', placeholder: 'Spieler picken …' });
+      input.dataset.pickFor = p.name;
+      input.setAttribute('list', 'playerOptions');
+      input.setAttribute('aria-label', `Spieler für ${p.name} picken`);
+      const addPick = () => {
+        const n = input.value.trim();
+        if (!n) return;
+        const chain = subChain(n);
+        p.picks.push({ name: chain.at(-1), orig: n, history: chain.slice(0, -1) });
+        renderAll();
+      };
+      input.addEventListener('keydown', (e) => { if (e.key === 'Enter') addPick(); });
+      const more = el('div', { className: 'more' });
+      for (const pick of p.picks) {
+        more.append(el('button', { className: 'chip', textContent: `⇄ ${pick.name}`, onclick: async () => {
+          const next = await ask({ title: 'Auswechslung', text: `Wer kommt für ${pick.name}?`, input: true, ok: 'Wechseln' });
+          if (next) { pick.history = [...(pick.history || []), pick.name]; pick.name = next; renderAll(); }
+        } }));
+      }
+      if (p.picks.length) more.append(el('button', { className: 'chip', textContent: '✕ Picks löschen', onclick: async () => { if (await ask({ title: 'Picks löschen?', text: `Alle Spieler-Picks von ${p.name} werden entfernt.`, ok: 'Löschen', danger: true })) { p.picks = []; renderAll(); } } }));
+      const panel = el('div', { className: 'panel' },
+        stepper('Schlucke', () => p.count, (v) => { p.count = v; }),
+        stepper('Ex', () => p.ex || 0, (v) => { p.ex = v; }),
+        el('div', { className: 'pick-input' }, input, el('button', { textContent: 'OK', onclick: addPick })),
+        more);
+
+      const row = el('div', { className: 'p' + (isOpen ? ' open' : ''), style: `--c: ${colorOf(p)}` }, main, panel);
+      main.style.backgroundImage = `radial-gradient(rgba(0, 0, 0, 0.13) 0.7px, transparent 1.1px), ${bannerBackground(colorOf(p), 'hex', 'home')}`;
+      list.append(row);
+    });
+  }
+
+  // Warnung, wenn die ausgelosten Teams nicht zu den geladenen Spielen passen (z. B. anderes Datum).
+  function renderMismatch() {
+    const box = $('mismatch');
+    box.innerHTML = '';
+    if (!games.length || !players.length) return;
+    const playing = (t) => games.some((g) => sameClub(g.home, t) || sameClub(g.away, t));
+    const stray = players.flatMap((p) => p.teams || []).filter((t) => !playing(t));
+    const unowned = games.flatMap((g) => [g.home, g.away]).filter((t) => !ownersOf(t).length);
+    if (!stray.length) return;
+    box.append(el('div', { className: 'warn' },
+      el('b', { textContent: 'Teams passen nicht zum Spieltag' }),
+      `${stray.join(', ')} ${stray.length === 1 ? 'spielt' : 'spielen'} hier nicht mit${unowned.length ? `, dafür gehören ${unowned.join(', ')} niemandem` : ''}.`,
+      el('div', {}, el('button', { textContent: 'Neu auslosen', onclick: () => showTab('auslosung') }))));
+  }
+
+  function renderAll(flash) {
+    save();
+    renderRoster();
+    renderTeamGrid();
+    renderMismatch();
+    renderBoard();
+    renderTodos();
+    renderPlayers(flash);
+    renderFeed();
+    renderGames();
+  }
+
+  // ---------- Runde ----------
+  const lines = (text) => text.split('\n').map((s) => s.trim()).filter(Boolean);
+  $('names').value = store.get('kt-names', '');
+  $('teams').value = store.get('kt-teams', '');
+  $('autoPicks').checked = store.get('kt-autopicks', true);
+
+  // Mitspieler als farbige Schilder statt Textfeld.
+  let roster = lines($('names').value);
+  const rosterColor = (i) => PALETTE[i % PALETTE.length];
+  function saveRoster() {
+    $('names').value = roster.join('\n');
+    store.set('kt-names', $('names').value);
+    renderRoster();
+  }
+  function renderRoster() {
+    const box = $('roster');
+    box.innerHTML = '';
+    roster.forEach((name, i) => {
+      const remove = el('button', { textContent: '✕', onclick: () => { roster.splice(i, 1); saveRoster(); } });
+      remove.setAttribute('aria-label', `${name} entfernen`);
+      box.append(el('span', { className: 'rchip', style: `--c: ${rosterColor(i)}` }, el('span', { className: 'ini', textContent: [...name][0] }), name, remove));
+    });
+    $('rosterCount').textContent = roster.length ? `${roster.length} dabei` : '';
+  }
+  function addRoster() {
+    const name = $('rosterInput').value.trim();
+    $('rosterInput').value = '';
+    if (!name || roster.some((n) => norm(n) === norm(name))) return;
+    roster.push(name);
+    saveRoster();
+    $('rosterInput').focus();
+  }
+  $('rosterAdd').addEventListener('click', addRoster);
+  $('rosterInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addRoster(); } });
+
+  // Teams als Wappen; bearbeiten bei Bedarf im Textfeld.
+  function renderTeamGrid() {
+    const teams = lines($('teams').value);
+    $('teamGrid').innerHTML = '';
+    for (const t of teams) {
+      const g = games.find((x) => sameClub(x.home, t) || sameClub(x.away, t));
+      const abbr = g ? teamAbbr(g, sameClub(g.home, t) ? 'home' : 'away') : (club(t)[0] || clubKey(t).slice(0, 3).toUpperCase());
+      $('teamGrid').append(el('div', { className: 't', title: t }, crest(t, 40), abbr));
+    }
+    $('teamsCount').textContent = teams.length ? `${teams.length} Teams` : '';
+  }
+  $('teams').addEventListener('input', () => { store.set('kt-teams-auto', false); store.set('kt-teams', $('teams').value); renderTeamGrid(); });
+
+  // Prüft die Eingaben und verteilt fair: Paarungen bleiben zusammen und werden reihum vergeben,
+  // so landen Heim und Gast eines Spiels nie bei derselben Person.
+  async function planDraw() {
+    const names = [...roster];
+    const teams = lines($('teams').value);
+    store.set('kt-autopicks', $('autoPicks').checked);
+    $('drawError').textContent = '';
+    const fail = (msg) => { $('drawError').textContent = msg; return null; };
+    if (names.length < 2) return fail('Mindestens zwei Mitspieler eintragen.');
+    if (teams.length < names.length) return fail('Es braucht mindestens so viele Teams wie Mitspieler.');
+    const raw = $('perPlayer').value.trim().toLowerCase();
+    const perPlayer = raw === 'auto' || raw === '' ? Infinity : parseInt(raw, 10);
+    if (Number.isNaN(perPlayer) || perPlayer < 1) return fail('Teams pro Person: „auto“ oder eine Zahl ab 1.');
+    if (perPlayer !== Infinity && perPlayer * names.length > teams.length) return fail(`Für ${names.length} Personen mit je ${perPlayer} Teams braucht es ${perPlayer * names.length} Teams.`);
+    if (players.some((p) => p.count || p.ex) && !(await ask({ title: 'Neue Runde starten?', text: 'Zähler und Ticker werden zurückgesetzt.', ok: 'Neue Runde', danger: true }))) return null;
+
+    const pairs = [];
+    for (const t of teams) {
+      const g = games.find((x) => sameClub(x.home, t) || sameClub(x.away, t));
+      const pair = g && pairs.find((pr) => pr.game === g);
+      if (pair) pair.teams.push(t); else pairs.push({ game: g || null, teams: [t] });
+    }
+    const pool = shuffle(pairs).flatMap((pr) => shuffle(pr.teams));
+    const take = perPlayer === Infinity ? pool.length : perPlayer * names.length;
+    const order = shuffle(names);
+    return { teams, order, steps: pool.slice(0, take).map((team, i) => ({ person: order[i % order.length], team })) };
+  }
+
+  function startRound(order, steps) {
+    // Reihenfolge wie in der Mitspielerliste, damit jede Person ihre Farbe behält.
+    players = [...order].sort((x, y) => roster.indexOf(x) - roster.indexOf(y)).map((name) => ({ name, teams: steps.filter((s) => s.person === name).map((s) => s.team), count: 0, ex: 0, picks: [] }));
+    feed = [];
+    processed = new Set();
+    if ($('autoPicks').checked) autoPick({ quiet: true });
+    processEvents();
+    renderAll();
+    showTab('zaehler');
+  }
+
+  $('draw').addEventListener('click', async () => {
+    const plan = await planDraw();
+    if (plan) startRound(plan.order, plan.steps);
+  });
+
+  // ---------- Glücksrad ----------
+  // Das Rad deckt den fairen Plan Zug um Zug auf; bereits vergebene Felder werden grau.
+  const wheel = { plan: null, step: 0, rotation: 0, spinning: false };
+  const personColor = (name) => rosterColor(Math.max(0, roster.indexOf(name)));
+  function drawWheel() {
+    const svg = $('wheel');
+    const teams = wheel.plan.teams;
+    const n = teams.length, a = 360 / n;
+    const taken = new Map(wheel.plan.steps.slice(0, wheel.step).map((s) => [s.team, s.person]));
+    const pt = (deg, r) => { const t = ((deg - 90) * Math.PI) / 180; return [r * Math.cos(t), r * Math.sin(t)]; };
+    let out = '<circle r="100" fill="#141414"/>';
+    teams.forEach((t, i) => {
+      const g = games.find((x) => sameClub(x.home, t) || sameClub(x.away, t));
+      const side = g && (sameClub(g.home, t) ? 'home' : 'away');
+      const owner = taken.get(t);
+      const fill = owner ? personColor(owner) : g ? teamColor(g, side) : club(t)[1] || '#555';
+      const [x1, y1] = pt(i * a, 100), [x2, y2] = pt((i + 1) * a, 100);
+      const path = n === 1 ? '<circle r="100"/>' : `<path d="M0 0L${x1.toFixed(2)} ${y1.toFixed(2)}A100 100 0 ${a > 180 ? 1 : 0} 1 ${x2.toFixed(2)} ${y2.toFixed(2)}Z"/>`;
+      const mid = i * a + a / 2;
+      const [lx, ly] = pt(mid, 64), [ix, iy] = pt(mid, 84);
+      const abbr = g ? teamAbbr(g, side) : (club(t)[0] || clubKey(t).slice(0, 3).toUpperCase());
+      const logo = g && g[side + 'Logo'];
+      const esc = (v) => String(v).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+      out += `<g fill="${fill}" fill-opacity="${owner ? 0.38 : 1}" stroke="#fff" stroke-width="1.2">${path}</g>`;
+      out += `<text x="${lx.toFixed(2)}" y="${ly.toFixed(2)}" transform="rotate(${mid} ${lx.toFixed(2)} ${ly.toFixed(2)})" text-anchor="middle" dominant-baseline="central" fill="#fff" font-family="Barlow Condensed, Arial Narrow, sans-serif" font-weight="800" font-size="${n > 12 ? 9 : 12}" style="paint-order:stroke" stroke="rgba(0,0,0,.35)" stroke-width="2">${esc(owner ? owner : abbr)}</text>`;
+      if (logo && !owner) out += `<image href="${esc(logo)}" x="${(ix - 7).toFixed(2)}" y="${(iy - 7).toFixed(2)}" width="14" height="14" transform="rotate(${mid} ${ix.toFixed(2)} ${iy.toFixed(2)})"/>`;
+    });
+    out += '<circle r="100" fill="none" stroke="#fff" stroke-width="3"/>';
+    svg.innerHTML = out;
+  }
+  function renderWheelStage() {
+    const { plan, step } = wheel;
+    const done = step >= plan.steps.length;
+    const turn = $('turnBanner');
+    turn.innerHTML = '';
+    if (done) {
+      turn.style.setProperty('--c', 'var(--accent)');
+      turn.append(el('div', {}, el('b', { textContent: 'Alles verlost!' }), el('span', { textContent: 'Viel Spaß bei der Konferenz' })));
+    } else {
+      const who = plan.steps[step].person;
+      turn.style.setProperty('--c', personColor(who));
+      turn.append(el('span', { className: 'ini', textContent: [...who][0] }),
+        el('div', {}, el('b', { textContent: `${who} ist dran` }), el('span', { textContent: `Team ${step + 1} von ${plan.steps.length} · auf DREH tippen` })));
+    }
+    $('spin').hidden = done;
+    $('wheelDone').hidden = !done;
+    $('wheelSkip').hidden = done;
+    const so = $('wheelSoFar');
+    so.innerHTML = '';
+    for (const name of plan.order) {
+      const got = plan.steps.slice(0, step).filter((s) => s.person === name).map((s) => s.team);
+      so.append(el('div', { className: 'sofar' }, el('span', { className: 'ini', style: `--c: ${personColor(name)}`, textContent: [...name][0] }),
+        el('span', { className: 'nm', textContent: name }), el('div', { className: 'cr' }, ...got.map((t) => crest(t, 26)))));
+    }
+  }
+  async function openWheel() {
+    const plan = await planDraw();
+    if (!plan) return;
+    Object.assign(wheel, { plan, step: 0, spinning: false });
+    $('setupStage').hidden = true;
+    $('wheelStage').hidden = false;
+    $('wheelResult').innerHTML = '';
+    drawWheel();
+    renderWheelStage();
+    window.scrollTo(0, 0);
+  }
+  function spin() {
+    if (wheel.spinning || wheel.step >= wheel.plan.steps.length) return;
+    const { team, person } = wheel.plan.steps[wheel.step];
+    const n = wheel.plan.teams.length, a = 360 / n;
+    const i = wheel.plan.teams.indexOf(team);
+    // Ziel: Mitte des Feldes (mit etwas Zufall) landet unter dem Zeiger oben.
+    const target = i * a + a / 2 + (Math.random() - 0.5) * a * 0.6;
+    const delta = (((-target - wheel.rotation) % 360) + 360) % 360;
+    const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    wheel.rotation += (calm ? 0 : 360 * 5) + delta;
+    wheel.spinning = true;
+    $('spin').disabled = true;
+    $('wheelResult').innerHTML = '';
+    $('wheel').style.transform = `rotate(${wheel.rotation}deg)`;
+    setTimeout(() => {
+      wheel.spinning = false;
+      $('spin').disabled = false;
+      wheel.step++;
+      try { navigator.vibrate?.(120); } catch {}
+      $('wheelResult').append(el('div', { className: 'won' }, crest(team, 40), `${person} ← ${team}`));
+      drawWheel();
+      renderWheelStage();
+    }, calm ? 350 : 4700);
+  }
+  $('wheelStart').addEventListener('click', openWheel);
+  $('spin').addEventListener('click', spin);
+  $('wheel').addEventListener('click', spin);
+  $('wheelSkip').addEventListener('click', () => { wheel.step = wheel.plan.steps.length; drawWheel(); renderWheelStage(); });
+  $('wheelDone').addEventListener('click', () => {
+    $('wheelStage').hidden = true;
+    $('setupStage').hidden = false;
+    startRound(wheel.plan.order, wheel.plan.steps);
+  });
+  $('wheelCancel').addEventListener('click', () => { $('wheelStage').hidden = true; $('setupStage').hidden = false; });
+
+  // ---------- Live-Tab Aktionen ----------
+  $('autoPickNow').addEventListener('click', () => autoPick());
+  $('addPlayer').addEventListener('click', () => {
+    const name = $('newPlayer').value.trim();
+    if (!name) return;
+    players.push({ name, teams: [], count: 0, ex: 0, picks: [] });
+    $('newPlayer').value = '';
+    renderAll();
+  });
+  $('newPlayer').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('addPlayer').click(); });
+  $('resetCounts').addEventListener('click', async () => {
+    if (!(await ask({ title: 'Zähler auf 0?', text: 'Alle Schlucke und Ex werden auf 0 gesetzt.', ok: 'Zurücksetzen', danger: true }))) return;
+    players.forEach((p) => { p.count = 0; p.ex = 0; });
+    renderAll();
+  });
+
+  // Start: ohne Runde zuerst zur Einrichtung, sonst Live.
+  // ---------- Push-Nachrichten ----------
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  const pushSupported = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+  const swReady = location.protocol.startsWith('http') && 'serviceWorker' in navigator
+    ? navigator.serviceWorker.register('/sw.js').then(() => navigator.serviceWorker.ready).catch(() => null)
+    : Promise.resolve(null);
+  const setPushInfo = (text) => { $('pushInfo').textContent = text; };
+  const urlKey = (s) => { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return Uint8Array.from(atob(s), (c) => c.charCodeAt(0)); };
+
+  async function currentSubscription() {
+    const reg = await swReady;
+    return reg?.pushManager ? reg.pushManager.getSubscription() : null;
+  }
+  // Dem Server sagen, welche Spiele dieses Gerät verfolgt (nur wenn sich etwas geändert hat).
+  async function syncPush(force = false) {
+    const sub = await currentSubscription();
+    if (!sub) return;
+    const watched = games.filter((g) => g.source !== 'oldb').map((g) => ({ id: g.id, date: berlinDate.format(g.kickoff) }));
+    const body = JSON.stringify({ subscription: sub.toJSON(), games: watched });
+    if (!force && store.get('kt-push-sync', '') === body) return;
+    const res = await fetch('/api/push/subscribe', { method: 'POST', headers: { 'content-type': 'application/json' }, body }).catch(() => null);
+    if (res?.ok) store.set('kt-push-sync', body);
+  }
+  async function enablePush() {
+    if (isIOS && !standalone) throw new Error('Auf iPhone/iPad erst „Teilen → Zum Home-Bildschirm“, dann die App von dort öffnen.');
+    if (!pushSupported) throw new Error('Dieser Browser kann keine Push-Nachrichten.');
+    if (await Notification.requestPermission() !== 'granted') throw new Error('Mitteilungen wurden nicht erlaubt (Einstellungen → Mitteilungen).');
+    const reg = await swReady;
+    const keyRes = await fetch('/api/push/key').catch(() => null);
+    const key = keyRes?.ok ? (await keyRes.json()).key : null;
+    if (!reg || !key) throw new Error('Push ist auf dem Server noch nicht eingerichtet.');
+    await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlKey(key) });
+    await syncPush(true);
+  }
+  async function disablePush() {
+    const sub = await currentSubscription();
+    if (!sub) return;
+    await fetch('/api/push/unsubscribe', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ endpoint: sub.endpoint }) }).catch(() => null);
+    await sub.unsubscribe();
+    store.set('kt-push-sync', '');
+  }
+  $('pushToggle').addEventListener('change', async (e) => {
+    const on = e.target.checked;
+    try {
+      if (on) { await enablePush(); setPushInfo('An: Meldungen kommen auch bei gesperrtem Handy'); }
+      else { await disablePush(); setPushInfo('Aus'); }
+    } catch (err) {
+      e.target.checked = false;
+      setPushInfo(err.message);
+    }
+  });
+  currentSubscription().then((sub) => {
+    $('pushToggle').checked = !!sub;
+    if (sub) setPushInfo('An: Meldungen kommen auch bei gesperrtem Handy');
+    else if (isIOS && !standalone) setPushInfo('Erst zum Home-Bildschirm hinzufügen (Teilen-Symbol)');
+  }).catch(() => {});
+
+  // Zurück in der App (Handy entsperrt, Tab gewechselt): sofort den neuesten Stand holen.
+  let lastLoad = 0;
+  const loadNow = () => { lastLoad = Date.now(); loadGames({ quiet: true }); };
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && Date.now() - lastLoad > 10e3) loadNow(); });
+  window.addEventListener('focus', () => { if (Date.now() - lastLoad > 10e3) loadNow(); });
+
+  showTab(players.length ? store.get('kt-tab', 'zaehler') : 'auslosung');
+  renderAll();
+  loadNow();
+</script>
+</body>
+</html>

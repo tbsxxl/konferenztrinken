@@ -89,7 +89,7 @@ self.addEventListener('push', (event) => {
       icon: '/icon-192.png',
       badge: '/icon-192.png',
       tag: `kt-${msg.id || 'x'}-${Date.now()}`,
-      data: { url: '/' },
+      data: { url: '/konferenz.html' },
     });
   })());
 });
@@ -98,7 +98,7 @@ self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   event.waitUntil((async () => {
     const all = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-    for (const c of all) if ('focus' in c) return c.focus();
-    return self.clients.openWindow('/');
+    for (const c of all) if ('focus' in c && c.url.includes('/konferenz')) return c.focus();
+    return self.clients.openWindow('/konferenz.html');
   })());
 });

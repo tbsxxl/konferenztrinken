@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="darkreader-lock" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#f2f2f2" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <title>Der Dümmste fliegt</title>
+  <meta name="description" content="Quiz-Trinkspiel: Wer falsch antwortet, trinkt und verliert ein Leben. Wer keine Leben mehr hat, fliegt." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>" />
+  <link rel="preload" href="/fonts/barlow-condensed-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/app.css" />
+  <style>
+    /* Spieler-Leiste: kleine Banner in Personenfarbe mit Herzen */
+    .dplayers { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+    .dp { position: relative; display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 8px; align-items: center; padding: 8px 10px; border-radius: 16px; background: var(--c); color: #fff; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18); }
+    .dp .ini { width: 36px; height: 36px; border-radius: 50%; background: #fff; color: var(--c); display: grid; place-items: center; font: 800 20px/1 var(--display); text-transform: uppercase; }
+    .dp b { display: block; font: 800 1.05rem/1.1 var(--display); text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .dp .hearts { font-size: 0.85rem; letter-spacing: 1px; }
+    .dp .tally { font-size: 0.75rem; opacity: 0.9; }
+    .dp.now { outline: 3px solid #fff; outline-offset: 2px; }
+    .dp.out { background: #2b2b2b; color: rgba(255, 255, 255, 0.5); box-shadow: none; }
+    .dp.out .ini { background: #444; color: #999; }
+    .dp.out::after { content: "RAUS"; position: absolute; right: 10px; top: 8px; font: 800 0.8rem/1 var(--display); letter-spacing: 0.06em; color: #ff6b6b; }
+
+    /* Frage auf der Tafel */
+    .qcard { margin-top: 14px; border-radius: var(--r); padding: 18px; background: linear-gradient(180deg, #1f1f1f, #121212); color: #fff; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2); }
+    .qhead { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .qcat { font: 700 0.85rem/1 var(--display); letter-spacing: 0.06em; text-transform: uppercase; background: rgba(255, 255, 255, 0.1); padding: 6px 10px; border-radius: 999px; }
+    .qtimer { font: 800 1.6rem/1 var(--display); font-variant-numeric: tabular-nums; min-width: 2.5ch; text-align: right; }
+    .qtimer.low { color: #ff6b6b; }
+    .qtext { font-size: 1.45rem; font-weight: 700; line-height: 1.3; margin: 16px 0 4px; }
+    .qanswer { margin-top: 14px; padding: 14px; border-radius: 14px; background: rgba(255, 255, 255, 0.08); font: 800 1.6rem/1.15 var(--display); text-transform: uppercase; letter-spacing: 0.01em; }
+    .qanswer small { display: block; font: 600 0.8rem/1.2 Inter, system-ui, sans-serif; letter-spacing: 0.04em; color: rgba(255, 255, 255, 0.55); margin-bottom: 4px; text-transform: uppercase; }
+    .qanswer.timeout small { color: #ff6b6b; }
+    .judge { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+    .judge button { min-height: 60px; border: 0; border-radius: 18px; color: #fff; font: 800 1.4rem/1 var(--display); text-transform: uppercase; letter-spacing: 0.03em; }
+    .judge .right { background: #18803c; }
+    .judge .wrong { background: var(--red); }
+    .mini { display: flex; gap: 8px; margin-top: 10px; }
+    .mini button { flex: 1; min-height: 44px; border: 0; border-radius: 999px; background: var(--fill); color: var(--label); font: inherit; font-weight: 600; }
+
+    /* Ergebnis nach einer Antwort */
+    .verdict { margin-top: 14px; border-radius: var(--r); padding: 16px 18px; background: var(--c); color: #fff; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2); animation: pop 0.4s cubic-bezier(0.3, 1.4, 0.6, 1); }
+    .verdict b { display: block; font: 800 1.9rem/1.05 var(--display); text-transform: uppercase; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); }
+    .verdict p { margin: 6px 0 0; font-weight: 600; }
+    .verdict .targets { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .verdict .targets button { min-height: 44px; border: 0; border-radius: 999px; padding: 0 16px; background: rgba(0, 0, 0, 0.35); color: #fff; font: inherit; font-weight: 700; }
+
+    /* Optionen */
+    .stepper-cell output { width: 4.6rem; flex: none; text-align: center; white-space: nowrap; font: 800 1.15rem/1 var(--display); text-transform: uppercase; }
+    .stepper-cell .ctl { display: flex; flex: none; align-items: center; gap: 6px; }
+    .stepper-cell button { flex: none; width: 44px; height: 44px; border: 0; border-radius: 12px; background: var(--fill); color: var(--label); font-size: 1.3rem; font-weight: 600; }
+    .cell.wrap { flex-wrap: wrap; row-gap: 10px; }
+    .cell.wrap .seg { flex: 1 1 100%; }
+    .seg { display: flex; gap: 4px; background: var(--fill); border-radius: 12px; padding: 3px; }
+    .seg button { flex: 1; min-width: 44px; min-height: 44px; border: 0; border-radius: 9px; background: transparent; color: var(--label); font: inherit; font-weight: 600; font-size: 0.9rem; }
+    .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+    .cats { display: flex; flex-wrap: wrap; gap: 8px; padding: 14px; }
+    .cats button { min-height: 44px; padding: 0 14px; border: 0; border-radius: 999px; background: var(--fill); color: var(--label); font: inherit; font-weight: 600; font-size: 0.9rem; }
+    .cats button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+
+    /* Ende */
+    .winner { margin-top: 6px; border-radius: 24px; padding: 22px 18px; text-align: center; background: var(--c); color: #fff; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25); }
+    .winner .ini { width: 72px; height: 72px; margin: 0 auto 10px; border-radius: 50%; background: #fff; color: var(--c); display: grid; place-items: center; font: 800 40px/1 var(--display); text-transform: uppercase; }
+    .winner b { display: block; font: 800 2.2rem/1 var(--display); text-transform: uppercase; }
+    .winner span { display: block; margin-top: 6px; font-weight: 600; opacity: 0.9; }
+    .rank { display: grid; grid-template-columns: 36px 1fr auto; gap: 10px; align-items: center; padding: 12px 18px; position: relative; }
+    .rank + .rank::before { content: ""; position: absolute; top: 0; left: 18px; right: 0; border-top: 0.5px solid var(--sep); }
+    .rank .pos { font: 800 1.3rem/1 var(--display); color: var(--secondary); }
+    .rank .nm { font: 800 1.15rem/1 var(--display); text-transform: uppercase; }
+    .rank .st2 { color: var(--secondary); font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+<main>
+  <a class="back-link" href="/">‹ Alle Spiele</a>
+
+  <!-- EINRICHTEN -->
+  <section id="setup">
+    <header class="lt"><div><div class="eyebrow">Quiz-Trinkspiel</div><h1>Der Dümmste fliegt</h1></div></header>
+
+    <h2 class="sec">Mitspieler <small id="rosterCount"></small></h2>
+    <div class="list">
+      <div class="add-row">
+        <input type="text" id="rosterInput" placeholder="Name eingeben …" aria-label="Mitspieler hinzufügen" autocomplete="off" enterkeyhint="done" />
+        <button class="btn small" id="rosterAdd">Hinzufügen</button>
+      </div>
+      <div class="roster" id="roster"></div>
+    </div>
+    <p class="foot">Die Liste gilt für alle Spiele.</p>
+
+    <h2 class="sec">Regeln</h2>
+    <div class="list">
+      <div class="cell stepper-cell"><span>Leben pro Person</span><div class="ctl"><button data-step="lives:-1" aria-label="Weniger Leben">−</button><output id="v-lives"></output><button data-step="lives:1" aria-label="Mehr Leben">+</button></div></div>
+      <div class="cell stepper-cell"><span>Falsche Antwort</span><div class="ctl"><button data-step="wrong:-1" aria-label="Weniger trinken">−</button><output id="v-wrong"></output><button data-step="wrong:1" aria-label="Mehr trinken">+</button></div></div>
+      <div class="cell stepper-cell"><span>Richtige Antwort: verteilen</span><div class="ctl"><button data-step="right:-1" aria-label="Weniger verteilen">−</button><output id="v-right"></output><button data-step="right:1" aria-label="Mehr verteilen">+</button></div></div>
+      <label class="cell"><span>Wer fliegt, muss exen</span><input type="checkbox" class="switch" id="exOnOut" /></label>
+      <div class="cell wrap"><span>Countdown pro Frage</span><div class="seg" id="timerSeg" role="group" aria-label="Countdown"></div></div>
+    </div>
+
+    <h2 class="sec">Kategorien <small id="qCount"></small></h2>
+    <div class="list"><div class="cats" id="cats"></div></div>
+
+    <button class="btn" id="start">🧠 Spiel starten</button>
+    <button class="btn ghost" id="resume" hidden>Laufendes Spiel fortsetzen</button>
+    <div class="error" id="setupError" role="alert"></div>
+  </section>
+
+  <!-- SPIEL -->
+  <section id="game" hidden>
+    <header class="lt"><div><div class="eyebrow" id="roundLabel"></div><h1>Der Dümmste fliegt</h1></div><span class="pill" id="aliveLabel"></span></header>
+    <div class="dplayers" id="dplayers"></div>
+    <div class="turn" id="turn" style="margin-top:14px"></div>
+    <div class="qcard" id="qcard">
+      <div class="qhead"><span class="qcat" id="qcat"></span><span class="qtimer" id="qtimer" aria-live="off"></span></div>
+      <div class="qtext" id="qtext"></div>
+      <div class="qanswer" id="qanswer" hidden></div>
+    </div>
+    <div id="actions"></div>
+    <div id="verdict" aria-live="polite"></div>
+    <div class="mini"><button id="skip">Andere Frage</button><button id="quit">Spiel beenden</button></div>
+  </section>
+
+  <!-- ENDE -->
+  <section id="end" hidden>
+    <header class="lt"><div><div class="eyebrow">Spielende</div><h1>Der Klügste bleibt</h1></div></header>
+    <div class="winner" id="winner"></div>
+    <h2 class="sec">Rangliste</h2>
+    <div class="list" id="ranking"></div>
+    <button class="btn" id="again">Nochmal spielen</button>
+    <button class="btn ghost" id="toSetup">Einstellungen</button>
+  </section>
+
+  <footer>Trinkt verantwortungsvoll · Wasser zwischendurch · Alkoholfrei zählt auch.<br /><a class="legal" href="/datenschutz.html">Datenschutz</a></footer>
+</main>
+
+<script src="/dumm-fragen.js"></script>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const el = (tag, props = {}, ...children) => { const n = Object.assign(document.createElement(tag), props); n.append(...children); return n; };
+  const store = {
+    get(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; } },
+    set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch {} },
+  };
+  const norm = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+  const shuffle = (arr) => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  // Gleiche Personenfarben wie im Konferenztrinken (weiße Schrift ≥ 4,5 : 1 Kontrast).
+  const PALETTE = ['#0a6ed1', '#18803c', '#d0103a', '#8e44c9', '#b85400', '#0b7285', '#4c4cdb', '#946800', '#c2185b', '#7a5a35'];
+  const lines = (text) => String(text || '').split('\n').map((s) => s.trim()).filter(Boolean);
+  const initial = (name) => [...name][0] || '?';
+
+  // ---------- Mitspieler (gemeinsam mit allen Spielen) ----------
+  let roster = lines(store.get('kt-names', ''));
+  const colorOf = (name) => PALETTE[Math.max(0, roster.indexOf(name)) % PALETTE.length];
+  function saveRoster() { store.set('kt-names', roster.join('\n')); renderRoster(); }
+  function renderRoster() {
+    const box = $('roster');
+    box.innerHTML = '';
+    roster.forEach((name, i) => {
+      const remove = el('button', { textContent: '✕', onclick: () => { roster.splice(i, 1); saveRoster(); } });
+      remove.setAttribute('aria-label', `${name} entfernen`);
+      box.append(el('span', { className: 'rchip', style: `--c: ${PALETTE[i % PALETTE.length]}` }, el('span', { className: 'ini', textContent: initial(name) }), name, remove));
+    });
+    $('rosterCount').textContent = roster.length ? `${roster.length} dabei` : '';
+  }
+  function addRoster() {
+    const name = $('rosterInput').value.trim();
+    $('rosterInput').value = '';
+    if (name && !roster.some((n) => norm(n) === norm(name))) { roster.push(name); saveRoster(); }
+    $('rosterInput').focus();
+  }
+  $('rosterAdd').addEventListener('click', addRoster);
+  $('rosterInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addRoster(); } });
+
+  // ---------- Einstellungen ----------
+  const CATS = [...new Set(FRAGEN.map((q) => q.k))];
+  const DEFAULTS = { lives: 3, wrong: 1, right: 0, exOnOut: true, timer: 0, cats: CATS };
+  const settings = { ...DEFAULTS, ...store.get('dumm-settings', {}) };
+  settings.cats = settings.cats.filter((c) => CATS.includes(c));
+  if (!settings.cats.length) settings.cats = CATS;
+  const LIMITS = { lives: [1, 9], wrong: [0, 11], right: [0, 5] };
+  // „Falsche Antwort“: 1–10 Schlucke, 11 = Ex, 0 = nichts
+  const wrongLabel = (v) => (v === 11 ? 'Ex' : v === 0 ? 'Nichts' : `${v} Schl.`);
+  function renderSettings() {
+    $('v-lives').textContent = '♥'.repeat(Math.min(settings.lives, 5)) + (settings.lives > 5 ? ` ${settings.lives}` : '');
+    $('v-wrong').textContent = wrongLabel(settings.wrong);
+    $('v-right').textContent = settings.right ? `${settings.right} Schl.` : 'Nichts';
+    $('exOnOut').checked = settings.exOnOut;
+    const seg = $('timerSeg');
+    seg.innerHTML = '';
+    for (const t of [0, 10, 15, 20, 30]) {
+      const b = el('button', { textContent: t ? `${t}s` : 'Aus', onclick: () => { settings.timer = t; saveSettings(); } });
+      b.setAttribute('aria-pressed', String(settings.timer === t));
+      seg.append(b);
+    }
+    const cats = $('cats');
+    cats.innerHTML = '';
+    for (const c of CATS) {
+      const b = el('button', { textContent: c, onclick: () => {
+        const on = settings.cats.includes(c);
+        if (on && settings.cats.length === 1) return;
+        settings.cats = on ? settings.cats.filter((x) => x !== c) : [...settings.cats, c];
+        saveSettings();
+      } });
+      b.setAttribute('aria-pressed', String(settings.cats.includes(c)));
+      cats.append(b);
+    }
+    $('qCount').textContent = `${FRAGEN.filter((q) => settings.cats.includes(q.k)).length} Fragen`;
+  }
+  function saveSettings() { store.set('dumm-settings', settings); renderSettings(); }
+  document.querySelectorAll('[data-step]').forEach((b) => b.addEventListener('click', () => {
+    const [key, d] = b.dataset.step.split(':');
+    const [lo, hi] = LIMITS[key];
+    settings[key] = Math.min(hi, Math.max(lo, settings[key] + Number(d)));
+    saveSettings();
+  }));
+  $('exOnOut').addEventListener('change', (e) => { settings.exOnOut = e.target.checked; saveSettings(); });
+
+  // ---------- Spiel ----------
+  // state = { players: [{name, lives, sips, ex, out}], turn, q, revealed, timedOut, asked: [], outOrder: [], round, verdict }
+  let state = store.get('dumm-state', null);
+  let timer = null;
+  const alive = () => state.players.filter((p) => !p.out);
+  const save = () => store.set('dumm-state', state);
+  const show = (id) => ['setup', 'game', 'end'].forEach((s) => { $(s).hidden = s !== id; window.scrollTo(0, 0); });
+
+  function nextQuestion() {
+    const pool = FRAGEN.map((q, i) => i).filter((i) => settings.cats.includes(FRAGEN[i].k));
+    let fresh = pool.filter((i) => !state.asked.includes(i));
+    if (!fresh.length) { state.asked = state.asked.filter((i) => !pool.includes(i)); fresh = pool; }
+    state.q = shuffle(fresh)[0];
+    state.asked.push(state.q);
+    state.revealed = false;
+    state.timedOut = false;
+    state.verdict = null;
+    state.deadline = settings.timer ? Date.now() + settings.timer * 1000 : 0;
+  }
+  function advanceTurn() {
+    const n = state.players.length;
+    for (let k = 1; k <= n; k++) {
+      const i = (state.turn + k) % n;
+      if (!state.players[i].out) { state.turn = i; break; }
+    }
+    state.round++;
+  }
+
+  function start() {
+    $('setupError').textContent = '';
+    if (roster.length < 2) { $('setupError').textContent = 'Mindestens zwei Mitspieler eintragen.'; return; }
+    state = {
+      players: shuffle(roster).map((name) => ({ name, lives: settings.lives, sips: 0, ex: 0, out: false })),
+      turn: 0, round: 1, asked: store.get('dumm-asked', []), outOrder: [], q: null,
+    };
+    nextQuestion();
+    save();
+    show('game');
+    render();
+  }
+
+  function reveal(timedOut = false) {
+    if (!state || state.revealed) return;
+    state.revealed = true;
+    state.timedOut = timedOut;
+    save();
+    render();
+  }
+
+  function judge(correct) {
+    const p = state.players[state.turn];
+    if (correct) {
+      state.verdict = { kind: 'right', name: p.name, give: settings.right, left: settings.right };
+    } else {
+      p.lives--;
+      if (settings.wrong === 11) p.ex++; else p.sips += settings.wrong;
+      const outNow = p.lives <= 0;
+      if (outNow) { p.out = true; state.outOrder.push(p.name); if (settings.exOnOut) p.ex++; }
+      state.verdict = { kind: outNow ? 'out' : 'wrong', name: p.name };
+    }
+    store.set('dumm-asked', state.asked.slice(-400));
+    save();
+    render();
+  }
+
+  function next() {
+    if (alive().length <= 1) { finish(); return; }
+    advanceTurn();
+    nextQuestion();
+    save();
+    render();
+  }
+
+  function finish() {
+    clearInterval(timer);
+    state.finished = true;
+    save();
+    // Bei vorzeitigem Ende: mehr Leben vor weniger Schlucken.
+    const standing = [...alive()].sort((a, b) => b.lives - a.lives || a.sips - b.sips || a.ex - b.ex);
+    const win = standing[0] || state.players.find((p) => p.name === state.outOrder.at(-1));
+    const w = $('winner');
+    w.innerHTML = '';
+    w.style.setProperty('--c', colorOf(win.name));
+    w.append(el('div', { className: 'ini', textContent: initial(win.name) }), el('b', { textContent: win.name }),
+      el('span', { textContent: win.out ? 'hat am längsten durchgehalten' : `gewinnt mit ${win.lives} Leben übrig` }));
+    const order = [...standing.map((p) => p.name), ...[...state.outOrder].reverse()].filter((n, i, a) => a.indexOf(n) === i);
+    if (!order.includes(win.name)) order.unshift(win.name);
+    const rk = $('ranking');
+    rk.innerHTML = '';
+    order.forEach((name, i) => {
+      const p = state.players.find((x) => x.name === name);
+      rk.append(el('div', { className: 'rank' }, el('span', { className: 'pos', textContent: `${i + 1}.` }),
+        el('span', { className: 'nm', textContent: name }),
+        el('span', { className: 'st2', textContent: `${p.sips} Schl.${p.ex ? ` · ${p.ex} Ex` : ''}` })));
+    });
+    show('end');
+  }
+
+  function tick() {
+    if (!state || !state.deadline || state.revealed) { $('qtimer').textContent = ''; return; }
+    const left = Math.max(0, Math.ceil((state.deadline - Date.now()) / 1000));
+    $('qtimer').textContent = `${left}`;
+    $('qtimer').classList.toggle('low', left <= 5);
+    if (left === 0) reveal(true);
+  }
+
+  function render() {
+    if (!state) return;
+    // Spieler-Leiste
+    const box = $('dplayers');
+    box.innerHTML = '';
+    state.players.forEach((p, i) => {
+      const hearts = '♥'.repeat(Math.max(0, p.lives)) + '♡'.repeat(Math.max(0, settings.lives - p.lives));
+      box.append(el('div', { className: 'dp' + (p.out ? ' out' : '') + (i === state.turn && !p.out ? ' now' : ''), style: `--c: ${colorOf(p.name)}` },
+        el('span', { className: 'ini', textContent: initial(p.name) }),
+        el('div', {}, el('b', { textContent: p.name }), el('div', { className: 'hearts', textContent: p.out ? '' : hearts }),
+          el('div', { className: 'tally', textContent: `${p.sips} Schl.${p.ex ? ` · ${p.ex} Ex` : ''}` }))));
+    });
+    $('aliveLabel').textContent = `${alive().length} im Spiel`;
+    $('roundLabel').textContent = `Frage ${state.round}`;
+
+    // Wer ist dran
+    const p = state.players[state.turn];
+    const turn = $('turn');
+    turn.innerHTML = '';
+    turn.style.setProperty('--c', colorOf(p.name));
+    turn.append(el('span', { className: 'ini', textContent: initial(p.name) }),
+      el('div', {}, el('b', { textContent: `${p.name} ist dran` }), el('span', { textContent: `noch ${p.lives} ${p.lives === 1 ? 'Leben' : 'Leben'}` })));
+
+    // Frage
+    const q = FRAGEN[state.q];
+    $('qcat').textContent = q.k;
+    $('qtext').textContent = q.f;
+    const ans = $('qanswer');
+    ans.hidden = !state.revealed;
+    ans.className = 'qanswer' + (state.timedOut ? ' timeout' : '');
+    ans.replaceChildren(el('small', { textContent: state.timedOut ? 'Zeit um! Richtige Antwort' : 'Richtige Antwort' }), q.a);
+
+    // Aktionen
+    const act = $('actions');
+    act.innerHTML = '';
+    const v = state.verdict;
+    if (!state.revealed) {
+      act.append(el('button', { className: 'btn', textContent: 'Auflösen', onclick: () => reveal() }));
+    } else if (!v) {
+      act.append(el('div', { className: 'judge' },
+        el('button', { className: 'right', textContent: '✓ Richtig', onclick: () => judge(true) }),
+        el('button', { className: 'wrong', textContent: '✗ Falsch', onclick: () => judge(false) })));
+    }
+
+    // Ergebnis
+    const vd = $('verdict');
+    vd.innerHTML = '';
+    if (v) {
+      const who = state.players.find((x) => x.name === v.name);
+      const card = el('div', { className: 'verdict', style: `--c: ${v.kind === 'right' ? '#18803c' : v.kind === 'out' ? '#121212' : 'var(--red)'}` });
+      if (v.kind === 'right') {
+        card.append(el('b', { textContent: 'Richtig!' }), el('p', { textContent: v.give ? `${v.name} darf noch ${v.left} ${v.left === 1 ? 'Schluck' : 'Schlucke'} verteilen` : `${v.name} ist sicher.` }));
+        if (v.left > 0) {
+          const t = el('div', { className: 'targets' });
+          for (const o of state.players.filter((x) => x.name !== v.name)) {
+            t.append(el('button', { textContent: o.name, style: `background: ${colorOf(o.name)}`, onclick: () => { o.sips++; v.left--; save(); render(); } }));
+          }
+          card.append(t);
+        }
+      } else if (v.kind === 'wrong') {
+        const drink = settings.wrong === 11 ? 'muss exen 🍺' : settings.wrong ? `trinkt ${settings.wrong}` : 'kommt davon';
+        card.append(el('b', { textContent: 'Falsch!' }), el('p', { textContent: `${v.name} ${drink} · noch ${who.lives} ${who.lives === 1 ? 'Leben' : 'Leben'}` }));
+      } else {
+        card.append(el('b', { textContent: `${v.name} fliegt!` }), el('p', { textContent: settings.exOnOut ? 'Keine Leben mehr – Ex! 🍺' : 'Keine Leben mehr.' }));
+      }
+      vd.append(card);
+      act.append(el('button', { className: 'btn', textContent: alive().length <= 1 ? 'Zur Siegerehrung' : 'Nächste Frage', onclick: next }));
+    }
+    $('skip').hidden = !!v;
+    tick();
+  }
+
+  $('start').addEventListener('click', start);
+  $('resume').addEventListener('click', () => { show('game'); render(); });
+  $('skip').addEventListener('click', () => { nextQuestion(); save(); render(); });
+  $('quit').addEventListener('click', () => { if (state) { finish(); } });
+  $('again').addEventListener('click', start);
+  $('toSetup').addEventListener('click', () => { state = null; store.set('dumm-state', null); renderSetup(); show('setup'); });
+  timer = setInterval(tick, 250);
+
+  function renderSetup() {
+    renderRoster();
+    renderSettings();
+    $('resume').hidden = !(state && !state.finished);
+  }
+  renderSetup();
+  if (state && !state.finished) { show('game'); render(); }
+</script>
+</body>
+</html>
