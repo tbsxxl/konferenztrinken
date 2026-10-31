@@ -158,6 +158,12 @@
     .art-konf .scoreboard .min { margin-top: 1.5cqw; padding: 0.8cqw 3cqw; font-size: max(9px, 6cqw); }
     .ttt { gap: 3cqw; width: 64%; }
     .ttt span { border-radius: 4cqw; }
+    /* Spieler-Figuren statt X und O: hell = Spieler 1, dunkel = Spieler 2 */
+    .ttt { grid-template-rows: repeat(3, 1fr); }
+    .ttt span { min-height: 0; }
+    .ttt span svg { display: block; width: 96%; height: auto; margin-top: 30%; }
+    .ttt span.pa { background: rgba(255, 255, 255, 0.92); fill: #137a40; overflow: hidden; }
+    .ttt span.pb { background: rgba(0, 0, 0, 0.28); fill: #fff; overflow: hidden; }
     .art-dumm .hearts { font-size: 9cqw; letter-spacing: 1cqw; bottom: 9%; }
     /* Listen frei auf dem Grund, Symbole in Akzentfarbe, Pfeile, eingerückte Trennlinien */
     main .list.rows, main .list.links { background: transparent !important; padding: 0 !important; border-radius: 0; }
@@ -220,7 +226,7 @@
     <a class="cover-card" href="/tictactoe/">
       <div class="cover art-ttt">
         <span class="badge-live" id="liveTtt" hidden>Läuft</span>
-        <div class="ttt" aria-hidden="true"><span>X</span><span></span><span>O</span><span></span><span>X</span><span></span><span>O</span><span></span><span>X</span></div>
+        <div class="ttt" aria-hidden="true"><span class="pa"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.2" r="4.3"/><path d="M3.8 21.5c0-4.6 3.7-7.6 8.2-7.6s8.2 3 8.2 7.6z"/></svg></span><span></span><span class="pb"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.2" r="4.3"/><path d="M3.8 21.5c0-4.6 3.7-7.6 8.2-7.6s8.2 3 8.2 7.6z"/></svg></span><span></span><span class="pa"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.2" r="4.3"/><path d="M3.8 21.5c0-4.6 3.7-7.6 8.2-7.6s8.2 3 8.2 7.6z"/></svg></span><span></span><span class="pb"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.2" r="4.3"/><path d="M3.8 21.5c0-4.6 3.7-7.6 8.2-7.6s8.2 3 8.2 7.6z"/></svg></span><span></span><span class="pa"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.2" r="4.3"/><path d="M3.8 21.5c0-4.6 3.7-7.6 8.2-7.6s8.2 3 8.2 7.6z"/></svg></span></div>
       </div>
       <b>Tic Tac Toe</b>
     </a>
