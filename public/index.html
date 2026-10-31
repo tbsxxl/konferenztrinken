@@ -8,11 +8,11 @@
   <meta name="theme-color" content="#14121f" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Trinkspiele" />
+  <meta name="apple-mobile-web-app-title" content="Klirr" />
   <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-  <title>Trinkspiele</title>
-  <meta name="description" content="Trinkspiel-Hub: Konferenztrinken zu Bundesliga und Champions League und das Quiz „Der Dümmste fliegt“." />
+  <title>Klirr – Trinkspiele</title>
+  <meta name="description" content="Klirr – Trinkspiele: Konferenztrinken zu Bundesliga und Champions League und das Quiz „Der Dümmste fliegt“." />
   <link rel="icon" type="image/svg+xml" href="/icon.svg" />
   <link rel="stylesheet" href="/app.css" />
   <style>
@@ -90,6 +90,9 @@
     .brand { display: flex; align-items: center; gap: 12px; margin: 0 4px 2px; }
     .brand img { width: 52px; height: 52px; flex: none; border-radius: 12px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45), inset 0 0 0 0.5px rgba(255, 255, 255, 0.18); }
     .brand .hero-title { margin: 0; }
+    /* Wortmarke: gerundete Schrift, Bernstein-Perle als Schlusspunkt */
+    .wordmark { font-family: "SF Pro Rounded", ui-rounded, -apple-system, Inter, system-ui, sans-serif; font-weight: 800; font-size: 2.6rem; letter-spacing: -0.02em; }
+    .wordmark .perl { display: inline-block; width: 0.2em; height: 0.2em; margin-left: 0.06em; border-radius: 50%; background: var(--amber); box-shadow: 0 0 12px var(--amber-2); vertical-align: 0.62em; }
   </style>
 </head>
 <body>
@@ -101,9 +104,9 @@
   </div>
   <div class="brand">
     <img src="/icon.svg" alt="" width="52" height="52" />
-    <h1 class="hero-title">Trinkspiele</h1>
+    <h1 class="hero-title wordmark">Klirr<span class="perl" aria-hidden="true"></span></h1>
   </div>
-  <p class="hero-sub" id="heroSub">Such dir ein Spiel aus.</p>
+  <p class="hero-sub" id="heroSub">Trinkspiele für deine Runde.</p>
 
   <h2 class="shelf-title">Spiele</h2>
   <div class="covers">
@@ -197,7 +200,7 @@
     });
     box.append(el('label', { className: 'prow add' }, el('span', { className: 'av', textContent: '+' }), input, el('span')));
     $('count').textContent = roster.length ? roster.length : '';
-    $('heroSub').textContent = roster.length ? `${roster.length} Mitspieler bereit. Such dir ein Spiel aus.` : 'Trag unten eure Namen ein und such dir ein Spiel aus.';
+    $('heroSub').textContent = roster.length ? `Trinkspiele für deine Runde · ${roster.length} dabei` : 'Trinkspiele für deine Runde.';
   }
   render();
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('/sw.js').catch(() => {});

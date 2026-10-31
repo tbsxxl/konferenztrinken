@@ -1,7 +1,7 @@
 {
-  "name": "Trinkspiele",
-  "short_name": "Trinkspiele",
-  "description": "Trinkspiel-Hub: Konferenztrinken und Der Dümmste fliegt",
+  "name": "Klirr – Trinkspiele",
+  "short_name": "Klirr",
+  "description": "Klirr – Trinkspiele: Konferenztrinken und Der Dümmste fliegt",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

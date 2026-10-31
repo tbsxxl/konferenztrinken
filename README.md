@@ -1,4 +1,6 @@
-# Trinkspiele 🍺
+# Klirr
+
+Trinkspiele für deine Runde.
 
 Hub mit Trinkspielen: **Konferenztrinken** (`/konferenz.html`) und **Der Dümmste fliegt** (`/dumm.html`). Startseite `/` ist der Hub, das Design liegt gemeinsam in `public/app.css`, die Mitspielerliste gilt für alle Spiele.
 
