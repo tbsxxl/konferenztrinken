@@ -323,6 +323,14 @@
     }, `Runde ${no} gespeichert`);
     haptic([10, 40, 10]);
     toast(state.finished ? "Letzte Runde gespeichert" : `Runde ${no} gespeichert`, true);
+    // Klirr-Trinkregel: je Stich daneben 1 Schluck
+    const miss = state.players
+      .map((p) => ({ name: p.name, d: Math.abs((round.bids[p.id] ?? 0) - (round.tricks[p.id] ?? 0)) }))
+      .filter((x) => x.d > 0);
+    if (miss.length && window.Klirr) {
+      Klirr.note(`Daneben: ${miss.map((x) => `${x.name} trinkt ${x.d}`).join(" · ")}`);
+      Klirr.moment();
+    }
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 

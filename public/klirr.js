@@ -1,6 +1,10 @@
 // Gemeinsame Klirr-Bausteine: Rückgängig-Hinweis und der „Klirr-Moment“ (zwei Glas-Kreise stoßen an).
 (function () {
   const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Styles einmal nachladen, damit auch übernommene Spiele (Tic Tac Toe, Wizard, Flip 7) sie haben.
+  if (!document.querySelector('link[href="/klirr-fx.css"]')) {
+    const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = '/klirr-fx.css'; document.head.append(l);
+  }
 
   // Kurzer Hinweis unten mit „Rückgängig“ (5 s), z. B. nach dem Entfernen eines Mitspielers.
   let undoTimer = null;
@@ -47,5 +51,16 @@
     setTimeout(() => { o.remove(); busy = false; }, reduced() ? 700 : 1100);
   }
 
-  window.Klirr = { undoToast, moment };
+  // Kurzer Hinweis ohne Knopf (z. B. „Tobi trinkt 2“), oben, damit er die Spiel-Hinweise unten nicht verdeckt.
+  let noteTimer = null;
+  function note(text) {
+    let n = document.getElementById('klNote');
+    if (!n) { n = document.createElement('div'); n.id = 'klNote'; n.className = 'kl-note'; n.setAttribute('role', 'status'); n.setAttribute('aria-live', 'polite'); document.body.append(n); }
+    n.textContent = text;
+    n.classList.add('is-open');
+    clearTimeout(noteTimer);
+    noteTimer = setTimeout(() => n.classList.remove('is-open'), 4500);
+  }
+
+  window.Klirr = { undoToast, moment, note };
 })();

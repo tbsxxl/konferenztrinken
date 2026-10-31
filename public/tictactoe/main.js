@@ -1122,6 +1122,7 @@ function commitMove(force = false){
     roundOutcome = { winner };
     adjustScore(winner, +1);
     setResult(winText, winner === "X" ? "x" : "o");
+    window.Klirr?.moment();
     lockBoard();
     setCurrentPlayerLabel();
     saveState(winText);
@@ -1133,6 +1134,7 @@ function commitMove(force = false){
     const drawText = "🤝 Unentschieden – beide trinken 2!";
     roundOutcome = { winner: null };
     setResult(drawText, "draw");
+    window.Klirr?.moment();
     lockBoard();
     setCurrentPlayerLabel();
     saveState(drawText);
@@ -1204,6 +1206,7 @@ function skipTurn(){
   moveHistory.push({ type: "skip", player: currentPlayer });
   setUndoButtonState();
   setResult(`🍺 Spieler ${currentPlayer} passt und trinkt 1 Schluck.`, currentPlayer === "X" ? "x" : "o");
+  window.Klirr?.moment();
 
   currentPlayer = currentPlayer === "X" ? "O" : "X";
   setCurrentPlayerLabel();

@@ -940,6 +940,13 @@ async function endRound() {
   });
   vib(20);
   showToast(`Runde ${roundNo} gespeichert`, true);
+  // Klirr-Trinkregeln: Bust = 1 Schluck, Flip 7 = 7 Schlucke verteilen
+  const bust = game.players.filter((p) => lastDeltas[p.id].b).map((p) => `${p.name} trinkt 1`);
+  const f7 = game.players.filter((p) => lastDeltas[p.id].f).map((p) => `${p.name} verteilt 7`);
+  if ((bust.length || f7.length) && window.Klirr) {
+    Klirr.note([bust.length ? `Bust: ${bust.join(" · ")}` : "", f7.length ? `Flip 7: ${f7.join(" · ")}` : ""].filter(Boolean).join("  ·  "));
+    Klirr.moment();
+  }
 
   const w = winners(game.players, game.target);
   if (w.length) setTimeout(() => showWinner(w), reduceMotion() ? 0 : 500);
