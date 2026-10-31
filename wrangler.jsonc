@@ -11,6 +11,13 @@
   "kv_namespaces": [
     { "binding": "PUSH" }
   ],
+  // Mehrspieler-Räume für „Der Dümmste fliegt“ (SQLite-Durable-Objects, auch im kostenlosen Tarif).
+  "durable_objects": {
+    "bindings": [{ "name": "ROOMS", "class_name": "Room" }]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["Room"] }
+  ],
   // Jede Minute die abonnierten Spiele prüfen und neue Ereignisse pushen.
   "triggers": {
     "crons": ["* * * * *"]

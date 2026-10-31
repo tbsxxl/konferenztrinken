@@ -2,6 +2,7 @@
 // und verschickt Push-Nachrichten: Abos unter /api/push/…, Prüfung der Spiele jede Minute per Cron.
 import { getVapid, isPushEndpoint } from './push.js';
 import { pollAndPush } from './live.js';
+export { Room } from './room.js';
 
 const UPSTREAM = {
   scoreboard: 'https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/scoreboard',
@@ -11,6 +12,24 @@ const UPSTREAM = {
 };
 const ALLOWED_PARAMS = ['dates', 'event'];
 const MAX_SUBS = 300;
+// Raumcodes ohne verwechselbare Zeichen (kein 0/O, 1/I/L).
+const CODE_CHARS = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+const newCode = () => Array.from(crypto.getRandomValues(new Uint8Array(4)), (b) => CODE_CHARS[b % CODE_CHARS.length]).join('');
+
+async function handleRoom(request, env, url) {
+  if (!env.ROOMS) return json({ error: 'Mehrspieler ist auf dem Server nicht eingerichtet.' }, 503);
+  if (url.pathname === '/api/room/new' && request.method === 'POST') {
+    for (let i = 0; i < 6; i++) {
+      const code = newCode();
+      const res = await env.ROOMS.get(env.ROOMS.idFromName(code)).fetch('https://room/create', { method: 'POST' });
+      if (res.ok) return json({ code, ...(await res.json()) });
+    }
+    return json({ error: 'Kein freier Raumcode gefunden' }, 503);
+  }
+  const m = url.pathname.match(/^\/api\/room\/([A-Z0-9]{4})\/ws$/);
+  if (m) return env.ROOMS.get(env.ROOMS.idFromName(m[1])).fetch(request);
+  return json({ error: 'Nicht gefunden' }, 404);
+}
 // Bildquellen, deren Vereinslogos durchgereicht werden dürfen (ESPN, OpenLigaDB-Wappen).
 const LOGO_HOSTS = [/(^|\.)espncdn\.com$/, /^upload\.wikimedia\.org$/, /^i\.imgur\.com$/, /(^|\.)openligadb\.de$/];
 
@@ -57,6 +76,7 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (url.pathname === '/api/logo') return handleLogo(url);
+    if (url.pathname.startsWith('/api/room/')) return handleRoom(request, env, url);
     const push = url.pathname.match(/^\/api\/push\/(key|subscribe|unsubscribe)$/);
     if (push) return handlePush(request, env, push[1]);
 

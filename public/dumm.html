@@ -5,53 +5,75 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="darkreader-lock" />
   <meta name="color-scheme" content="light dark" />
-  <meta name="theme-color" content="#f2f2f2" media="(prefers-color-scheme: light)" />
-  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#f2f2f4" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0b0b0d" media="(prefers-color-scheme: dark)" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <title>Der Dümmste fliegt</title>
-  <meta name="description" content="Quiz-Trinkspiel: Wer falsch antwortet, trinkt und verliert ein Leben. Wer keine Leben mehr hat, fliegt." />
+  <meta name="description" content="Quiz-Trinkspiel: klassisch mit Leben oder mit Abstimmung – auf einem Handy oder jeder auf seinem eigenen." />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>" />
   <link rel="preload" href="/fonts/barlow-condensed-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="/app.css" />
   <style>
-    /* Spieler-Leiste: kleine Banner in Personenfarbe mit Herzen */
+    /* Im Spiel kleinerer Titel, damit Raum-Schild und Spieler sichtbar bleiben */
+    #game .lt h1, #end .lt h1 { font-size: 2rem; }
+    #game .lt { align-items: center; }
+
+    /* Spieler-Leiste: kleine Banner in Personenfarbe */
     .dplayers { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
-    .dp { position: relative; display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 8px; align-items: center; padding: 8px 10px; border-radius: 16px; background: var(--c); color: #fff; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18); }
-    .dp .ini { width: 36px; height: 36px; border-radius: 50%; background: #fff; color: var(--c); display: grid; place-items: center; font: 800 20px/1 var(--display); text-transform: uppercase; }
-    .dp b { display: block; font: 800 1.05rem/1.1 var(--display); text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .dp .hearts { font-size: 0.85rem; letter-spacing: 1px; }
-    .dp .tally { font-size: 0.75rem; opacity: 0.9; }
-    .dp.now { outline: 3px solid #fff; outline-offset: 2px; }
-    .dp.out { background: #2b2b2b; color: rgba(255, 255, 255, 0.5); box-shadow: none; }
-    .dp.out .ini { background: #444; color: #999; }
-    .dp.out::after { content: "RAUS"; position: absolute; right: 10px; top: 8px; font: 800 0.8rem/1 var(--display); letter-spacing: 0.06em; color: #ff6b6b; }
+    .dp { position: relative; display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 9px; align-items: center; padding: 9px 11px; border-radius: 18px; background: var(--c); color: #fff; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.18); overflow: hidden; }
+    .dp::before { content: ""; position: absolute; inset: 0; background: radial-gradient(rgba(0, 0, 0, 0.12) 0.7px, transparent 1.1px) 0 0 / 4px 4px, linear-gradient(135deg, rgba(255, 255, 255, 0.14), transparent 55%); pointer-events: none; }
+    .dp > * { position: relative; }
+    .dp .ini { width: 38px; height: 38px; border-radius: 50%; background: #fff; color: var(--c); display: grid; place-items: center; font: 800 21px/1 var(--display); text-transform: uppercase; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25); }
+    .dp b { display: block; font: 800 1.05rem/1.1 var(--display); text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); }
+    .dp .meta { font-size: 0.78rem; font-weight: 600; opacity: 0.92; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .dp.now { box-shadow: 0 0 0 3px #fff, 0 8px 20px rgba(0, 0, 0, 0.3); }
+    .dp.me .ini { box-shadow: 0 0 0 3px #ffd60a; }
+    .dp.out { background: #26262b; color: rgba(255, 255, 255, 0.5); box-shadow: none; }
+    .dp.out .ini { background: #3a3a40; color: #8e8e93; box-shadow: none; }
+    .dp.out::after { content: "RAUS"; position: absolute; right: 10px; top: 9px; font: 800 0.8rem/1 var(--display); letter-spacing: 0.06em; color: #ff6b6b; }
 
     /* Frage auf der Tafel */
-    .qcard { margin-top: 14px; border-radius: var(--r); padding: 18px; background: linear-gradient(180deg, #1f1f1f, #121212); color: #fff; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2); }
+    .qcard { margin-top: 14px; padding: 18px; border-radius: var(--r); }
     .qhead { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-    .qcat { font: 700 0.85rem/1 var(--display); letter-spacing: 0.06em; text-transform: uppercase; background: rgba(255, 255, 255, 0.1); padding: 6px 10px; border-radius: 999px; }
-    .qtimer { font: 800 1.6rem/1 var(--display); font-variant-numeric: tabular-nums; min-width: 2.5ch; text-align: right; }
+    .qcat { font: 700 0.85rem/1 var(--display); letter-spacing: 0.06em; text-transform: uppercase; background: rgba(255, 255, 255, 0.1); padding: 7px 11px; border-radius: 999px; }
+    .qtimer { font: 800 1.7rem/1 var(--display); font-variant-numeric: tabular-nums; min-width: 2.5ch; text-align: right; }
     .qtimer.low { color: #ff6b6b; }
-    .qtext { font-size: 1.45rem; font-weight: 700; line-height: 1.3; margin: 16px 0 4px; }
-    .qanswer { margin-top: 14px; padding: 14px; border-radius: 14px; background: rgba(255, 255, 255, 0.08); font: 800 1.6rem/1.15 var(--display); text-transform: uppercase; letter-spacing: 0.01em; }
-    .qanswer small { display: block; font: 600 0.8rem/1.2 Inter, system-ui, sans-serif; letter-spacing: 0.04em; color: rgba(255, 255, 255, 0.55); margin-bottom: 4px; text-transform: uppercase; }
+    .qtext { font-size: 1.45rem; font-weight: 700; line-height: 1.3; margin: 16px 0 4px; letter-spacing: -0.01em; }
+    .qanswer { margin-top: 14px; padding: 14px 16px; border-radius: 16px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.08); font: 800 1.65rem/1.15 var(--display); text-transform: uppercase; letter-spacing: 0.01em; }
+    .qanswer small { display: block; font: 700 0.75rem/1.2 Inter, system-ui, sans-serif; letter-spacing: 0.06em; color: rgba(255, 255, 255, 0.55); margin-bottom: 4px; text-transform: uppercase; }
     .qanswer.timeout small { color: #ff6b6b; }
     .judge { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
-    .judge button { min-height: 60px; border: 0; border-radius: 18px; color: #fff; font: 800 1.4rem/1 var(--display); text-transform: uppercase; letter-spacing: 0.03em; }
-    .judge .right { background: #18803c; }
-    .judge .wrong { background: var(--red); }
-    .mini { display: flex; gap: 8px; margin-top: 10px; }
+    .judge button { min-height: 62px; border: 0; border-radius: 20px; color: #fff; font: 800 1.4rem/1 var(--display); text-transform: uppercase; letter-spacing: 0.03em; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2); }
+    .judge .right { background: linear-gradient(180deg, #23a04c, #157535); }
+    .judge .wrong { background: linear-gradient(180deg, #ef2a37, #b3000f); }
+    .mini { display: flex; gap: 8px; margin-top: 12px; }
     .mini button { flex: 1; min-height: 44px; border: 0; border-radius: 999px; background: var(--fill); color: var(--label); font: inherit; font-weight: 600; }
+    .waiting { margin-top: 14px; padding: 18px; border-radius: var(--r); text-align: center; font-weight: 600; }
 
-    /* Ergebnis nach einer Antwort */
-    .verdict { margin-top: 14px; border-radius: var(--r); padding: 16px 18px; background: var(--c); color: #fff; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2); animation: pop 0.4s cubic-bezier(0.3, 1.4, 0.6, 1); }
-    .verdict b { display: block; font: 800 1.9rem/1.05 var(--display); text-transform: uppercase; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); }
+    /* Ergebniskarten */
+    .verdict { margin-top: 14px; border-radius: var(--r); padding: 18px; background: var(--c); color: #fff; box-shadow: 0 10px 26px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.18); animation: pop 0.4s cubic-bezier(0.3, 1.4, 0.6, 1); }
+    .verdict b { display: block; font: 800 2rem/1.05 var(--display); text-transform: uppercase; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); }
     .verdict p { margin: 6px 0 0; font-weight: 600; }
-    .verdict .targets { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-    .verdict .targets button { min-height: 44px; border: 0; border-radius: 999px; padding: 0 16px; background: rgba(0, 0, 0, 0.35); color: #fff; font: inherit; font-weight: 700; }
+    .targets { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .targets button { min-height: 44px; border: 0; border-radius: 999px; padding: 0 16px; background: rgba(0, 0, 0, 0.35); color: #fff; font: inherit; font-weight: 700; }
+
+    /* Abstimmung */
+    .vote { margin-top: 14px; padding: 18px; border-radius: var(--r); }
+    .vote h3 { margin: 0; font: 800 1.7rem/1.05 var(--display); text-transform: uppercase; }
+    .vote p { margin: 6px 0 0; color: var(--secondary); }
+    .vote .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-top: 14px; }
+    .vote .grid button { min-height: 64px; border: 0; border-radius: 18px; background: var(--c); color: #fff; font: 800 1.25rem/1 var(--display); text-transform: uppercase; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.18); }
+    .vote .grid button small { display: block; font: 600 0.75rem/1.2 Inter, system-ui, sans-serif; text-transform: none; opacity: 0.9; margin-top: 4px; }
+    .vote .who { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .vote .who span { padding: 6px 10px; border-radius: 999px; background: var(--fill); font-size: 0.85rem; font-weight: 600; }
+    .vote .who span.done { background: #18803c; color: #fff; }
+    .bars { margin-top: 14px; display: grid; gap: 8px; }
+    .bar { display: grid; grid-template-columns: 90px 1fr 28px; align-items: center; gap: 10px; font-weight: 700; }
+    .bar i { display: block; height: 14px; border-radius: 7px; background: var(--c); min-width: 4px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25); }
+    .bar span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: uppercase; font-family: var(--display); font-size: 1.05rem; }
 
     /* Optionen */
     .stepper-cell output { width: 4.6rem; flex: none; text-align: center; white-space: nowrap; font: 800 1.15rem/1 var(--display); text-transform: uppercase; }
@@ -59,23 +81,43 @@
     .stepper-cell button { flex: none; width: 44px; height: 44px; border: 0; border-radius: 12px; background: var(--fill); color: var(--label); font-size: 1.3rem; font-weight: 600; }
     .cell.wrap { flex-wrap: wrap; row-gap: 10px; }
     .cell.wrap .seg { flex: 1 1 100%; }
-    .seg { display: flex; gap: 4px; background: var(--fill); border-radius: 12px; padding: 3px; }
-    .seg button { flex: 1; min-width: 44px; min-height: 44px; border: 0; border-radius: 9px; background: transparent; color: var(--label); font: inherit; font-weight: 600; font-size: 0.9rem; }
-    .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+    .seg { display: flex; gap: 4px; background: var(--fill); border-radius: 14px; padding: 3px; }
+    .seg button { flex: 1; min-width: 44px; min-height: 44px; border: 0; border-radius: 11px; background: transparent; color: var(--label); font: inherit; font-weight: 600; font-size: 0.9rem; }
+    .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); box-shadow: 0 4px 10px rgba(210, 5, 21, 0.35); }
+    .seg.big button { min-height: 58px; font: 800 1.05rem/1.1 var(--display); text-transform: uppercase; letter-spacing: 0.03em; }
+    .seg.big button small { display: block; font: 500 0.72rem/1.2 Inter, system-ui, sans-serif; text-transform: none; letter-spacing: 0; opacity: 0.8; }
     .cats { display: flex; flex-wrap: wrap; gap: 8px; padding: 14px; }
     .cats button { min-height: 44px; padding: 0 14px; border: 0; border-radius: 999px; background: var(--fill); color: var(--label); font: inherit; font-weight: 600; font-size: 0.9rem; }
     .cats button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+    .mode-info { padding: 0 18px 14px; color: var(--secondary); font-size: 0.9rem; line-height: 1.4; }
+
+    /* Raum / Lobby */
+    .room { padding: 18px; border-radius: var(--r); text-align: center; }
+    .room .code { font: 800 3.4rem/1 var(--display); letter-spacing: 0.18em; margin: 6px 0 4px; }
+    .room .hint { color: var(--secondary); font-size: 0.9rem; overflow-wrap: anywhere; }
+    .room .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+    .room .btns button { min-height: 48px; border: 0; border-radius: 999px; background: var(--fill); color: var(--label); font: inherit; font-weight: 700; }
+    .code-input { width: 100%; min-height: 64px; margin-top: 6px; border: 0; border-radius: 16px; background: var(--fill); color: var(--label); text-align: center; font: 800 2.6rem/1 var(--display); letter-spacing: 0.22em; text-transform: uppercase; }
+    .netpill { display: inline-flex; align-items: center; gap: 6px; }
+    .netpill::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #8e8e93; }
+    .netpill.on::before { background: #30d158; }
+    .netpill.off::before { background: #ff453a; }
+    .you { margin: 0 0 10px; padding: 10px 14px; border-radius: 14px; background: var(--fill); font-weight: 600; text-align: center; }
 
     /* Ende */
-    .winner { margin-top: 6px; border-radius: 24px; padding: 22px 18px; text-align: center; background: var(--c); color: #fff; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25); }
-    .winner .ini { width: 72px; height: 72px; margin: 0 auto 10px; border-radius: 50%; background: #fff; color: var(--c); display: grid; place-items: center; font: 800 40px/1 var(--display); text-transform: uppercase; }
-    .winner b { display: block; font: 800 2.2rem/1 var(--display); text-transform: uppercase; }
-    .winner span { display: block; margin-top: 6px; font-weight: 600; opacity: 0.9; }
+    .winner { margin-top: 6px; border-radius: 26px; padding: 24px 18px; text-align: center; background: var(--c); color: #fff; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2); }
+    .winner .ini { width: 76px; height: 76px; margin: 0 auto 10px; border-radius: 50%; background: #fff; color: var(--c); display: grid; place-items: center; font: 800 42px/1 var(--display); text-transform: uppercase; }
+    .winner .crown { font-size: 2rem; display: block; margin-bottom: 4px; }
+    .winner b { display: block; font: 800 2.3rem/1 var(--display); text-transform: uppercase; }
+    .winner span { display: block; margin-top: 6px; font-weight: 600; opacity: 0.92; }
     .rank { display: grid; grid-template-columns: 36px 1fr auto; gap: 10px; align-items: center; padding: 12px 18px; position: relative; }
     .rank + .rank::before { content: ""; position: absolute; top: 0; left: 18px; right: 0; border-top: 0.5px solid var(--sep); }
     .rank .pos { font: 800 1.3rem/1 var(--display); color: var(--secondary); }
     .rank .nm { font: 800 1.15rem/1 var(--display); text-transform: uppercase; }
     .rank .st2 { color: var(--secondary); font-size: 0.9rem; }
+
+    .fx { position: fixed; left: 12px; right: 12px; top: calc(12px + env(safe-area-inset-top)); z-index: 40; max-width: 520px; margin: 0 auto; padding: 18px; border-radius: 24px; text-align: center; background: var(--c, #d20515); color: #fff; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45); animation: pop 0.4s cubic-bezier(0.3, 1.4, 0.6, 1); }
+    .fx b { display: block; font: 800 2.1rem/1.05 var(--display); text-transform: uppercase; }
   </style>
 </head>
 <body>
@@ -83,22 +125,54 @@
   <a class="back-link" href="/">‹ Alle Spiele</a>
 
   <!-- EINRICHTEN -->
-  <section id="setup">
+  <section id="setup" hidden>
     <header class="lt"><div><div class="eyebrow">Quiz-Trinkspiel</div><h1>Der Dümmste fliegt</h1></div></header>
 
-    <h2 class="sec">Mitspieler <small id="rosterCount"></small></h2>
+    <h2 class="sec">Spielart</h2>
     <div class="list">
-      <div class="add-row">
-        <input type="text" id="rosterInput" placeholder="Name eingeben …" aria-label="Mitspieler hinzufügen" autocomplete="off" enterkeyhint="done" />
-        <button class="btn small" id="rosterAdd">Hinzufügen</button>
-      </div>
-      <div class="roster" id="roster"></div>
+      <div class="cell wrap"><div class="seg big" id="modeSeg" role="group" aria-label="Spielart"></div></div>
+      <div class="mode-info" id="modeInfo"></div>
     </div>
-    <p class="foot">Die Liste gilt für alle Spiele.</p>
+
+    <h2 class="sec">Gespielt wird</h2>
+    <div class="list">
+      <div class="cell wrap"><div class="seg big" id="playSeg" role="group" aria-label="Gespielt wird"></div></div>
+      <div class="mode-info" id="playInfo"></div>
+    </div>
+
+    <!-- Ein Handy: Mitspielerliste -->
+    <div id="localPlayers">
+      <h2 class="sec">Mitspieler <small id="rosterCount"></small></h2>
+      <div class="list">
+        <div class="add-row">
+          <input type="text" id="rosterInput" placeholder="Name eingeben …" aria-label="Mitspieler hinzufügen" autocomplete="off" enterkeyhint="done" />
+          <button class="btn small" id="rosterAdd">Hinzufügen</button>
+        </div>
+        <div class="roster" id="roster"></div>
+      </div>
+      <p class="foot">Die Liste gilt für alle Spiele.</p>
+    </div>
+
+    <!-- Mehrere Handys: Raum -->
+    <div id="onlinePlayers" hidden>
+      <h2 class="sec">Raum <small class="netpill" id="hostNet"></small></h2>
+      <div class="list room" id="roomBox">
+        <button class="btn" id="createRoom" style="margin:0">Raum erstellen</button>
+        <p class="hint" style="margin:10px 0 0">Alle anderen öffnen den Link auf ihrem Handy und tragen ihren Namen ein.</p>
+      </div>
+      <h2 class="sec">Du</h2>
+      <div class="list">
+        <div class="add-row"><input type="text" id="hostName" placeholder="Dein Name" aria-label="Dein Name" autocomplete="off" /></div>
+        <label class="cell"><span>Ich spiele selbst mit</span><input type="checkbox" class="switch" id="hostPlays" /></label>
+      </div>
+      <h2 class="sec">Im Raum <small id="lobbyCount"></small></h2>
+      <div class="list"><div class="roster" id="lobby"></div></div>
+    </div>
 
     <h2 class="sec">Regeln</h2>
     <div class="list">
-      <div class="cell stepper-cell"><span>Leben pro Person</span><div class="ctl"><button data-step="lives:-1" aria-label="Weniger Leben">−</button><output id="v-lives"></output><button data-step="lives:1" aria-label="Mehr Leben">+</button></div></div>
+      <div class="cell stepper-cell" id="rowLives"><span>Leben pro Person</span><div class="ctl"><button data-step="lives:-1" aria-label="Weniger Leben">−</button><output id="v-lives"></output><button data-step="lives:1" aria-label="Mehr Leben">+</button></div></div>
+      <div class="cell stepper-cell" id="rowPer"><span>Fragen pro Person</span><div class="ctl"><button data-step="perRound:-1" aria-label="Weniger Fragen">−</button><output id="v-perRound"></output><button data-step="perRound:1" aria-label="Mehr Fragen">+</button></div></div>
       <div class="cell stepper-cell"><span>Falsche Antwort</span><div class="ctl"><button data-step="wrong:-1" aria-label="Weniger trinken">−</button><output id="v-wrong"></output><button data-step="wrong:1" aria-label="Mehr trinken">+</button></div></div>
       <div class="cell stepper-cell"><span>Richtige Antwort: verteilen</span><div class="ctl"><button data-step="right:-1" aria-label="Weniger verteilen">−</button><output id="v-right"></output><button data-step="right:1" aria-label="Mehr verteilen">+</button></div></div>
       <label class="cell"><span>Wer fliegt, muss exen</span><input type="checkbox" class="switch" id="exOnOut" /></label>
@@ -110,22 +184,31 @@
 
     <button class="btn" id="start">🧠 Spiel starten</button>
     <button class="btn ghost" id="resume" hidden>Laufendes Spiel fortsetzen</button>
+    <button class="btn ghost" id="joinOther">Einem Raum beitreten</button>
     <div class="error" id="setupError" role="alert"></div>
+  </section>
+
+  <!-- BEITRETEN (Gast) -->
+  <section id="join" hidden>
+    <header class="lt"><div><div class="eyebrow">Mehrspieler</div><h1>Raum beitreten</h1></div></header>
+    <div class="list room">
+      <div class="hint">Raumcode</div>
+      <input type="text" id="joinCode" class="code-input" maxlength="4" autocapitalize="characters" autocomplete="off" aria-label="Raumcode" />
+    </div>
+    <h2 class="sec">Dein Name</h2>
+    <div class="list"><div class="add-row"><input type="text" id="joinName" placeholder="Name" aria-label="Dein Name" autocomplete="off" enterkeyhint="go" /></div></div>
+    <button class="btn" id="joinBtn">Beitreten</button>
+    <button class="btn ghost" id="joinBack">Selbst ein Spiel starten</button>
+    <div class="error" id="joinError" role="alert"></div>
   </section>
 
   <!-- SPIEL -->
   <section id="game" hidden>
-    <header class="lt"><div><div class="eyebrow" id="roundLabel"></div><h1>Der Dümmste fliegt</h1></div><span class="pill" id="aliveLabel"></span></header>
+    <header class="lt"><div><div class="eyebrow" id="roundLabel"></div><h1>Der Dümmste fliegt</h1></div><span class="pill" id="statusPill"></span></header>
+    <div class="you" id="youBox" hidden></div>
     <div class="dplayers" id="dplayers"></div>
-    <div class="turn" id="turn" style="margin-top:14px"></div>
-    <div class="qcard" id="qcard">
-      <div class="qhead"><span class="qcat" id="qcat"></span><span class="qtimer" id="qtimer" aria-live="off"></span></div>
-      <div class="qtext" id="qtext"></div>
-      <div class="qanswer" id="qanswer" hidden></div>
-    </div>
-    <div id="actions"></div>
-    <div id="verdict" aria-live="polite"></div>
-    <div class="mini"><button id="skip">Andere Frage</button><button id="quit">Spiel beenden</button></div>
+    <div id="stage"></div>
+    <div class="mini" id="hostMini"><button id="skip">Andere Frage</button><button id="quit">Spiel beenden</button></div>
   </section>
 
   <!-- ENDE -->
@@ -144,7 +227,7 @@
 <script src="/dumm-fragen.js"></script>
 <script>
   const $ = (id) => document.getElementById(id);
-  const el = (tag, props = {}, ...children) => { const n = Object.assign(document.createElement(tag), props); n.append(...children); return n; };
+  const el = (tag, props = {}, ...children) => { const n = Object.assign(document.createElement(tag), props); n.append(...children.filter((c) => c !== null && c !== undefined && c !== false)); return n; };
   const store = {
     get(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; } },
     set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch {} },
@@ -155,23 +238,27 @@
   const PALETTE = ['#0a6ed1', '#18803c', '#d0103a', '#8e44c9', '#b85400', '#0b7285', '#4c4cdb', '#946800', '#c2185b', '#7a5a35'];
   const lines = (text) => String(text || '').split('\n').map((s) => s.trim()).filter(Boolean);
   const initial = (name) => [...name][0] || '?';
+  const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+  const show = (id) => { ['setup', 'join', 'game', 'end'].forEach((s) => { $(s).hidden = s !== id; }); };
 
   // ---------- Mitspieler (gemeinsam mit allen Spielen) ----------
   let roster = lines(store.get('kt-names', ''));
-  const colorOf = (name) => PALETTE[Math.max(0, roster.indexOf(name)) % PALETTE.length];
   function saveRoster() { store.set('kt-names', roster.join('\n')); renderRoster(); }
+  function chip(name, color, onRemove) {
+    const node = el('span', { className: 'rchip', style: `--c: ${color}` }, el('span', { className: 'ini', textContent: initial(name) }), name);
+    if (onRemove) {
+      const x = el('button', { textContent: '✕', onclick: onRemove });
+      x.setAttribute('aria-label', `${name} entfernen`);
+      node.append(x);
+    }
+    return node;
+  }
   function renderRoster() {
-    const box = $('roster');
-    box.innerHTML = '';
-    roster.forEach((name, i) => {
-      const remove = el('button', { textContent: '✕', onclick: () => { roster.splice(i, 1); saveRoster(); } });
-      remove.setAttribute('aria-label', `${name} entfernen`);
-      box.append(el('span', { className: 'rchip', style: `--c: ${PALETTE[i % PALETTE.length]}` }, el('span', { className: 'ini', textContent: initial(name) }), name, remove));
-    });
+    $('roster').replaceChildren(...roster.map((name, i) => chip(name, PALETTE[i % PALETTE.length], () => { roster.splice(i, 1); saveRoster(); })));
     $('rosterCount').textContent = roster.length ? `${roster.length} dabei` : '';
   }
   function addRoster() {
-    const name = $('rosterInput').value.trim();
+    const name = $('rosterInput').value.trim().slice(0, 24);
     $('rosterInput').value = '';
     if (name && !roster.some((n) => norm(n) === norm(name))) { roster.push(name); saveRoster(); }
     $('rosterInput').focus();
@@ -181,28 +268,44 @@
 
   // ---------- Einstellungen ----------
   const CATS = [...new Set(FRAGEN.map((q) => q.k))];
-  const DEFAULTS = { lives: 3, wrong: 1, right: 0, exOnOut: true, timer: 0, cats: CATS };
+  const DEFAULTS = { mode: 'vote', play: 'local', lives: 3, perRound: 2, wrong: 1, right: 0, exOnOut: true, timer: 0, cats: CATS };
   const settings = { ...DEFAULTS, ...store.get('dumm-settings', {}) };
-  settings.cats = settings.cats.filter((c) => CATS.includes(c));
+  settings.cats = (settings.cats || []).filter((c) => CATS.includes(c));
   if (!settings.cats.length) settings.cats = CATS;
-  const LIMITS = { lives: [1, 9], wrong: [0, 11], right: [0, 5] };
+  const LIMITS = { lives: [1, 9], perRound: [1, 4], wrong: [0, 11], right: [0, 5] };
   // „Falsche Antwort“: 1–10 Schlucke, 11 = Ex, 0 = nichts
   const wrongLabel = (v) => (v === 11 ? 'Ex' : v === 0 ? 'Nichts' : `${v} Schl.`);
+  function segButtons(box, options, current, onPick) {
+    box.replaceChildren(...options.map(([value, label, sub]) => {
+      const b = el('button', { onclick: () => onPick(value) }, label, sub ? el('small', { textContent: sub }) : null);
+      b.setAttribute('aria-pressed', String(current === value));
+      return b;
+    }));
+  }
   function renderSettings() {
+    segButtons($('modeSeg'), [['vote', 'Abstimmung', 'wie im TV'], ['classic', 'Klassisch', 'mit Leben']], settings.mode, (v) => { settings.mode = v; saveSettings(); });
+    $('modeInfo').textContent = settings.mode === 'vote'
+      ? `Jede Runde beantwortet jede Person ${plural(settings.perRound, 'Frage', 'Fragen')}. Danach stimmen alle geheim ab, wer der Dümmste war – der fliegt. Bei Gleichstand fliegt, wer weniger richtig hatte. Die letzten zwei spielen ein Finale.`
+      : 'Reihum eine Frage. Falsche Antwort kostet ein Leben. Wer keine Leben mehr hat, fliegt. Wer übrig bleibt, gewinnt.';
+    segButtons($('playSeg'), [['local', 'Ein Handy', 'wird herumgereicht'], ['online', 'Mehrere Handys', 'jeder spielt mit']], settings.play, (v) => {
+      settings.play = v;
+      saveSettings();
+      if (role === 'host' && v === 'local') location.reload();
+    });
+    $('playInfo').textContent = settings.play === 'online'
+      ? 'Du bist Quizmaster: Du siehst die Antworten und wertest. Alle sehen die Fragen live auf ihrem Handy und stimmen dort geheim ab.'
+      : 'Eine Person liest vor und wertet. Zum Abstimmen wird das Handy reihum weitergegeben.';
+    $('localPlayers').hidden = settings.play !== 'local';
+    $('onlinePlayers').hidden = settings.play !== 'online';
+    $('rowLives').hidden = settings.mode !== 'classic';
+    $('rowPer').hidden = settings.mode !== 'vote';
     $('v-lives').textContent = '♥'.repeat(Math.min(settings.lives, 5)) + (settings.lives > 5 ? ` ${settings.lives}` : '');
+    $('v-perRound').textContent = settings.perRound;
     $('v-wrong').textContent = wrongLabel(settings.wrong);
     $('v-right').textContent = settings.right ? `${settings.right} Schl.` : 'Nichts';
     $('exOnOut').checked = settings.exOnOut;
-    const seg = $('timerSeg');
-    seg.innerHTML = '';
-    for (const t of [0, 10, 15, 20, 30]) {
-      const b = el('button', { textContent: t ? `${t}s` : 'Aus', onclick: () => { settings.timer = t; saveSettings(); } });
-      b.setAttribute('aria-pressed', String(settings.timer === t));
-      seg.append(b);
-    }
-    const cats = $('cats');
-    cats.innerHTML = '';
-    for (const c of CATS) {
+    segButtons($('timerSeg'), [0, 10, 15, 20, 30].map((t) => [t, t ? `${t}s` : 'Aus']), settings.timer, (v) => { settings.timer = v; saveSettings(); });
+    $('cats').replaceChildren(...CATS.map((c) => {
       const b = el('button', { textContent: c, onclick: () => {
         const on = settings.cats.includes(c);
         if (on && settings.cats.length === 1) return;
@@ -210,11 +313,12 @@
         saveSettings();
       } });
       b.setAttribute('aria-pressed', String(settings.cats.includes(c)));
-      cats.append(b);
-    }
+      return b;
+    }));
     $('qCount').textContent = `${FRAGEN.filter((q) => settings.cats.includes(q.k)).length} Fragen`;
+    renderLobby();
   }
-  function saveSettings() { store.set('dumm-settings', settings); renderSettings(); }
+  function saveSettings() { store.set('dumm-settings', settings); renderSettings(); pushLobby(); }
   document.querySelectorAll('[data-step]').forEach((b) => b.addEventListener('click', () => {
     const [key, d] = b.dataset.step.split(':');
     const [lo, hi] = LIMITS[key];
@@ -223,16 +327,133 @@
   }));
   $('exOnOut').addEventListener('change', (e) => { settings.exOnOut = e.target.checked; saveSettings(); });
 
-  // ---------- Spiel ----------
-  // state = { players: [{name, lives, sips, ex, out}], turn, q, revealed, timedOut, asked: [], outOrder: [], round, verdict }
-  let state = store.get('dumm-state', null);
-  let timer = null;
+  // ---------- Verbindung zum Raum ----------
+  // Der Quizmaster schickt den kompletten Spielstand, Gäste schicken nur Beitritt und Stimme.
+  function connect(code, onMessage, onStatus) {
+    let ws, tries = 0, closed = false;
+    const conn = {
+      send: (msg) => { if (ws?.readyState === 1) ws.send(JSON.stringify(msg)); },
+      close: () => { closed = true; ws?.close(); },
+      onopen: null,
+    };
+    const open = () => {
+      ws = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/api/room/${code}/ws`);
+      ws.onopen = () => { tries = 0; onStatus(true); conn.onopen?.(); };
+      ws.onmessage = (e) => { try { onMessage(JSON.parse(e.data)); } catch {} };
+      ws.onclose = () => { onStatus(false); if (!closed) setTimeout(open, Math.min(8000, 500 * 2 ** tries++)); };
+    };
+    open();
+    return conn;
+  }
+
+  // ---------- Rollen ----------
+  // role: 'local' (ein Handy), 'host' (Quizmaster mit Raum), 'guest' (Mitspieler im Raum)
+  let role = 'local';
+  let state = null;
+  let net = null;
+  let online = false;
+  const host = store.get('dumm-host', null);           // { code, hostKey }
+  let guest = store.get('dumm-guest', null);           // { code, name, id }
+  let lobby = [];                                       // Namen der Gäste im Raum (nur Quizmaster)
+  const colorOf = (name) => {
+    const list = state?.players?.map((p) => p.name) || state?.lobby || (role === 'local' ? roster : lobbyNames());
+    return PALETTE[Math.max(0, list.indexOf(name)) % PALETTE.length];
+  };
+
+  function setNet(on) {
+    online = on;
+    const pill = $('hostNet');
+    pill.classList.toggle('on', on);
+    pill.classList.toggle('off', !on);
+    pill.textContent = on ? 'verbunden' : 'getrennt';
+    if (role === 'guest' && !state) renderAny(); else renderStatusPill();
+  }
+
+  // --- Quizmaster ---
+  function lobbyNames() {
+    const names = [...lobby];
+    const me = $('hostName').value.trim();
+    if ($('hostPlays').checked && me && !names.some((n) => norm(n) === norm(me))) names.unshift(me);
+    return names;
+  }
+  function renderLobby() {
+    const box = $('roomBox');
+    if (host && role === 'host') {
+      const link = `${location.origin}/dumm.html?raum=${host.code}`;
+      box.replaceChildren(
+        el('div', { className: 'hint', textContent: 'Raumcode' }),
+        el('div', { className: 'code', textContent: host.code }),
+        el('div', { className: 'hint', textContent: link.replace(/^https?:\/\//, '') }),
+        el('div', { className: 'btns' },
+          el('button', { textContent: '🔗 Link teilen', onclick: async () => {
+            try { if (navigator.share) await navigator.share({ title: 'Der Dümmste fliegt', text: `Komm in meinen Raum ${host.code}`, url: link }); else { await navigator.clipboard.writeText(link); flash('Link kopiert'); } } catch {}
+          } }),
+          el('button', { textContent: 'Neuer Raum', onclick: () => createRoom(true) })));
+    }
+    const names = lobbyNames();
+    $('lobby').replaceChildren(...names.map((n, i) => chip(n, PALETTE[i % PALETTE.length], lobby.includes(n) ? () => { lobby = lobby.filter((x) => x !== n); store.set('dumm-lobby', lobby); pushLobby(); renderLobby(); } : null)));
+    $('lobbyCount').textContent = names.length ? `${names.length} dabei` : '';
+  }
+  async function createRoom(force = false) {
+    if (host && role === 'host' && !force) return;
+    $('setupError').textContent = '';
+    const res = await fetch('/api/room/new', { method: 'POST' }).catch(() => null);
+    const data = res?.ok ? await res.json() : null;
+    if (!data?.code) { $('setupError').textContent = 'Raum konnte nicht erstellt werden. Ist Mehrspieler auf dem Server eingerichtet?'; return; }
+    store.set('dumm-host', data);
+    store.set('dumm-lobby', []);
+    location.reload();
+  }
+  $('createRoom').addEventListener('click', () => createRoom());
+  $('hostName').value = store.get('dumm-hostname', '');
+  $('hostPlays').checked = store.get('dumm-hostplays', true);
+  $('hostName').addEventListener('input', () => { store.set('dumm-hostname', $('hostName').value.trim()); renderLobby(); pushLobby(); });
+  $('hostPlays').addEventListener('change', () => { store.set('dumm-hostplays', $('hostPlays').checked); renderLobby(); pushLobby(); });
+  // Solange noch nicht gespielt wird, sehen Gäste die Lobby.
+  function pushLobby() {
+    if (role !== 'host' || state) return;
+    net?.send({ t: 'state', state: { phase: 'lobby', code: host.code, lobby: lobbyNames(), mode: settings.mode } });
+  }
+  function hostMessage(msg) {
+    if (msg.t === 'host-ok') { if (state) broadcast(); else pushLobby(); return; }
+    if (msg.t === 'join') {
+      const name = msg.name;
+      // Neue Namen landen immer in der Lobby fürs nächste Spiel; laufende Spiele bekommen den aktuellen Stand.
+      if (!lobby.some((n) => norm(n) === norm(name))) { lobby.push(name); store.set('dumm-lobby', lobby); renderLobby(); }
+      if (state) broadcast(); else pushLobby();
+      return;
+    }
+    if (msg.t === 'vote' && state?.phase === 'vote') castVote(msg.name, msg.target);
+  }
+
+  // --- Gast ---
+  function guestMessage(msg) {
+    if (msg.t !== 'state') return;
+    const prev = state;
+    state = msg.state;
+    showEffects(prev, state);
+    renderAny();
+  }
+  function startGuest() {
+    role = 'guest';
+    state = null;
+    net = connect(guest.code, guestMessage, setNet);
+    net.onopen = () => net.send({ t: 'join', name: guest.name, id: guest.id });
+    renderAny();
+  }
+
+  // ---------- Spiel-Logik (Quizmaster bzw. ein Handy) ----------
   const alive = () => state.players.filter((p) => !p.out);
-  const save = () => store.set('dumm-state', state);
-  const show = (id) => ['setup', 'game', 'end'].forEach((s) => { $(s).hidden = s !== id; window.scrollTo(0, 0); });
+  const cur = () => state.players[state.turn];
+  function save() {
+    state.seq = (state.seq || 0) + 1;
+    store.set('dumm-state', state);
+    broadcast();
+  }
+  function broadcast() { if (role === 'host' && state) net?.send({ t: 'state', state }); }
 
   function nextQuestion() {
-    const pool = FRAGEN.map((q, i) => i).filter((i) => settings.cats.includes(FRAGEN[i].k));
+    const pool = FRAGEN.map((q, i) => i).filter((i) => state.cfg.cats.includes(FRAGEN[i].k));
     let fresh = pool.filter((i) => !state.asked.includes(i));
     if (!fresh.length) { state.asked = state.asked.filter((i) => !pool.includes(i)); fresh = pool; }
     state.q = shuffle(fresh)[0];
@@ -240,182 +461,470 @@
     state.revealed = false;
     state.timedOut = false;
     state.verdict = null;
-    state.deadline = settings.timer ? Date.now() + settings.timer * 1000 : 0;
+    state.deadline = state.cfg.timer ? Date.now() + state.cfg.timer * 1000 : 0;
   }
-  function advanceTurn() {
+  function nextAliveAfter(i) {
     const n = state.players.length;
-    for (let k = 1; k <= n; k++) {
-      const i = (state.turn + k) % n;
-      if (!state.players[i].out) { state.turn = i; break; }
-    }
-    state.round++;
+    for (let k = 1; k <= n; k++) { const j = (i + k) % n; if (!state.players[j].out) return j; }
+    return i;
   }
 
-  function start() {
+  function startGame() {
     $('setupError').textContent = '';
-    if (roster.length < 2) { $('setupError').textContent = 'Mindestens zwei Mitspieler eintragen.'; return; }
+    if (settings.play === 'online' && role !== 'host') { $('setupError').textContent = 'Erst oben einen Raum erstellen.'; return; }
+    const names = role === 'host' ? lobbyNames() : roster;
+    if (names.length < 2) { $('setupError').textContent = role === 'host' ? 'Es braucht mindestens zwei Personen im Raum.' : 'Mindestens zwei Mitspieler eintragen.'; return; }
+    if (settings.mode === 'vote' && names.length < 3) { $('setupError').textContent = 'Für die Abstimmung braucht es mindestens drei Personen.'; return; }
     state = {
-      players: shuffle(roster).map((name) => ({ name, lives: settings.lives, sips: 0, ex: 0, out: false })),
-      turn: 0, round: 1, asked: store.get('dumm-asked', []), outOrder: [], q: null,
+      phase: 'play', mode: settings.mode, cfg: { ...settings }, code: role === 'host' ? host.code : undefined,
+      players: shuffle(names).map((name) => ({ name, lives: settings.lives, sips: 0, ex: 0, out: false, rc: 0, rq: 0 })),
+      turn: 0, round: 1, step: 0, asked: store.get('dumm-asked', []), outOrder: [], votes: {}, voter: 0, final: null, fx: [],
     };
     nextQuestion();
     save();
-    show('game');
-    render();
+    renderAny();
   }
 
   function reveal(timedOut = false) {
-    if (!state || state.revealed) return;
+    if (!state || state.revealed || state.phase !== 'play') return;
     state.revealed = true;
     state.timedOut = timedOut;
     save();
-    render();
+    renderAny();
   }
+  function addFx(name, text, kind = 'drink') { state.fx = [...(state.fx || []).slice(-20), { id: `${Date.now()}-${Math.random()}`, name, text, kind }]; }
 
   function judge(correct) {
-    const p = state.players[state.turn];
+    if (state.verdict) return;
+    const p = cur();
+    const c = state.cfg;
+    p.rq++;
     if (correct) {
-      state.verdict = { kind: 'right', name: p.name, give: settings.right, left: settings.right };
+      p.rc++;
+      if (state.final) state.final.scores[p.name]++;
+      state.verdict = { kind: 'right', name: p.name, left: c.right };
     } else {
-      p.lives--;
-      if (settings.wrong === 11) p.ex++; else p.sips += settings.wrong;
-      const outNow = p.lives <= 0;
-      if (outNow) { p.out = true; state.outOrder.push(p.name); if (settings.exOnOut) p.ex++; }
-      state.verdict = { kind: outNow ? 'out' : 'wrong', name: p.name };
+      if (c.wrong === 11) { p.ex++; addFx(p.name, 'Ex! 🍺', 'ex'); } else if (c.wrong) { p.sips += c.wrong; addFx(p.name, `${plural(c.wrong, 'Schluck', 'Schlucke')} trinken`); }
+      let out = false;
+      if (state.mode === 'classic') {
+        p.lives--;
+        if (p.lives <= 0) { out = true; eliminate(p); }
+      }
+      state.verdict = { kind: out ? 'out' : 'wrong', name: p.name };
     }
+    if (state.final) state.final.answered[p.name]++;
+    state.step++;
     store.set('dumm-asked', state.asked.slice(-400));
     save();
-    render();
+    renderAny();
+  }
+  function eliminate(p) {
+    p.out = true;
+    state.outOrder.push(p.name);
+    if (state.cfg.exOnOut) { p.ex++; addFx(p.name, 'Du fliegst – Ex! 🍺', 'ex'); } else addFx(p.name, 'Du fliegst!', 'out');
+  }
+  function give(target) {
+    const v = state.verdict;
+    if (!v || v.left <= 0) return;
+    const t = state.players.find((x) => x.name === target);
+    t.sips++;
+    v.left--;
+    addFx(t.name, `1 Schluck von ${v.name}`);
+    save();
+    renderAny();
   }
 
+  // Weiter nach dem Werten einer Antwort.
   function next() {
-    if (alive().length <= 1) { finish(); return; }
-    advanceTurn();
+    if (state.mode === 'classic') {
+      if (alive().length <= 1) return finish();
+      state.turn = nextAliveAfter(state.turn);
+      state.round++;
+    } else if (state.final) {
+      const [a, b] = alive();
+      const f = state.final;
+      const left = (n) => f.per - f.answered[n];
+      // Vorzeitig entschieden, wenn einer nicht mehr aufholen kann.
+      const decided = f.scores[a.name] > f.scores[b.name] + left(b.name) || f.scores[b.name] > f.scores[a.name] + left(a.name);
+      if (decided || (left(a.name) <= 0 && left(b.name) <= 0)) {
+        if (f.scores[a.name] !== f.scores[b.name]) {
+          eliminate(f.scores[a.name] > f.scores[b.name] ? b : a);
+          return finish();
+        }
+        f.per++;            // Gleichstand: Stechen, je eine Frage mehr
+        f.sudden = true;
+      }
+      state.turn = nextAliveAfter(state.turn);
+      state.round++;
+    } else {
+      const total = alive().length * state.cfg.perRound;
+      if (state.step >= total) {
+        if (alive().length > 2) {
+          state.phase = 'vote';
+          state.votes = {};
+          state.voter = 0;
+          state.voteRes = null;
+          save();
+          return renderAny();
+        }
+        return startFinal();
+      }
+      state.turn = nextAliveAfter(state.turn);
+      state.round++;
+    }
     nextQuestion();
     save();
-    render();
+    renderAny();
   }
 
+  function castVote(voter, target) {
+    if (state.phase !== 'vote') return;
+    const v = state.players.find((p) => p.name === voter && !p.out);
+    const t = state.players.find((p) => p.name === target && !p.out);
+    if (!v || !t || v.name === t.name) return;
+    state.votes[voter] = target;
+    if (role === 'local') state.voter++;
+    if (alive().every((p) => state.votes[p.name])) return tally();
+    save();
+    renderAny();
+  }
+  // Auszählen: meiste Stimmen fliegt; bei Gleichstand weniger richtige Antworten, dann mehr Schlucke, dann Los.
+  function tally() {
+    const counts = {};
+    for (const p of alive()) counts[p.name] = 0;
+    for (const t of Object.values(state.votes)) if (t in counts) counts[t]++;
+    const max = Math.max(...Object.values(counts));
+    let cands = alive().filter((p) => counts[p.name] === max);
+    let reason = '';
+    if (cands.length > 1) {
+      const minRc = Math.min(...cands.map((p) => p.rc));
+      const fewer = cands.filter((p) => p.rc === minRc);
+      if (fewer.length < cands.length) reason = 'Gleichstand – weniger richtige Antworten entscheiden.';
+      cands = fewer;
+    }
+    if (cands.length > 1) {
+      const maxS = Math.max(...cands.map((p) => p.sips));
+      const more = cands.filter((p) => p.sips === maxS);
+      if (more.length < cands.length) reason = 'Gleichstand – mehr Schlucke entscheiden.';
+      cands = more;
+    }
+    if (cands.length > 1) { cands = [shuffle(cands)[0]]; reason = 'Gleichstand – das Los entscheidet.'; }
+    const target = cands[0];
+    eliminate(target);
+    state.voteRes = { target: target.name, counts, reason };
+    state.phase = 'result';
+    save();
+    renderAny();
+  }
+  function nextRound() {
+    for (const p of state.players) { p.rc = 0; p.rq = 0; }
+    state.step = 0;
+    if (alive().length <= 1) return finish();
+    if (alive().length === 2) return startFinal();
+    state.phase = 'play';
+    state.turn = nextAliveAfter(state.turn);
+    state.round++;
+    nextQuestion();
+    save();
+    renderAny();
+  }
+  function startFinal() {
+    for (const p of state.players) { p.rc = 0; p.rq = 0; }
+    const [a, b] = alive();
+    state.final = { per: 3, scores: { [a.name]: 0, [b.name]: 0 }, answered: { [a.name]: 0, [b.name]: 0 }, sudden: false };
+    state.phase = 'play';
+    state.turn = state.players.indexOf(a);
+    state.round++;
+    nextQuestion();
+    save();
+    renderAny();
+  }
   function finish() {
-    clearInterval(timer);
+    const standing = [...alive()].sort((a, b) => b.lives - a.lives || a.sips - b.sips || a.ex - b.ex);
+    state.winner = (standing[0] || state.players.find((p) => p.name === state.outOrder.at(-1))).name;
+    state.rank = [...standing.map((p) => p.name), ...[...state.outOrder].reverse()].filter((n, i, a) => a.indexOf(n) === i);
+    state.phase = 'end';
     state.finished = true;
     save();
-    // Bei vorzeitigem Ende: mehr Leben vor weniger Schlucken.
-    const standing = [...alive()].sort((a, b) => b.lives - a.lives || a.sips - b.sips || a.ex - b.ex);
-    const win = standing[0] || state.players.find((p) => p.name === state.outOrder.at(-1));
-    const w = $('winner');
-    w.innerHTML = '';
-    w.style.setProperty('--c', colorOf(win.name));
-    w.append(el('div', { className: 'ini', textContent: initial(win.name) }), el('b', { textContent: win.name }),
-      el('span', { textContent: win.out ? 'hat am längsten durchgehalten' : `gewinnt mit ${win.lives} Leben übrig` }));
-    const order = [...standing.map((p) => p.name), ...[...state.outOrder].reverse()].filter((n, i, a) => a.indexOf(n) === i);
-    if (!order.includes(win.name)) order.unshift(win.name);
-    const rk = $('ranking');
-    rk.innerHTML = '';
-    order.forEach((name, i) => {
-      const p = state.players.find((x) => x.name === name);
-      rk.append(el('div', { className: 'rank' }, el('span', { className: 'pos', textContent: `${i + 1}.` }),
-        el('span', { className: 'nm', textContent: name }),
-        el('span', { className: 'st2', textContent: `${p.sips} Schl.${p.ex ? ` · ${p.ex} Ex` : ''}` })));
-    });
-    show('end');
+    renderAny();
   }
 
-  function tick() {
-    if (!state || !state.deadline || state.revealed) { $('qtimer').textContent = ''; return; }
-    const left = Math.max(0, Math.ceil((state.deadline - Date.now()) / 1000));
-    $('qtimer').textContent = `${left}`;
-    $('qtimer').classList.toggle('low', left <= 5);
-    if (left === 0) reveal(true);
+  // ---------- Darstellung ----------
+  const me = () => (role === 'guest' ? guest?.name : role === 'host' && $('hostPlays').checked ? $('hostName').value.trim() : null);
+  const canControl = () => role !== 'guest';
+
+  function renderStatusPill() {
+    const pill = $('statusPill');
+    if (role === 'local') { pill.className = 'pill'; pill.textContent = state?.players ? `${alive().length} im Spiel` : ''; return; }
+    pill.className = `pill netpill ${online ? 'on' : 'off'}`;
+    pill.textContent = `Raum ${state?.code || guest?.code || host?.code || ''}`;
   }
 
-  function render() {
-    if (!state) return;
-    // Spieler-Leiste
-    const box = $('dplayers');
-    box.innerHTML = '';
-    state.players.forEach((p, i) => {
-      const hearts = '♥'.repeat(Math.max(0, p.lives)) + '♡'.repeat(Math.max(0, settings.lives - p.lives));
-      box.append(el('div', { className: 'dp' + (p.out ? ' out' : '') + (i === state.turn && !p.out ? ' now' : ''), style: `--c: ${colorOf(p.name)}` },
+  function playersStrip() {
+    const now = state.phase === 'play' ? state.turn : -1;
+    return state.players.map((p, i) => {
+      let meta;
+      if (p.out) meta = `${p.sips} Schl.${p.ex ? ` · ${p.ex} Ex` : ''}`;
+      else if (state.mode === 'classic') meta = `${'♥'.repeat(Math.max(0, p.lives))}${'♡'.repeat(Math.max(0, state.cfg.lives - p.lives))} · ${p.sips} Schl.`;
+      else if (state.final) meta = `Finale: ${state.final.scores[p.name]} ✓ · ${p.sips} Schl.`;
+      else meta = `${p.rc}/${p.rq} ✓ · ${p.sips} Schl.${p.ex ? ` · ${p.ex} Ex` : ''}`;
+      return el('div', { className: 'dp' + (p.out ? ' out' : '') + (i === now && !p.out ? ' now' : '') + (p.name === me() ? ' me' : ''), style: `--c: ${colorOf(p.name)}` },
         el('span', { className: 'ini', textContent: initial(p.name) }),
-        el('div', {}, el('b', { textContent: p.name }), el('div', { className: 'hearts', textContent: p.out ? '' : hearts }),
-          el('div', { className: 'tally', textContent: `${p.sips} Schl.${p.ex ? ` · ${p.ex} Ex` : ''}` }))));
+        el('div', {}, el('b', { textContent: p.name }), el('div', { className: 'meta', textContent: meta })));
     });
-    $('aliveLabel').textContent = `${alive().length} im Spiel`;
-    $('roundLabel').textContent = `Frage ${state.round}`;
+  }
 
-    // Wer ist dran
-    const p = state.players[state.turn];
-    const turn = $('turn');
-    turn.innerHTML = '';
-    turn.style.setProperty('--c', colorOf(p.name));
-    turn.append(el('span', { className: 'ini', textContent: initial(p.name) }),
-      el('div', {}, el('b', { textContent: `${p.name} ist dran` }), el('span', { textContent: `noch ${p.lives} ${p.lives === 1 ? 'Leben' : 'Leben'}` })));
+  function roundLabel() {
+    if (state.phase === 'vote' || state.phase === 'result') return 'Abstimmung';
+    if (state.final) return state.final.sudden ? 'Finale · Stechen' : 'Finale';
+    if (state.mode === 'vote') {
+      const total = alive().length * state.cfg.perRound;
+      return `Runde · Frage ${Math.min(state.step + 1, total)} von ${total}`;
+    }
+    return `Frage ${state.round}`;
+  }
 
-    // Frage
+  function stagePlay() {
+    const p = cur();
     const q = FRAGEN[state.q];
-    $('qcat').textContent = q.k;
-    $('qtext').textContent = q.f;
-    const ans = $('qanswer');
-    ans.hidden = !state.revealed;
-    ans.className = 'qanswer' + (state.timedOut ? ' timeout' : '');
-    ans.replaceChildren(el('small', { textContent: state.timedOut ? 'Zeit um! Richtige Antwort' : 'Richtige Antwort' }), q.a);
+    const isMe = p.name === me();
+    const parts = [];
+    parts.push(el('div', { className: 'turn', style: `--c: ${colorOf(p.name)}; margin-top: 14px` },
+      el('span', { className: 'ini', textContent: initial(p.name) }),
+      el('div', {}, el('b', { textContent: isMe ? 'Du bist dran!' : `${p.name} ist dran` }),
+        el('span', { textContent: state.mode === 'classic' ? `noch ${plural(p.lives, 'Leben', 'Leben')}` : state.final ? `Finale: ${state.final.scores[p.name]} richtig` : `${p.rc} von ${p.rq} richtig in dieser Runde` }))));
+    const card = el('div', { className: 'qcard surface' },
+      el('div', { className: 'qhead' }, el('span', { className: 'qcat', textContent: q.k }), el('span', { className: 'qtimer', id: 'qtimer' })),
+      el('div', { className: 'qtext', textContent: q.f }));
+    if (state.revealed) card.append(el('div', { className: 'qanswer' + (state.timedOut ? ' timeout' : '') }, el('small', { textContent: state.timedOut ? 'Zeit um! Richtige Antwort' : 'Richtige Antwort' }), q.a));
+    parts.push(card);
 
-    // Aktionen
-    const act = $('actions');
-    act.innerHTML = '';
     const v = state.verdict;
-    if (!state.revealed) {
-      act.append(el('button', { className: 'btn', textContent: 'Auflösen', onclick: () => reveal() }));
-    } else if (!v) {
-      act.append(el('div', { className: 'judge' },
+    if (canControl()) {
+      if (!state.revealed) parts.push(el('button', { className: 'btn', textContent: 'Auflösen', onclick: () => reveal() }));
+      else if (!v) parts.push(el('div', { className: 'judge' },
         el('button', { className: 'right', textContent: '✓ Richtig', onclick: () => judge(true) }),
         el('button', { className: 'wrong', textContent: '✗ Falsch', onclick: () => judge(false) })));
+    } else if (!v) {
+      parts.push(el('div', { className: 'waiting surface', textContent: state.revealed ? 'Der Quizmaster wertet …' : isMe ? 'Sag deine Antwort laut!' : `${p.name} antwortet …` }));
     }
-
-    // Ergebnis
-    const vd = $('verdict');
-    vd.innerHTML = '';
-    if (v) {
-      const who = state.players.find((x) => x.name === v.name);
-      const card = el('div', { className: 'verdict', style: `--c: ${v.kind === 'right' ? '#18803c' : v.kind === 'out' ? '#121212' : 'var(--red)'}` });
-      if (v.kind === 'right') {
-        card.append(el('b', { textContent: 'Richtig!' }), el('p', { textContent: v.give ? `${v.name} darf noch ${v.left} ${v.left === 1 ? 'Schluck' : 'Schlucke'} verteilen` : `${v.name} ist sicher.` }));
-        if (v.left > 0) {
-          const t = el('div', { className: 'targets' });
-          for (const o of state.players.filter((x) => x.name !== v.name)) {
-            t.append(el('button', { textContent: o.name, style: `background: ${colorOf(o.name)}`, onclick: () => { o.sips++; v.left--; save(); render(); } }));
-          }
-          card.append(t);
-        }
-      } else if (v.kind === 'wrong') {
-        const drink = settings.wrong === 11 ? 'muss exen 🍺' : settings.wrong ? `trinkt ${settings.wrong}` : 'kommt davon';
-        card.append(el('b', { textContent: 'Falsch!' }), el('p', { textContent: `${v.name} ${drink} · noch ${who.lives} ${who.lives === 1 ? 'Leben' : 'Leben'}` }));
-      } else {
-        card.append(el('b', { textContent: `${v.name} fliegt!` }), el('p', { textContent: settings.exOnOut ? 'Keine Leben mehr – Ex! 🍺' : 'Keine Leben mehr.' }));
+    if (v) parts.push(verdictCard(v));
+    if (v && canControl()) parts.push(el('button', { className: 'btn', textContent: nextLabel(), onclick: next }));
+    return parts;
+  }
+  function nextLabel() {
+    if (state.mode === 'classic') return alive().length <= 1 ? 'Zur Siegerehrung' : 'Nächste Frage';
+    if (!state.final && state.step >= alive().length * state.cfg.perRound) return alive().length > 2 ? 'Zur Abstimmung' : 'Zum Finale';
+    return 'Nächste Frage';
+  }
+  function verdictCard(v) {
+    const who = state.players.find((x) => x.name === v.name);
+    const mine = v.name === me();
+    const card = el('div', { className: 'verdict', style: `--c: ${v.kind === 'right' ? '#18803c' : v.kind === 'out' ? '#1c1c1f' : '#c8101e'}` });
+    if (v.kind === 'right') {
+      card.append(el('b', { textContent: 'Richtig!' }), el('p', { textContent: v.left > 0 ? `${mine ? 'Du darfst' : `${v.name} darf`} noch ${plural(v.left, 'Schluck', 'Schlucke')} verteilen` : `${mine ? 'Du bist' : `${v.name} ist`} sicher.` }));
+      if (v.left > 0 && canControl()) {
+        card.append(el('div', { className: 'targets' }, ...state.players.filter((x) => x.name !== v.name).map((o) =>
+          el('button', { textContent: o.name, style: `background: ${colorOf(o.name)}`, onclick: () => give(o.name) }))));
       }
-      vd.append(card);
-      act.append(el('button', { className: 'btn', textContent: alive().length <= 1 ? 'Zur Siegerehrung' : 'Nächste Frage', onclick: next }));
+    } else if (v.kind === 'wrong') {
+      const w = state.cfg.wrong;
+      const drink = w === 11 ? (mine ? 'musst exen 🍺' : 'muss exen 🍺') : w ? (mine ? `trinkst ${w}` : `trinkt ${w}`) : (mine ? 'kommst davon' : 'kommt davon');
+      card.append(el('b', { textContent: 'Falsch!' }), el('p', { textContent: `${mine ? 'Du' : v.name} ${drink}${state.mode === 'classic' ? ` · noch ${plural(who.lives, 'Leben', 'Leben')}` : ''}` }));
+    } else {
+      card.append(el('b', { textContent: mine ? 'Du fliegst!' : `${v.name} fliegt!` }), el('p', { textContent: state.cfg.exOnOut ? 'Keine Leben mehr – Ex! 🍺' : 'Keine Leben mehr.' }));
     }
-    $('skip').hidden = !!v;
+    return card;
+  }
+
+  // Abstimmung: ein Handy = reihum weitergeben; mehrere Handys = jeder auf seinem.
+  let localVoteOpen = false;
+  function stageVote() {
+    const voters = alive();
+    const box = el('div', { className: 'vote surface' });
+    if (role === 'local') {
+      const voter = voters[state.voter];
+      if (!voter) return [box];
+      if (!localVoteOpen) {
+        box.append(el('h3', { textContent: `${voter.name} stimmt ab` }),
+          el('p', { textContent: `Gib das Handy an ${voter.name}. Alle anderen schauen weg. (${state.voter + 1} von ${voters.length})` }),
+          el('button', { className: 'btn', textContent: `Ich bin ${voter.name}`, onclick: () => { localVoteOpen = true; renderAny(); } }));
+      } else {
+        box.append(el('h3', { textContent: 'Wer war der Dümmste?' }), el('p', { textContent: 'Deine Stimme ist geheim.' }),
+          voteGrid(voter.name, (t) => { localVoteOpen = false; castVote(voter.name, t); }));
+      }
+      return [box];
+    }
+    const myName = me();
+    const amVoter = voters.some((p) => p.name === myName);
+    const myVote = state.votes[myName];
+    box.append(el('h3', { textContent: 'Wer war der Dümmste?' }));
+    if (amVoter && !myVote) {
+      box.append(el('p', { textContent: 'Tippe geheim auf eine Person.' }), voteGrid(myName, (t) => {
+        if (role === 'host') castVote(myName, t);
+        else { net.send({ t: 'vote', name: guest.name, id: guest.id, target: t }); state.votes = { ...state.votes, [myName]: t }; renderAny(); }
+      }));
+    } else {
+      box.append(el('p', { textContent: myVote ? 'Du hast abgestimmt. Warte auf die anderen …' : 'Die anderen stimmen ab …' }));
+    }
+    box.append(el('div', { className: 'who' }, ...voters.map((p) => el('span', { className: state.votes[p.name] ? 'done' : '', textContent: `${state.votes[p.name] ? '✓' : '…'} ${p.name}` }))));
+    if (role === 'host') box.append(el('button', { className: 'btn ghost', textContent: 'Jetzt auszählen', onclick: () => { if (Object.keys(state.votes).length) tally(); } }));
+    return [box];
+  }
+  function voteGrid(voter, onPick) {
+    return el('div', { className: 'grid' }, ...alive().filter((p) => p.name !== voter).map((p) =>
+      el('button', { style: `--c: ${colorOf(p.name)}`, onclick: () => onPick(p.name) }, p.name, el('small', { textContent: `${p.rc}/${p.rq} richtig` }))));
+  }
+  function stageResult() {
+    const r = state.voteRes;
+    const mine = r.target === me();
+    const max = Math.max(1, ...Object.values(r.counts));
+    const parts = [
+      el('div', { className: 'verdict', style: `--c: ${colorOf(r.target)}` },
+        el('b', { textContent: mine ? 'Du fliegst!' : `${r.target} fliegt!` }),
+        el('p', { textContent: `${state.cfg.exOnOut ? 'Ex! 🍺 ' : ''}${r.reason}` })),
+      el('div', { className: 'vote surface' }, el('h3', { textContent: 'Stimmen' }),
+        el('div', { className: 'bars' }, ...Object.entries(r.counts).sort((a, b) => b[1] - a[1]).map(([n, c]) =>
+          el('div', { className: 'bar', style: `--c: ${colorOf(n)}` }, el('span', { textContent: n }), el('i', { style: `width: ${(c / max) * 100}%` }), el('span', { textContent: c }))))),
+    ];
+    if (canControl()) parts.push(el('button', { className: 'btn', textContent: alive().length > 2 ? 'Nächste Runde' : alive().length === 2 ? 'Zum Finale' : 'Zur Siegerehrung', onclick: nextRound }));
+    return parts;
+  }
+  function stageLobby() {
+    const names = state.lobby || [];
+    return [el('div', { className: 'room surface', style: 'margin-top:14px' },
+      el('div', { className: 'hint', textContent: 'Raum' }), el('div', { className: 'code', textContent: state.code || guest.code }),
+      el('div', { className: 'hint', textContent: `${names.length} dabei · ${state.mode === 'classic' ? 'Klassisch' : 'Abstimmung'} · warte auf den Start …` }),
+      el('div', { className: 'roster', style: 'justify-content:center;padding:14px 0 0' }, ...names.map((n, i) => chip(n, PALETTE[i % PALETTE.length]))))];
+  }
+
+  function renderEnd() {
+    const win = state.players.find((p) => p.name === state.winner) || state.players[0];
+    const w = $('winner');
+    w.style.setProperty('--c', colorOf(win.name));
+    w.replaceChildren(el('span', { className: 'crown', textContent: '👑' }), el('div', { className: 'ini', textContent: initial(win.name) }), el('b', { textContent: win.name === me() ? 'Du gewinnst!' : win.name }),
+      el('span', { textContent: state.mode === 'classic' ? (win.out ? 'hat am längsten durchgehalten' : `gewinnt mit ${plural(win.lives, 'Leben', 'Leben')} übrig`) : 'ist der Klügste der Runde' }));
+    $('ranking').replaceChildren(...state.rank.map((name, i) => {
+      const p = state.players.find((x) => x.name === name);
+      return el('div', { className: 'rank' }, el('span', { className: 'pos', textContent: `${i + 1}.` }), el('span', { className: 'nm', textContent: name }),
+        el('span', { className: 'st2', textContent: `${p.sips} Schl.${p.ex ? ` · ${p.ex} Ex` : ''}` }));
+    }));
+    $('again').hidden = !canControl();
+    $('toSetup').textContent = canControl() ? 'Einstellungen' : 'Selbst ein Spiel starten';
+  }
+
+  function renderAny() {
+    if (role === 'guest' && !state) {
+      show('game');
+      renderStatusPill();
+      $('roundLabel').textContent = 'Mehrspieler';
+      $('youBox').hidden = false;
+      $('youBox').textContent = `Du spielst als ${guest.name}`;
+      $('dplayers').replaceChildren();
+      $('stage').replaceChildren(el('div', { className: 'waiting surface', textContent: online ? 'Verbunden – warte auf den Quizmaster …' : 'Verbinde mit dem Raum …' }));
+      $('hostMini').hidden = true;
+      return;
+    }
+    if (!state || (role !== 'guest' && state.phase === 'lobby')) { show('setup'); renderSetup(); return; }
+    if (state.phase === 'end') { show('end'); renderEnd(); return; }
+    show('game');
+    $('youBox').hidden = role !== 'guest';
+    if (role === 'guest') $('youBox').textContent = state.phase === 'lobby' || state.players?.some((p) => p.name === guest.name) ? `Du spielst als ${guest.name}` : `Du schaust zu (${guest.name})`;
+    $('hostMini').hidden = !canControl();
+    renderStatusPill();
+    if (state.phase === 'lobby') { $('roundLabel').textContent = 'Lobby'; $('dplayers').replaceChildren(); $('stage').replaceChildren(...stageLobby()); return; }
+    $('roundLabel').textContent = roundLabel();
+    $('dplayers').replaceChildren(...playersStrip());
+    const stage = state.phase === 'vote' ? stageVote() : state.phase === 'result' ? stageResult() : stagePlay();
+    $('stage').replaceChildren(...stage);
+    $('skip').hidden = state.phase !== 'play' || !!state.verdict;
     tick();
   }
 
-  $('start').addEventListener('click', start);
-  $('resume').addEventListener('click', () => { show('game'); render(); });
-  $('skip').addEventListener('click', () => { nextQuestion(); save(); render(); });
-  $('quit').addEventListener('click', () => { if (state) { finish(); } });
-  $('again').addEventListener('click', start);
-  $('toSetup').addEventListener('click', () => { state = null; store.set('dumm-state', null); renderSetup(); show('setup'); });
-  timer = setInterval(tick, 250);
+  // Effekte für das eigene Handy (Mehrspieler): „Du trinkst 2!“
+  function showEffects(prev, nextState) {
+    const mine = me();
+    if (!mine || !prev || !nextState?.fx) return;
+    const seen = new Set((prev.fx || []).map((f) => f.id));
+    const fresh = nextState.fx.filter((f) => !seen.has(f.id) && f.name === mine);
+    if (!fresh.length) return;
+    flash(fresh.map((f) => f.text).join(' · '), fresh.some((f) => f.kind !== 'drink') ? '#c8101e' : colorOf(mine));
+    try { navigator.vibrate?.([200, 80, 200]); } catch {}
+  }
+  let flashTimer;
+  function flash(text, color) {
+    document.querySelector('.fx')?.remove();
+    const n = el('div', { className: 'fx', style: color ? `--c: ${color}` : '' }, el('b', { textContent: text }));
+    n.setAttribute('role', 'status');
+    n.addEventListener('click', () => n.remove());
+    document.body.append(n);
+    clearTimeout(flashTimer);
+    flashTimer = setTimeout(() => n.remove(), 4000);
+  }
+
+  function tick() {
+    const t = $('qtimer');
+    if (!t) return;
+    if (!state || state.phase !== 'play' || !state.deadline || state.revealed) { t.textContent = ''; return; }
+    const left = Math.max(0, Math.ceil((state.deadline - Date.now()) / 1000));
+    t.textContent = `${left}`;
+    t.classList.toggle('low', left <= 5);
+    if (left === 0 && canControl()) reveal(true);
+  }
+  setInterval(tick, 250);
 
   function renderSetup() {
     renderRoster();
     renderSettings();
-    $('resume').hidden = !(state && !state.finished);
+    const saved = store.get('dumm-state', null);
+    const mine = role === 'host' ? saved?.code === host?.code : !saved?.code;
+    $('resume').hidden = !(saved && !saved.finished && saved.phase !== 'lobby' && mine) || !!state;
   }
-  renderSetup();
-  if (state && !state.finished) { show('game'); render(); }
+
+  // ---------- Knöpfe ----------
+  $('start').addEventListener('click', startGame);
+  $('resume').addEventListener('click', () => { state = store.get('dumm-state', null); renderAny(); broadcast(); });
+  $('skip').addEventListener('click', () => { if (canControl() && state?.phase === 'play' && !state.verdict) { nextQuestion(); save(); renderAny(); } });
+  $('quit').addEventListener('click', () => { if (canControl() && state) finish(); });
+  $('again').addEventListener('click', () => { state = null; startGame(); });
+  $('toSetup').addEventListener('click', () => {
+    if (role === 'guest') { store.set('dumm-guest', null); net?.close(); location.href = '/dumm.html'; return; }
+    state = null; store.set('dumm-state', null); renderAny(); pushLobby();
+  });
+  $('joinOther').addEventListener('click', () => { show('join'); $('joinName').value = store.get('dumm-myname', ''); $('joinCode').focus(); });
+  $('joinBack').addEventListener('click', () => { history.replaceState(null, '', '/dumm.html'); show('setup'); renderSetup(); });
+  $('joinBtn').addEventListener('click', () => {
+    const code = $('joinCode').value.trim().toUpperCase();
+    const name = $('joinName').value.trim().slice(0, 24);
+    $('joinError').textContent = '';
+    if (!/^[A-Z0-9]{4}$/.test(code)) { $('joinError').textContent = 'Der Raumcode hat 4 Zeichen.'; return; }
+    if (!name) { $('joinError').textContent = 'Bitte deinen Namen eintragen.'; return; }
+    store.set('dumm-myname', name);
+    guest = { code, name, id: guest?.code === code && guest?.name === name ? guest.id : (crypto.randomUUID?.() || String(Math.random())) };
+    store.set('dumm-guest', guest);
+    history.replaceState(null, '', `/dumm.html?raum=${code}`);
+    startGuest();
+  });
+  $('joinName').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('joinBtn').click(); });
+
+  // ---------- Start ----------
+  const roomParam = (new URLSearchParams(location.search).get('raum') || '').toUpperCase();
+  if (roomParam && !(host && host.code === roomParam && settings.play === 'online')) {
+    if (guest && guest.code === roomParam) startGuest();
+    else { show('join'); $('joinCode').value = roomParam; $('joinName').value = store.get('dumm-myname', ''); }
+  } else if (settings.play === 'online' && host) {
+    role = 'host';
+    lobby = store.get('dumm-lobby', []);
+    const saved = store.get('dumm-state', null);
+    state = saved && saved.code === host.code && !saved.finished ? saved : null;
+    net = connect(host.code, hostMessage, setNet);
+    net.onopen = () => net.send({ t: 'host', hostKey: host.hostKey });
+    renderAny();
+  } else {
+    const saved = store.get('dumm-state', null);
+    state = saved && !saved.finished && !saved.code ? saved : null;
+    renderAny();
+  }
 </script>
 </body>
 </html>
