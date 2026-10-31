@@ -22,6 +22,8 @@
   /* --tint = Akzent als Textfarbe auf dunklem Grund; je Seite überschreibbar */
   --tint: #ff453a;
   --accent-text: var(--tint);
+  /* Flächenfarbe für Knöpfe mit weißer Schrift (≥ 4.5:1); Text auf Dunkel nutzt --tint */
+  --accent-fill: var(--accent);
   --red: #ff453a;
   --green: #30d158;
   --display: -apple-system, BlinkMacSystemFont, "SF Pro Display", Inter, system-ui, sans-serif;
@@ -81,7 +83,7 @@ h2.sec small { font: 500 0.9rem/1.2 var(--display); color: var(--secondary); tex
 .cells span, .cells b { font-family: var(--display); }
 
 /* Knöpfe: flach, iOS-Rundung */
-.btn { background: var(--accent); box-shadow: none; border-radius: 14px; font-weight: 600; letter-spacing: -0.01em; min-height: 50px; }
+.btn { background: var(--accent-fill); box-shadow: none; border-radius: 14px; font-weight: 600; letter-spacing: -0.01em; min-height: 50px; }
 .btn.ghost { background: var(--cell); border: 0; color: var(--tint); }
 .btn.small { border-radius: 999px; box-shadow: none; }
 .judge button, .vote .grid button, .verdict, .winner, .turn, .dp, .p, .row, .rchip, .game-tile { box-shadow: none; }
@@ -113,5 +115,5 @@ h2.sec small { font: 500 0.9rem/1.2 var(--display); color: var(--secondary); tex
 .warn { background: var(--cell); border: 0; }
 .qanswer { background: var(--fill); border: 0; }
 .toast { background: rgba(44, 44, 46, 0.92); border: 0; }
-footer { color: var(--tertiary); }
+footer { color: var(--secondary); } /* tertiary (2.4:1) war zu schwach für Text */
 .game-tile .live { font: 600 0.8rem/1.2 var(--display); text-transform: none; letter-spacing: 0; }
