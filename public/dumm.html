@@ -75,7 +75,9 @@
     .bar span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: uppercase; font-family: var(--display); font-size: 1.05rem; }
 
     /* Optionen */
-    .stepper-cell .sub { display: block; color: var(--secondary); font-size: 0.8rem; margin-top: 2px; }
+    /* Trinkmodus aus: Trink-Regeln ausblenden */
+    :root[data-drink="off"] .drink-only { display: none !important; }
+    .cell .sub { display: block; color: var(--secondary); font-size: 0.8rem; margin-top: 2px; }
     /* Startknopf bleibt beim Scrollen durch die Einstellungen unten sichtbar (wie eine iOS-Aktionsleiste) */
     .cta-bar { position: sticky; bottom: 0; z-index: 5; margin: 18px -16px 0; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: linear-gradient(transparent, rgba(10, 10, 16, 0.85) 30%); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
     .cta-bar .btn { margin-top: 0; }
@@ -182,13 +184,14 @@
 
     <h2 class="sec">Regeln</h2>
     <div class="list">
+      <label class="cell"><span>Trinkmodus<small class="sub">Aus: reines Quiz ohne Schlucke</small></span><input type="checkbox" class="switch" data-klirr-drink="dumm" /></label>
       <div class="cell stepper-cell" id="rowLives"><span>Leben pro Person</span><div class="ctl"><button data-step="lives:-1" aria-label="Weniger Leben">−</button><output id="v-lives"></output><button data-step="lives:1" aria-label="Mehr Leben">+</button></div></div>
       <div class="cell stepper-cell" id="rowVoteLives"><span>Leben pro Person<small class="sub">Zum Dümmsten gewählt = 1 Leben weg</small></span><div class="ctl"><button data-step="voteLives:-1" aria-label="Weniger Leben">−</button><output id="v-voteLives"></output><button data-step="voteLives:1" aria-label="Mehr Leben">+</button></div></div>
-      <div class="cell stepper-cell" id="rowLifeLoss"><span>Leben verloren: trinken</span><div class="ctl"><button data-step="lifeLoss:-1" aria-label="Weniger trinken">−</button><output id="v-lifeLoss"></output><button data-step="lifeLoss:1" aria-label="Mehr trinken">+</button></div></div>
+      <div class="cell stepper-cell drink-only" id="rowLifeLoss"><span>Leben verloren: trinken</span><div class="ctl"><button data-step="lifeLoss:-1" aria-label="Weniger trinken">−</button><output id="v-lifeLoss"></output><button data-step="lifeLoss:1" aria-label="Mehr trinken">+</button></div></div>
       <div class="cell stepper-cell" id="rowPer"><span>Fragen pro Person</span><div class="ctl"><button data-step="perRound:-1" aria-label="Weniger Fragen">−</button><output id="v-perRound"></output><button data-step="perRound:1" aria-label="Mehr Fragen">+</button></div></div>
-      <div class="cell stepper-cell"><span>Falsche Antwort</span><div class="ctl"><button data-step="wrong:-1" aria-label="Weniger trinken">−</button><output id="v-wrong"></output><button data-step="wrong:1" aria-label="Mehr trinken">+</button></div></div>
-      <div class="cell stepper-cell"><span>Richtige Antwort: verteilen</span><div class="ctl"><button data-step="right:-1" aria-label="Weniger verteilen">−</button><output id="v-right"></output><button data-step="right:1" aria-label="Mehr verteilen">+</button></div></div>
-      <label class="cell"><span>Wer fliegt, muss exen</span><input type="checkbox" class="switch" id="exOnOut" /></label>
+      <div class="cell stepper-cell drink-only"><span>Falsche Antwort</span><div class="ctl"><button data-step="wrong:-1" aria-label="Weniger trinken">−</button><output id="v-wrong"></output><button data-step="wrong:1" aria-label="Mehr trinken">+</button></div></div>
+      <div class="cell stepper-cell drink-only"><span>Richtige Antwort: verteilen</span><div class="ctl"><button data-step="right:-1" aria-label="Weniger verteilen">−</button><output id="v-right"></output><button data-step="right:1" aria-label="Mehr verteilen">+</button></div></div>
+      <label class="cell drink-only"><span>Wer fliegt, muss exen</span><input type="checkbox" class="switch" id="exOnOut" /></label>
       <div class="cell wrap"><span>Countdown pro Frage</span><div class="seg" id="timerSeg" role="group" aria-label="Countdown"></div></div>
     </div>
 
@@ -497,7 +500,7 @@
     if (names.length < 2) { $('setupError').textContent = role === 'host' ? 'Es braucht mindestens zwei Personen im Raum.' : 'Mindestens zwei Mitspieler eintragen.'; return; }
     if (settings.mode === 'vote' && names.length < 3) { $('setupError').textContent = 'Für die Abstimmung braucht es mindestens drei Personen.'; return; }
     state = {
-      phase: 'play', mode: settings.mode, cfg: { ...settings }, code: role === 'host' ? host.code : undefined,
+      phase: 'play', mode: settings.mode, cfg: drinkCfg(), code: role === 'host' ? host.code : undefined,
       players: shuffle(names).map((name) => ({ name, lives: settings.mode === 'vote' ? settings.voteLives : settings.lives, sips: 0, ex: 0, out: false, rc: 0, rq: 0 })),
       turn: 0, round: 1, step: 0, asked: store.get('dumm-asked', []), outOrder: [], votes: {}, voter: 0, final: null, fx: [],
     };
@@ -514,7 +517,13 @@
     renderAny();
   }
   // Jeder Trink-Effekt löst den Klirr-Moment aus (auf dem Gerät, das wertet).
-  function addFx(name, text, kind = 'drink') { state.fx = [...(state.fx || []).slice(-20), { id: `${Date.now()}-${Math.random()}`, name, text, kind }]; window.Klirr?.moment(); }
+  // Trinkmodus aus: reines Quiz – keine Schlucke, kein Ex, kein Klirr-Moment.
+  const drinkOn = () => state?.cfg?.drink !== false;
+  function drinkCfg() {
+    const on = window.Klirr ? Klirr.drink('dumm') : true;
+    return on ? { ...settings, drink: true } : { ...settings, drink: false, wrong: 0, right: 0, lifeLoss: 0, exOnOut: false };
+  }
+  function addFx(name, text, kind = 'drink') { state.fx = [...(state.fx || []).slice(-20), { id: `${Date.now()}-${Math.random()}`, name, text, kind }]; if (drinkOn()) window.Klirr?.moment(); }
 
   function judge(correct) {
     if (state.verdict) return;
@@ -693,10 +702,11 @@
     const now = state.phase === 'play' ? state.turn : -1;
     return state.players.map((p, i) => {
       let meta;
-      if (p.out) meta = `${p.sips} Schl.${p.ex ? ` · ${p.ex} Ex` : ''}`;
-      else if (state.mode === 'classic') meta = `${'♥'.repeat(Math.max(0, p.lives))}${'♡'.repeat(Math.max(0, state.cfg.lives - p.lives))}\n${p.sips} Schl.${p.ex ? ` · ${p.ex} Ex` : ''}`;
-      else if (state.final) meta = `Finale: ${state.final.scores[p.name]} ✓ · ${p.sips} Schl.`;
-      else meta = `${'♥'.repeat(Math.max(0, p.lives))}${'♡'.repeat(Math.max(0, (state.cfg.voteLives || 1) - p.lives))}\n${p.rc}/${p.rq} ✓ · ${p.sips} Schl.${p.ex ? ` · ${p.ex} Ex` : ''}`;
+      const sl = drinkOn() ? `${p.sips} Schl.${p.ex ? ` · ${p.ex} Ex` : ''}` : '';
+      if (p.out) meta = drinkOn() ? sl : 'raus';
+      else if (state.mode === 'classic') meta = `${'♥'.repeat(Math.max(0, p.lives))}${'♡'.repeat(Math.max(0, state.cfg.lives - p.lives))}\n${sl || `${p.rc}/${p.rq} ✓`}`;
+      else if (state.final) meta = `Finale: ${state.final.scores[p.name]} ✓${drinkOn() ? ` · ${p.sips} Schl.` : ''}`;
+      else meta = `${'♥'.repeat(Math.max(0, p.lives))}${'♡'.repeat(Math.max(0, (state.cfg.voteLives || 1) - p.lives))}\n${p.rc}/${p.rq} ✓${sl ? ` · ${sl}` : ''}`;
       return el('div', { className: 'dp' + (p.out ? ' out' : '') + (i === now && !p.out ? ' now' : '') + (p.name === me() ? ' me' : ''), style: `--c: ${colorOf(p.name)}` },
         el('span', { className: 'ini', textContent: initial(p.name) }),
         el('div', {}, el('b', { textContent: p.name }), el('div', { className: 'meta', textContent: meta })));
@@ -758,7 +768,7 @@
       }
     } else if (v.kind === 'wrong') {
       const w = state.cfg.wrong;
-      const drink = w === 11 ? (mine ? 'musst exen 🍺' : 'muss exen 🍺') : w ? (mine ? `trinkst ${w}` : `trinkt ${w}`) : (mine ? 'kommst davon' : 'kommt davon');
+      const drink = !drinkOn() ? (mine ? 'liegst daneben' : 'liegt daneben') : w === 11 ? (mine ? 'musst exen 🍺' : 'muss exen 🍺') : w ? (mine ? `trinkst ${w}` : `trinkt ${w}`) : (mine ? 'kommst davon' : 'kommt davon');
       card.append(el('b', { textContent: 'Falsch!' }), el('p', { textContent: `${mine ? 'Du' : v.name} ${drink}${state.mode === 'classic' ? ` · noch ${plural(who.lives, 'Leben', 'Leben')}` : ''}` }));
     } else {
       card.append(el('b', { textContent: mine ? 'Du fliegst!' : `${v.name} fliegt!` }), el('p', { textContent: state.cfg.exOnOut ? 'Keine Leben mehr – Ex! 🍺' : 'Keine Leben mehr.' }));
@@ -838,7 +848,7 @@
     $('ranking').replaceChildren(...state.rank.map((name, i) => {
       const p = state.players.find((x) => x.name === name);
       return el('div', { className: 'rank' }, el('span', { className: 'pos', textContent: `${i + 1}.` }), el('span', { className: 'nm', textContent: name }),
-        el('span', { className: 'st2', textContent: `${p.sips} Schl.${p.ex ? ` · ${p.ex} Ex` : ''}` }));
+        el('span', { className: 'st2', textContent: drinkOn() ? `${p.sips} Schl.${p.ex ? ` · ${p.ex} Ex` : ''}` : `${p.rc} richtig` }));
     }));
     $('again').hidden = !canControl();
     $('toSetup').textContent = canControl() ? 'Einstellungen' : 'Selbst ein Spiel starten';
@@ -880,7 +890,7 @@
     const fresh = nextState.fx.filter((f) => !seen.has(f.id) && f.name === mine);
     if (!fresh.length) return;
     flash(fresh.map((f) => f.text).join(' · '), fresh.some((f) => f.kind !== 'drink') ? '#c8101e' : colorOf(mine));
-    window.Klirr?.moment();
+    if (drinkOn()) window.Klirr?.moment();
     try { navigator.vibrate?.([200, 80, 200]); } catch {}
   }
   let flashTimer;

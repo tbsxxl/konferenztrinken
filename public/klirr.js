@@ -65,7 +65,8 @@
   // Trinkmodus je Spiel (Tic Tac Toe, Wizard, Flip 7). Standard: aus.
   // Schalter im Menü: <input type="checkbox" data-klirr-drink="wizard">; <html data-drink="on|off"> für CSS.
   const key = (game) => `klirr-drink:${game}`;
-  function drink(game) { try { return localStorage.getItem(key(game)) === '1'; } catch { return false; } }
+  const DEFAULT_ON = { dumm: true }; // Der Dümmste fliegt ist von Haus aus ein Trinkspiel
+  function drink(game) { try { const v = localStorage.getItem(key(game)); return v === null ? !!DEFAULT_ON[game] : v === '1'; } catch { return !!DEFAULT_ON[game]; } }
   function setDrink(game, on) { try { localStorage.setItem(key(game), on ? '1' : '0'); } catch {} document.documentElement.dataset.drink = on ? 'on' : 'off'; }
   function bindDrink() {
     document.querySelectorAll('input[data-klirr-drink]').forEach((input) => {

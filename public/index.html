@@ -296,8 +296,8 @@
     
   }
   render();
-  // Trinkmodus über das Logo: gilt für Tic Tac Toe, Wizard und Flip 7 (in deren Menüs einzeln änderbar).
-  const DRINK_GAMES = ['tictactoe', 'wizard', 'flip7'];
+  // Trinkmodus über das Logo: gilt für Tic Tac Toe, Wizard, Flip 7 und Der Dümmste fliegt (in deren Menüs einzeln änderbar).
+  const DRINK_GAMES = ['tictactoe', 'wizard', 'flip7', 'dumm'];
   const drinkAll = () => { try { return localStorage.getItem('klirr-drink:all') === '1'; } catch { return false; } };
   function showDrink(on) {
     const m = $('drinkMark');
