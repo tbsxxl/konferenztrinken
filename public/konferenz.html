@@ -12,7 +12,7 @@
   <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <title>Konferenztrinken</title>
-  <meta name="description" content="Das Trinkspiel zur Bundesliga-Konferenz am Samstag um 15:30 Uhr: Live-Spieltag, Auslosung und automatischer Schluck-Zähler." />
+  <meta name="description" content="Das Trinkspiel zur Konferenz – Bundesliga am Samstag um 15:30 Uhr oder Champions League um 21 Uhr: Live-Spieltag, Auslosung und automatischer Schluck-Zähler." />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍺</text></svg>" />
   <link rel="preload" href="/fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="/fonts/barlow-condensed-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin />
@@ -58,8 +58,9 @@
   <section id="spieltag" hidden>
     <header class="lt"><div><div class="eyebrow" id="matchday2"></div><h1>Spieltag</h1></div></header>
     <div class="list">
+      <div class="cell wrap"><div class="seg" id="leagueSeg" role="group" aria-label="Wettbewerb"></div></div>
       <div class="cell"><label for="gameDate">Datum</label><input type="date" id="gameDate" /></div>
-      <label class="cell"><span>Nur 15:30-Konferenz</span><input type="checkbox" class="switch" id="only1530" checked /></label>
+      <label class="cell"><span id="confLabel">Nur Konferenz-Spiele</span><input type="checkbox" class="switch" id="only1530" checked /></label>
       <button class="cell action" id="loadGames">Neu laden</button>
     </div>
     <div class="error" id="gamesError" role="alert"></div>
@@ -122,7 +123,7 @@
   <section id="regeln" hidden>
     <header class="lt"><div><div class="eyebrow">So geht’s</div><h1>Regeln</h1></div></header>
     <div class="list"><div class="cell" style="font-size:15px;color:var(--secondary);display:block;padding:14px 18px">
-      Vor Anpfiff werden die Teams der 15:30-Spiele verlost, und jede Person bekommt einen Spieler gepickt. Alles mit <span class="auto-dot" style="margin:0 2px"></span> rechnet der Live-Tab selbst. <b style="color:var(--label)">Tippe auf eine Regel, um den Wert zu ändern.</b>
+      Vor Anpfiff werden die Teams der Konferenz-Spiele verlost (Bundesliga oder Champions League), und jede Person bekommt einen Spieler gepickt. Alles mit <span class="auto-dot" style="margin:0 2px"></span> rechnet der Live-Tab selbst. <b style="color:var(--label)">Tippe auf eine Regel, um den Wert zu ändern.</b>
     </div></div>
 
     <h2 class="sec">Tore &amp; Karten</h2>
@@ -340,6 +341,9 @@
 
   // ---------- Live-Daten ----------
   // Über den eigenen Worker (/api/…), lokal als Datei geöffnet direkt bei der Quelle.
+  // Wettbewerb: Bundesliga oder Champions League (ESPN-Kürzel)
+  const LEAGUES = { 'ger.1': 'Bundesliga', 'uefa.champions': 'Champions League' };
+  let league = LEAGUES[store.get('kt-league', 'ger.1')] ? store.get('kt-league', 'ger.1') : 'ger.1';
   const DIRECT = {
     scoreboard: 'https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/scoreboard',
     summary: 'https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/summary',
@@ -349,10 +353,12 @@
   // Vereinslogos über den eigenen Server laden, damit das Gerät nicht direkt bei ESPN anfragt.
   const logoSrc = (url) => (url && location.protocol.startsWith('http') ? `/api/logo?u=${encodeURIComponent(url)}` : url);
   async function api(endpoint, params = {}) {
+    if (endpoint === 'scoreboard' || endpoint === 'summary') params = { ...params, league };
     const qs = new URLSearchParams(params).toString();
     const suffix = qs ? `?${qs}` : '';
     // Online nur über den eigenen Server (keine direkte Verbindung zu ESPN/OpenLigaDB); lokal als Datei direkt.
-    const urls = location.protocol.startsWith('http') ? [`/api/${endpoint}${suffix}`] : [DIRECT[endpoint] + suffix];
+    const direct = DIRECT[endpoint].replace('/ger.1/', `/${params.league || 'ger.1'}/`);
+    const urls = location.protocol.startsWith('http') ? [`/api/${endpoint}${suffix}`] : [direct + suffix];
     for (const url of urls) {
       try {
         const res = await fetch(url);
@@ -375,6 +381,33 @@
   const today = berlinDate.format(new Date());
   const savedDate = store.get('kt-date', '');
   $('gameDate').value = savedDate && savedDate >= today ? savedDate : nextSaturday();
+  const ymd = (d) => berlinDate.format(d).replaceAll('-', '');
+  // Nächster Tag mit Spielen im gewählten Wettbewerb (für die Champions League: Di/Mi, nicht jede Woche).
+  async function nextMatchDate() {
+    const start = new Date();
+    const end = new Date(Date.now() + 35 * 86400e3);
+    const data = await api('scoreboard', { dates: `${ymd(start)}-${ymd(end)}` }).catch(() => null);
+    const days = (data?.events || []).map((e) => berlinDate.format(new Date(e.date))).filter((d) => d >= today).sort();
+    return days[0] || null;
+  }
+  function renderLeagueSeg() {
+    $('leagueSeg').replaceChildren(...Object.entries(LEAGUES).map(([key, name]) => {
+      const b = el('button', { textContent: name, onclick: async () => {
+        if (league === key) return;
+        league = key;
+        store.set('kt-league', key);
+        renderLeagueSeg();
+        const d = key === 'ger.1' ? nextSaturday() : await nextMatchDate();
+        if (d) { $('gameDate').value = d; store.set('kt-date', d); }
+        store.set('kt-teams-auto', true);
+        loadGames();
+      } });
+      b.setAttribute('aria-pressed', String(league === key));
+      return b;
+    }));
+  }
+  renderLeagueSeg();
+  if (league !== 'ger.1' && !(savedDate && savedDate >= today)) nextMatchDate().then((d) => { if (d) { $('gameDate').value = d; loadGames({ quiet: true }); } });
   $('only1530').checked = store.get('kt-only1530', true);
 
   let games = [];          // [{id, home, away, homeScore, awayScore, state, halftime, detail, kickoff, events}]
@@ -576,12 +609,17 @@
 
   async function loadGames({ quiet = false } = {}) {
     if (!quiet) { $('gamesError').textContent = ''; setStatus('Lade …'); }
-    api('spieltag').then((g) => {
-      if (g?.groupName) { $('matchday').textContent = g.groupName; $('matchday2').textContent = g.groupName; }
-    }).catch(() => {});
+    if (league === 'ger.1') {
+      api('spieltag').then((g) => {
+        if (g?.groupName) { $('matchday').textContent = `Bundesliga · ${g.groupName}`; $('matchday2').textContent = `Bundesliga · ${g.groupName}`; }
+      }).catch(() => {});
+    } else {
+      $('matchday').textContent = LEAGUES[league];
+      $('matchday2').textContent = LEAGUES[league];
+    }
     try {
       const date = $('gameDate').value;
-      const [espn, oldb] = await Promise.allSettled([api('scoreboard', { dates: date.replaceAll('-', '') }), api('spiele')]);
+      const [espn, oldb] = await Promise.allSettled([api('scoreboard', { dates: date.replaceAll('-', '') }), league === 'ger.1' ? api('spiele') : Promise.resolve([])]);
       const oldbGames = oldb.status === 'fulfilled' && Array.isArray(oldb.value) ? parseOpenLigaDB(oldb.value) : [];
       let all;
       if (espn.status === 'fulfilled') {
@@ -591,7 +629,11 @@
       } else {
         throw new Error('Keine Spieldaten');
       }
-      games = $('only1530').checked ? all.filter((g) => berlinTime.format(g.kickoff) === '15:30') : all;
+      // Konferenz = häufigste Anstoßzeit des Tages (Bundesliga meist 15:30, Champions League 21:00).
+      const times = all.map((g) => berlinTime.format(g.kickoff));
+      const confTime = times.sort((a, b) => times.filter((t) => t === b).length - times.filter((t) => t === a).length)[0];
+      $('confLabel').textContent = confTime ? `Nur Konferenz (${confTime} Uhr)` : 'Nur Konferenz-Spiele';
+      games = $('only1530').checked && confTime ? all.filter((g) => berlinTime.format(g.kickoff) === confTime) : all;
       await Promise.all(games.map(async (g) => {
         if (g.source === 'oldb') return;
         try { lineups[g.id] = parseSummary(await api('summary', { event: g.id })); } catch {}
@@ -607,7 +649,7 @@
       const live = games.some((g) => g.state === 'in');
       const now = berlinTime.format(new Date());
       setStatus(!games.length ? 'Keine Spiele' : live ? `Live · ${now}` : games.every((g) => g.state === 'post') ? 'Abgepfiffen' : `Anpfiff ${berlinTime.format(games[0].kickoff)}`, live);
-      $('gamesInfo').textContent = !all.length ? 'keine Spiele an dem Tag' : !games.length ? 'keine um 15:30' : `Stand ${now}`;
+      $('gamesInfo').textContent = !all.length ? `keine ${LEAGUES[league]}-Spiele an dem Tag` : `Stand ${now}`;
       updatePlayerOptions();
       applySubstitutions();
       if (store.get('kt-autopick-pending', false)) autoPick({ quiet: true });
@@ -1396,7 +1438,7 @@
   async function syncPush(force = false) {
     const sub = await currentSubscription();
     if (!sub) return;
-    const watched = games.filter((g) => g.source !== 'oldb').map((g) => ({ id: g.id, date: berlinDate.format(g.kickoff) }));
+    const watched = games.filter((g) => g.source !== 'oldb').map((g) => ({ id: g.id, date: berlinDate.format(g.kickoff), league }));
     const body = JSON.stringify({ subscription: sub.toJSON(), games: watched });
     if (!force && store.get('kt-push-sync', '') === body) return;
     const res = await fetch('/api/push/subscribe', { method: 'POST', headers: { 'content-type': 'application/json' }, body }).catch(() => null);

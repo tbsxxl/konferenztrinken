@@ -4,9 +4,12 @@ import { getVapid, isPushEndpoint } from './push.js';
 import { pollAndPush } from './live.js';
 export { Room } from './room.js';
 
+// Erlaubte Wettbewerbe (ESPN-Kürzel): Bundesliga und Champions League.
+const LEAGUES = ['ger.1', 'uefa.champions'];
+const espnUrl = (league, endpoint) => `https://site.api.espn.com/apis/site/v2/sports/soccer/${league}/${endpoint}`;
 const UPSTREAM = {
-  scoreboard: 'https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/scoreboard',
-  summary: 'https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/summary',
+  scoreboard: 'espn',
+  summary: 'espn',
   spieltag: 'https://api.openligadb.de/getcurrentgroup/bl1',
   spiele: 'https://api.openligadb.de/getmatchdata/bl1',
 };
@@ -64,7 +67,7 @@ async function handlePush(request, env, action) {
     const games = (Array.isArray(body.games) ? body.games : [])
       .filter((g) => /^\d+$/.test(g?.id) && /^\d{4}-\d{2}-\d{2}$/.test(g?.date))
       .slice(0, 20)
-      .map((g) => ({ id: g.id, date: g.date }));
+      .map((g) => ({ id: g.id, date: g.date, league: LEAGUES.includes(g.league) ? g.league : 'ger.1' }));
     subs.push({ subscription: { endpoint, keys: { p256dh: subscription.keys.p256dh, auth: subscription.keys.auth } }, games });
     if (subs.length > MAX_SUBS) subs = subs.slice(-MAX_SUBS);
   }
@@ -83,8 +86,12 @@ export default {
     const match = url.pathname.match(/^\/api\/(\w+)$/);
     if (!match) return env.ASSETS.fetch(request);
 
-    const base = UPSTREAM[match[1]];
+    let base = UPSTREAM[match[1]];
     if (!base) return new Response('Not found', { status: 404 });
+    if (base === 'espn') {
+      const league = LEAGUES.includes(url.searchParams.get('league')) ? url.searchParams.get('league') : 'ger.1';
+      base = espnUrl(league, match[1]);
+    }
 
     const target = new URL(base);
     for (const key of ALLOWED_PARAMS) {

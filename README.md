@@ -14,6 +14,8 @@ Einstellbar: Leben, Fragen pro Runde, Schlucke/Ex bei falscher Antwort, Verteile
 
 # Konferenztrinken 🍺⚽
 
+Wettbewerb wählbar: **Bundesliga** (Samstag 15:30) oder **Champions League** (Di/Mi 21:00). Der Konferenz-Filter nimmt automatisch die häufigste Anstoßzeit des Tages; in der Champions League springt das Datum auf den nächsten Spieltag. Spiele, Aufstellungen und Torschützen kommen von ESPN (`ger.1` bzw. `uefa.champions`), OpenLigaDB ergänzt nur die Bundesliga.
+
 Das Trinkspiel zur Bundesliga-Konferenz am Samstag um 15:30 Uhr – als kleine Website mit:
 
 - **Regeln** (Werte wie „3 Schlucke verteilen“ lassen sich anpassen)

@@ -457,3 +457,10 @@ h2.sec small { margin-left: auto; }
 
 /* Gut sichtbarer Tastaturfokus */
 :focus-visible { outline: 3px solid #ffd60a; outline-offset: 2px; }
+
+/* Segment-Schalter (auch in Konferenztrinken) */
+.cell.wrap { flex-wrap: wrap; row-gap: 10px; }
+.cell.wrap .seg { flex: 1 1 100%; }
+.seg { display: flex; gap: 4px; background: var(--fill); border-radius: 14px; padding: 3px; }
+.seg button { flex: 1; min-width: 44px; min-height: 44px; border: 0; border-radius: 11px; background: transparent; color: var(--label); font: inherit; font-weight: 600; font-size: 0.9rem; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }

@@ -2,7 +2,7 @@
 // und schickt neue Ereignisse (Tor, Torschütze, Rot, Halbzeit, Abpfiff) raus.
 import { getVapid, sendPush } from './push.js';
 
-const SCOREBOARD = 'https://site.api.espn.com/apis/site/v2/sports/soccer/ger.1/scoreboard';
+const scoreboardUrl = (league) => `https://site.api.espn.com/apis/site/v2/sports/soccer/${league}/scoreboard`;
 const berlinDate = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Berlin' });
 const norm = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 const lastName = (name) => norm(name).replace(/[^a-z0-9 -]/g, '').split(' ').filter(Boolean).at(-1) || '';
@@ -60,13 +60,16 @@ export async function pollAndPush(env, now = new Date()) {
 
   const watched = new Map();
   for (const s of subs) for (const g of s.games) if (g.date >= yesterday) watched.set(g.id, g.date);
+  // Abrufe je Wettbewerb und Tag (Bundesliga, Champions League)
+  const fetches = new Set();
+  for (const s of subs) for (const g of s.games) if (g.date >= yesterday) fetches.add(`${g.league || 'ger.1'}|${g.date}`);
   const seen = (await kv.get('seen', 'json')) || {};
   let seenChanged = false;
 
-  const dates = [...new Set(watched.values())];
   const events = [];
-  for (const date of dates) {
-    const res = await fetch(`${SCOREBOARD}?dates=${date.replaceAll('-', '')}`, { headers: { accept: 'application/json' } });
+  for (const key of fetches) {
+    const [league, date] = key.split('|');
+    const res = await fetch(`${scoreboardUrl(league)}?dates=${date.replaceAll('-', '')}`, { headers: { accept: 'application/json' } });
     if (!res.ok) continue;
     const data = await res.json();
     for (const ev of data.events || []) if (watched.has(ev.id)) events.push(ev);
