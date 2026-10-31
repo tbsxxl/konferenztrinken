@@ -75,6 +75,7 @@
     .bar span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: uppercase; font-family: var(--display); font-size: 1.05rem; }
 
     /* Optionen */
+    .stepper-cell .sub { display: block; color: var(--secondary); font-size: 0.8rem; margin-top: 2px; }
     .stepper-cell output { width: 4.6rem; flex: none; text-align: center; white-space: nowrap; font: 800 1.15rem/1 var(--display); text-transform: uppercase; }
     .stepper-cell .ctl { display: flex; flex: none; align-items: center; gap: 6px; }
     .stepper-cell button { flex: none; width: 44px; height: 44px; border: 0; border-radius: 12px; background: var(--fill); color: var(--label); font-size: 1.3rem; font-weight: 600; }
@@ -176,8 +177,8 @@
     <h2 class="sec">Regeln</h2>
     <div class="list">
       <div class="cell stepper-cell" id="rowLives"><span>Leben pro Person</span><div class="ctl"><button data-step="lives:-1" aria-label="Weniger Leben">−</button><output id="v-lives"></output><button data-step="lives:1" aria-label="Mehr Leben">+</button></div></div>
-      <div class="cell stepper-cell" id="rowVoteLives"><span>Wie oft darf man der Dümmste sein?</span><div class="ctl"><button data-step="voteLives:-1" aria-label="Weniger Leben">−</button><output id="v-voteLives"></output><button data-step="voteLives:1" aria-label="Mehr Leben">+</button></div></div>
-      <div class="cell stepper-cell" id="rowLifeLoss"><span>Dümmster, aber noch Leben übrig</span><div class="ctl"><button data-step="lifeLoss:-1" aria-label="Weniger trinken">−</button><output id="v-lifeLoss"></output><button data-step="lifeLoss:1" aria-label="Mehr trinken">+</button></div></div>
+      <div class="cell stepper-cell" id="rowVoteLives"><span>Leben pro Person<small class="sub">Zum Dümmsten gewählt = 1 Leben weg</small></span><div class="ctl"><button data-step="voteLives:-1" aria-label="Weniger Leben">−</button><output id="v-voteLives"></output><button data-step="voteLives:1" aria-label="Mehr Leben">+</button></div></div>
+      <div class="cell stepper-cell" id="rowLifeLoss"><span>Leben verloren: trinken</span><div class="ctl"><button data-step="lifeLoss:-1" aria-label="Weniger trinken">−</button><output id="v-lifeLoss"></output><button data-step="lifeLoss:1" aria-label="Mehr trinken">+</button></div></div>
       <div class="cell stepper-cell" id="rowPer"><span>Fragen pro Person</span><div class="ctl"><button data-step="perRound:-1" aria-label="Weniger Fragen">−</button><output id="v-perRound"></output><button data-step="perRound:1" aria-label="Mehr Fragen">+</button></div></div>
       <div class="cell stepper-cell"><span>Falsche Antwort</span><div class="ctl"><button data-step="wrong:-1" aria-label="Weniger trinken">−</button><output id="v-wrong"></output><button data-step="wrong:1" aria-label="Mehr trinken">+</button></div></div>
       <div class="cell stepper-cell"><span>Richtige Antwort: verteilen</span><div class="ctl"><button data-step="right:-1" aria-label="Weniger verteilen">−</button><output id="v-right"></output><button data-step="right:1" aria-label="Mehr verteilen">+</button></div></div>
@@ -274,8 +275,10 @@
 
   // ---------- Einstellungen ----------
   const CATS = [...new Set(FRAGEN.map((q) => q.k))];
-  const DEFAULTS = { mode: 'vote', play: 'local', lives: 3, voteLives: 1, lifeLoss: 2, perRound: 2, wrong: 1, right: 0, exOnOut: true, timer: 0, cats: CATS };
+  const DEFAULTS = { mode: 'vote', play: 'local', lives: 3, voteLives: 3, lifeLoss: 2, perRound: 2, wrong: 1, right: 0, exOnOut: true, timer: 0, cats: CATS };
   const settings = { ...DEFAULTS, ...store.get('dumm-settings', {}) };
+  // Ab Version 2 hat auch der Abstimmungsmodus standardmäßig Leben (vorher: einmal Dümmster = raus)
+  if (!settings.sv) { if (settings.voteLives === 1) settings.voteLives = DEFAULTS.voteLives; settings.sv = 2; store.set('dumm-settings', settings); }
   settings.cats = (settings.cats || []).filter((c) => CATS.includes(c));
   if (!settings.cats.length) settings.cats = CATS;
   const LIMITS = { lives: [1, 9], voteLives: [1, 9], lifeLoss: [0, 11], perRound: [1, 4], wrong: [0, 11], right: [0, 5] };
@@ -289,9 +292,9 @@
     }));
   }
   function renderSettings() {
-    segButtons($('modeSeg'), [['vote', 'Abstimmung', 'wie im TV'], ['classic', 'Klassisch', 'mit Leben']], settings.mode, (v) => { settings.mode = v; saveSettings(); });
+    segButtons($('modeSeg'), [['vote', 'Abstimmung', 'Runde wählt'], ['classic', 'Klassisch', 'falsch = Leben weg']], settings.mode, (v) => { settings.mode = v; saveSettings(); });
     $('modeInfo').textContent = settings.mode === 'vote'
-      ? `Jede Runde beantwortet jede Person ${plural(settings.perRound, 'Frage', 'Fragen')}. Danach stimmen alle geheim ab, wer der Dümmste war. ${settings.voteLives > 1 ? `Wer ${settings.voteLives}-mal der Dümmste war, fliegt.` : 'Der fliegt.'} Bei Gleichstand fliegt, wer weniger richtig hatte. Die letzten zwei spielen ein Finale.`
+      ? `Jede Runde beantwortet jede Person ${plural(settings.perRound, 'Frage', 'Fragen')}. Danach stimmen alle geheim ab, wer der Dümmste war. ${settings.voteLives > 1 ? `Wer gewählt wird, verliert ein Leben. Ohne Leben fliegt man (${plural(settings.voteLives, 'Leben', 'Leben')} pro Person).` : 'Wer gewählt wird, fliegt sofort.'} Bei Gleichstand fliegt, wer weniger richtig hatte. Die letzten zwei spielen ein Finale.`
       : 'Reihum eine Frage. Falsche Antwort kostet ein Leben. Wer keine Leben mehr hat, fliegt. Wer übrig bleibt, gewinnt.';
     segButtons($('playSeg'), [['local', 'Ein Handy', 'wird herumgereicht'], ['online', 'Mehrere Handys', 'jeder spielt mit']], settings.play, (v) => {
       settings.play = v;
@@ -306,7 +309,7 @@
     $('rowLives').hidden = settings.mode !== 'classic';
     $('rowVoteLives').hidden = settings.mode !== 'vote';
     $('rowLifeLoss').hidden = settings.mode !== 'vote' || settings.voteLives < 2;
-    $('v-voteLives').textContent = settings.voteLives === 1 ? '1×' : '♥'.repeat(Math.min(settings.voteLives, 5)) + (settings.voteLives > 5 ? ` ${settings.voteLives}` : '');
+    $('v-voteLives').textContent = '♥'.repeat(Math.min(settings.voteLives, 5)) + (settings.voteLives > 5 ? ` ${settings.voteLives}` : '');
     $('v-lifeLoss').textContent = wrongLabel(settings.lifeLoss);
     $('rowPer').hidden = settings.mode !== 'vote';
     $('v-lives').textContent = '♥'.repeat(Math.min(settings.lives, 5)) + (settings.lives > 5 ? ` ${settings.lives}` : '');
@@ -684,7 +687,7 @@
       if (p.out) meta = `${p.sips} Schl.${p.ex ? ` · ${p.ex} Ex` : ''}`;
       else if (state.mode === 'classic') meta = `${'♥'.repeat(Math.max(0, p.lives))}${'♡'.repeat(Math.max(0, state.cfg.lives - p.lives))}\n${p.sips} Schl.${p.ex ? ` · ${p.ex} Ex` : ''}`;
       else if (state.final) meta = `Finale: ${state.final.scores[p.name]} ✓ · ${p.sips} Schl.`;
-      else meta = `${(state.cfg.voteLives || 1) > 1 ? `${'♥'.repeat(Math.max(0, p.lives))}${'♡'.repeat(Math.max(0, state.cfg.voteLives - p.lives))}\n` : ''}${p.rc}/${p.rq} ✓ · ${p.sips} Schl.${p.ex ? ` · ${p.ex} Ex` : ''}`;
+      else meta = `${'♥'.repeat(Math.max(0, p.lives))}${'♡'.repeat(Math.max(0, (state.cfg.voteLives || 1) - p.lives))}\n${p.rc}/${p.rq} ✓ · ${p.sips} Schl.${p.ex ? ` · ${p.ex} Ex` : ''}`;
       return el('div', { className: 'dp' + (p.out ? ' out' : '') + (i === now && !p.out ? ' now' : '') + (p.name === me() ? ' me' : ''), style: `--c: ${colorOf(p.name)}` },
         el('span', { className: 'ini', textContent: initial(p.name) }),
         el('div', {}, el('b', { textContent: p.name }), el('div', { className: 'meta', textContent: meta })));
@@ -709,7 +712,7 @@
     parts.push(el('div', { className: 'turn', style: `--c: ${colorOf(p.name)}; margin-top: 14px` },
       el('span', { className: 'ini', textContent: initial(p.name) }),
       el('div', {}, el('b', { textContent: isMe ? 'Du bist dran!' : `${p.name} ist dran` }),
-        el('span', { textContent: state.mode === 'classic' ? `noch ${plural(p.lives, 'Leben', 'Leben')}` : state.final ? `Finale: ${state.final.scores[p.name]} richtig` : `${p.rc} von ${p.rq} richtig in dieser Runde` }))));
+        el('span', { textContent: state.mode === 'classic' ? `noch ${plural(p.lives, 'Leben', 'Leben')}` : state.final ? `Finale: ${state.final.scores[p.name]} richtig` : `${p.rc} von ${p.rq} richtig · noch ${plural(p.lives, 'Leben', 'Leben')}` }))));
     const card = el('div', { className: 'qcard surface' },
       el('div', { className: 'qhead' }, el('span', { className: 'qcat', textContent: q.k }), el('span', { className: 'qtimer', id: 'qtimer' })),
       el('div', { className: 'qtext', textContent: q.f }));
@@ -790,7 +793,7 @@
   }
   function voteGrid(voter, onPick) {
     return el('div', { className: 'grid' }, ...alive().filter((p) => p.name !== voter).map((p) =>
-      el('button', { style: `--c: ${colorOf(p.name)}`, onclick: () => onPick(p.name) }, p.name, el('small', { textContent: `${p.rc}/${p.rq} richtig` }))));
+      el('button', { style: `--c: ${colorOf(p.name)}`, onclick: () => onPick(p.name) }, p.name, el('small', { textContent: `${p.rc}/${p.rq} richtig · ${'♥'.repeat(Math.max(0, p.lives))}` }))));
   }
   function stageResult() {
     const r = state.voteRes;
