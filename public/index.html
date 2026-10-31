@@ -296,8 +296,7 @@
     
   }
   render();
-  // Trinkmodus über das Logo: gilt für Tic Tac Toe, Wizard, Flip 7 und Der Dümmste fliegt (in deren Menüs einzeln änderbar).
-  const DRINK_GAMES = ['tictactoe', 'wizard', 'flip7', 'dumm'];
+  // Trinkmodus über das Logo: gilt für alle Spiele außer Konferenztrinken (die Menü-Schalter der Spiele steuern denselben Wert).
   const drinkAll = () => { try { return localStorage.getItem('klirr-drink:all') === '1'; } catch { return false; } };
   function showDrink(on) {
     const m = $('drinkMark');
@@ -309,7 +308,7 @@
   showDrink(drinkAll());
   $('drinkMark').addEventListener('click', () => {
     const on = !drinkAll();
-    try { localStorage.setItem('klirr-drink:all', on ? '1' : '0'); DRINK_GAMES.forEach((g) => localStorage.setItem(`klirr-drink:${g}`, on ? '1' : '0')); } catch {}
+    try { localStorage.setItem('klirr-drink:all', on ? '1' : '0'); } catch {}
     showDrink(on);
     if (on) { setTimeout(() => window.Klirr?.moment(), 250); window.Klirr?.note('Trinkmodus an'); }
     else window.Klirr?.note('Trinkmodus aus');

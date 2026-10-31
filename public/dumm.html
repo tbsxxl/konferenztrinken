@@ -184,7 +184,7 @@
 
     <h2 class="sec">Regeln</h2>
     <div class="list">
-      <label class="cell"><span>Trinkmodus<small class="sub">Aus: reines Quiz ohne Schlucke</small></span><input type="checkbox" class="switch" data-klirr-drink="dumm" /></label>
+      <label class="cell"><span>Trinkmodus<small class="sub">Gilt für alle Spiele, wie das Logo im Hub. Aus: reines Quiz.</small></span><input type="checkbox" class="switch" data-klirr-drink="dumm" /></label>
       <div class="cell stepper-cell" id="rowLives"><span>Leben pro Person</span><div class="ctl"><button data-step="lives:-1" aria-label="Weniger Leben">−</button><output id="v-lives"></output><button data-step="lives:1" aria-label="Mehr Leben">+</button></div></div>
       <div class="cell stepper-cell" id="rowVoteLives"><span>Leben pro Person<small class="sub">Zum Dümmsten gewählt = 1 Leben weg</small></span><div class="ctl"><button data-step="voteLives:-1" aria-label="Weniger Leben">−</button><output id="v-voteLives"></output><button data-step="voteLives:1" aria-label="Mehr Leben">+</button></div></div>
       <div class="cell stepper-cell drink-only" id="rowLifeLoss"><span>Leben verloren: trinken</span><div class="ctl"><button data-step="lifeLoss:-1" aria-label="Weniger trinken">−</button><output id="v-lifeLoss"></output><button data-step="lifeLoss:1" aria-label="Mehr trinken">+</button></div></div>
@@ -520,7 +520,7 @@
   // Trinkmodus aus: reines Quiz – keine Schlucke, kein Ex, kein Klirr-Moment.
   const drinkOn = () => state?.cfg?.drink !== false;
   function drinkCfg() {
-    const on = window.Klirr ? Klirr.drink('dumm') : true;
+    const on = window.Klirr ? Klirr.drink() : false;
     return on ? { ...settings, drink: true } : { ...settings, drink: false, wrong: 0, right: 0, lifeLoss: 0, exOnOut: false };
   }
   function addFx(name, text, kind = 'drink') { state.fx = [...(state.fx || []).slice(-20), { id: `${Date.now()}-${Math.random()}`, name, text, kind }]; if (drinkOn()) window.Klirr?.moment(); }
