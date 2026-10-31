@@ -28,6 +28,9 @@
     .cell.wrap .seg { flex: 1 1 100%; }
     .seg { display: flex; gap: 4px; background: var(--fill); border-radius: 14px; padding: 3px; }
     .seg button { flex: 1; min-width: 44px; min-height: 44px; border: 0; border-radius: 11px; background: transparent; color: var(--label); font: inherit; font-weight: 600; font-size: 0.9rem; }
+    .seg.big button { min-height: 58px; font-weight: 700; font-size: 1rem; }
+    .seg.big button small { display: block; font-weight: 500; font-size: 0.75rem; opacity: 0.8; margin-top: 2px; }
+    .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
     .cats { display: flex; flex-wrap: wrap; gap: 8px; padding: 14px; }
     .cats button { min-height: 44px; padding: 0 14px; border: 0; border-radius: 999px; background: var(--fill); color: var(--label); font: inherit; font-weight: 600; font-size: 0.9rem; }
     .cats button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
@@ -80,6 +83,12 @@
     <header class="lt"><div><div class="eyebrow">Wer gehört nicht dazu?</div><h1>Imposter</h1></div></header>
     <div class="list"><div class="mode-info" style="padding-top:14px">Alle bekommen dasselbe geheime Wort – nur der Imposter nicht, er bekommt höchstens einen vagen Tipp. Reihum sagt jede Person einen Begriff zum Wort. Danach zeigt ihr auf den Verdächtigen. Wird der Imposter erwischt, darf er noch das Wort raten.</div></div>
 
+    <h2 class="sec">Spielart</h2>
+    <div class="list">
+      <div class="cell wrap"><div class="seg big" id="tipSeg" role="group" aria-label="Spielart"></div></div>
+      <div class="mode-info" id="tipInfo"></div>
+    </div>
+
     <h2 class="sec">Mitspieler <small id="rosterCount"></small></h2>
     <div class="list">
       <div class="add-row">
@@ -94,7 +103,6 @@
     <div class="list">
       <label class="cell"><span>Trinkmodus<small class="sub">Gilt für alle Spiele, wie das Logo im Hub.</small></span><input type="checkbox" class="switch" data-klirr-drink /></label>
       <div class="cell wrap"><span>Anzahl Imposter</span><div class="seg" id="impSeg" role="group" aria-label="Anzahl Imposter"></div></div>
-      <label class="cell"><span>Tipp für den Imposter<small class="sub">Aus: Er weiß gar nichts – schwerer.</small></span><input type="checkbox" class="switch" id="optTip" /></label>
       <label class="cell"><span>Kategorie für alle zeigen<small class="sub">Hilft auch dem Imposter.</small></span><input type="checkbox" class="switch" id="optCat" /></label>
       <div class="mode-info drink-only" style="padding-top:10px">Trinken: Imposter erwischt und Wort falsch → Imposter trinkt 3. Imposter entkommt oder errät das Wort → alle anderen trinken 2.</div>
     </div>
@@ -168,7 +176,14 @@
       b.setAttribute('aria-pressed', String(settings.imps === n));
       return b;
     }));
-    $('optTip').checked = settings.tip;
+    $('tipSeg').replaceChildren(...[[true, 'Mit Tipp', 'leichter'], [false, 'Ohne Tipp', 'schwerer']].map(([v, label, sub]) => {
+      const b = el('button', { onclick: () => { settings.tip = v; saveSettings(); } }, label, el('small', { textContent: sub }));
+      b.setAttribute('aria-pressed', String(settings.tip === v));
+      return b;
+    }));
+    $('tipInfo').textContent = settings.tip
+      ? 'Der Imposter bekommt einen vagen Tipp, der zu mehreren Wörtern passt – eine Spur, aber keine Lösung.'
+      : 'Der Imposter bekommt nur „Du bist der Imposter“. Er muss allein aus den Begriffen der anderen herausfinden, worum es geht.';
     $('optCat').checked = settings.cat;
     $('cats').replaceChildren(...CATS.map((c) => {
       const b = el('button', { textContent: c, onclick: () => {
@@ -182,7 +197,6 @@
     $('wCount').textContent = `${WOERTER.filter((w) => settings.cats.includes(w.k)).length} Wörter`;
     $('resume').hidden = !(state && ['reveal', 'talk', 'vote', 'guess'].includes(state.phase));
   }
-  $('optTip').addEventListener('change', (e) => { settings.tip = e.target.checked; saveSettings(); });
   $('optCat').addEventListener('change', (e) => { settings.cat = e.target.checked; saveSettings(); });
 
   // ---------- Spielzustand ----------
@@ -251,7 +265,7 @@
     if (isImp) {
       inner.append(el('div', { className: 'who', textContent: name }), el('span', { className: 'big', textContent: 'Du bist der Imposter' }));
       if (state.impostors.length > 1) inner.append(el('div', { className: 'small', textContent: 'Es gibt noch einen zweiten Imposter.' }));
-      inner.append(el('div', { className: 'tip', textContent: state.cfg.tip ? `Tipp: ${state.tip}` : 'Kein Tipp – hör gut zu.' }));
+      inner.append(el('div', { className: 'tip', textContent: state.cfg.tip ? `Tipp: ${state.tip}` : 'Ohne Tipp – hör gut zu.' }));
       if (state.cfg.cat) inner.append(el('div', { className: 'hint', textContent: `Kategorie: ${state.cat}` }));
     } else {
       inner.append(el('div', { className: 'who', textContent: `${name}, dein Wort` }), el('span', { className: 'big', textContent: state.word }));
