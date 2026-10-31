@@ -5,7 +5,7 @@ Hub mit Trinkspielen: **Konferenztrinken** (`/konferenz.html`) und **Der Dümmst
 ## Der Dümmste fliegt
 
 Zwei Spielarten:
-- **Abstimmung (wie im TV):** Jede Runde beantwortet jede Person nacheinander 1–4 Fragen (Standard 2). Danach stimmen alle geheim ab, wer der Dümmste war, der fliegt (Gleichstand: weniger richtige Antworten, dann mehr Schlucke, dann Los). Die letzten zwei spielen ein Finale (je 3 Fragen, bei Gleichstand Stechen).
+- **Abstimmung (wie im TV):** Jede Runde beantwortet jede Person nacheinander 1–4 Fragen (Standard 2). Danach stimmen alle geheim ab, wer der Dümmste war. Einstellbar ist, wie oft man der Dümmste sein darf (Leben, Standard 1); wer noch Leben hat, verliert eins und trinkt, beim letzten fliegt man (Gleichstand: weniger richtige Antworten, dann mehr Schlucke, dann Los). Die letzten zwei spielen ein Finale (je 3 Fragen, bei Gleichstand Stechen).
 - **Klassisch:** Reihum eine Frage, falsche Antwort kostet ein Leben, wer keine mehr hat, fliegt.
 
 Gespielt wird auf **einem Handy** (Abstimmen durch Weitergeben) oder mit **mehreren Handys**: Der Quizmaster erstellt einen Raum (Code + Link), alle treten auf ihrem Handy bei, sehen die Fragen live, stimmen geheim ab und bekommen „Du trinkst …“ angezeigt. Technisch: Das Handy des Quizmasters rechnet das Spiel und schickt den Stand an einen Cloudflare-Durable-Object-Raum (`src/room.js`), der ihn per WebSocket an alle verteilt und Beitritte/Stimmen an den Quizmaster weiterleitet. Räume werden 12 Stunden nach der letzten Aktivität gelöscht. Die Bindung `ROOMS` und die Migration stehen in `wrangler.jsonc` und werden beim Deploy angelegt.

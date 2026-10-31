@@ -1,5 +1,6 @@
 // Fragen für „Der Dümmste fliegt“ (über 600): k = Kategorie, f = Frage, a = Antwort.
-// Bewusst nur Fakten, die nicht veralten (keine amtierenden Personen, keine laufenden Wettbewerbe).
+// Bewusst nur Fakten, die nicht veralten: keine amtierenden Personen, keine laufenden Wettbewerbe und
+// keine Rekorde, die noch fallen können (stattdessen feste Zahlen, z. B. „Wie viele WM-Tore erzielte Klose?“).
 const FRAGEN = [
   // Allgemeinwissen
   { k: 'Allgemeinwissen', f: 'Wie viele Tage hat ein Schaltjahr?', a: '366' },
@@ -92,7 +93,7 @@ const FRAGEN = [
   { k: 'Sport', f: 'Wie viele Spieler hat eine Handballmannschaft auf dem Feld (mit Torwart)?', a: '7' },
   { k: 'Sport', f: 'Was ist die höchste Punktzahl mit drei Pfeilen beim Darts?', a: '180' },
   { k: 'Sport', f: 'Wie viele Spieler pro Team stehen beim Volleyball auf dem Feld?', a: '6' },
-  { k: 'Sport', f: 'Welches Stadion war früher als „Westfalenstadion“ bekannt?', a: 'Das Stadion von Borussia Dortmund (Signal Iduna Park)' },
+  { k: 'Sport', f: 'Welcher Verein spielt im Westfalenstadion?', a: 'Borussia Dortmund' },
 
   // Musik
   { k: 'Musik', f: 'Wie viele Saiten hat eine Geige?', a: '4' },
@@ -467,7 +468,7 @@ const FRAGEN = [
   { k: 'Tiere', f: "Wie viele Augen hat eine Spinne meistens?", a: "8" },
   { k: 'Tiere', f: "Wie nennt man ein weibliches Schwein?", a: "Sau" },
   { k: 'Tiere', f: "Wie nennt man die Larve eines Frosches?", a: "Kaulquappe" },
-  { k: 'Tiere', f: "Was ist das größte Raubtier im Meer unter den Fischen?", a: "Weißer Hai" },
+  { k: 'Tiere', f: "Welcher ist der größte Raubfisch der Welt?", a: "Weißer Hai" },
 
   // Technik
   { k: 'Technik', f: "Wofür steht die Abkürzung „WWW“?", a: "World Wide Web" },
@@ -526,7 +527,7 @@ const FRAGEN = [
   { k: 'Sport', f: "Welcher Verein spielt im Weserstadion?", a: "Werder Bremen" },
   { k: 'Sport', f: "Welcher Verein spielt im Volksparkstadion?", a: "Hamburger SV" },
   { k: 'Sport', f: "Welcher Verein spielt im Stadion An der Alten Försterei?", a: "1. FC Union Berlin" },
-  { k: 'Sport', f: "Wer schoss die meisten Tore in der Geschichte der Bundesliga (365)?", a: "Gerd Müller" },
+  { k: 'Sport', f: "Welcher Spieler erzielte in seiner Karriere 365 Bundesliga-Tore?", a: "Gerd Müller" },
   { k: 'Sport', f: "Wie wird die niederländische Nationalmannschaft genannt?", a: "Oranje" },
   { k: 'Sport', f: "Wie wird die italienische Nationalmannschaft genannt?", a: "Squadra Azzurra" },
   { k: 'Sport', f: "Welcher Verein wird „Die Roten Teufel“ genannt?", a: "1. FC Kaiserslautern" },
@@ -534,7 +535,7 @@ const FRAGEN = [
   { k: 'Sport', f: "Welcher Verein wird „Die Löwen“ genannt?", a: "TSV 1860 München" },
   { k: 'Sport', f: "Welcher Verein wird „Die Wölfe“ genannt?", a: "VfL Wolfsburg" },
   { k: 'Sport', f: "Wer war Kapitän der deutschen Weltmeister-Elf 2014?", a: "Philipp Lahm" },
-  { k: 'Sport', f: "Wer ist mit 16 Toren WM-Rekordtorschütze?", a: "Miroslav Klose" },
+  { k: 'Sport', f: "Wie viele Tore erzielte Miroslav Klose insgesamt bei Fußball-Weltmeisterschaften?", a: "16" },
   { k: 'Sport', f: "Wer war Bundestrainer beim WM-Titel 2014?", a: "Joachim Löw" },
   { k: 'Sport', f: "Wer war Teamchef beim WM-Titel 1990?", a: "Franz Beckenbauer" },
   { k: 'Sport', f: "Wie endete das WM-Halbfinale 2014 zwischen Brasilien und Deutschland?", a: "1:7" },
