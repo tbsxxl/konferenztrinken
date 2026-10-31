@@ -59,13 +59,29 @@
     .art-dumm .hearts { position: absolute; bottom: 10%; left: 0; right: 0; text-align: center; font-size: 10cqw; letter-spacing: 4px; color: #ff6b8a; text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35); }
     .art-dumm .spark { position: absolute; font-size: 12cqw; opacity: 0.85; }
 
+    /* Wizard: aufgefächerte Karten, vorne Weiß mit Stern (gleiche Formensprache wie Tic Tac Toe) */
+    .art-wiz { background: radial-gradient(110% 80% at 80% 0%, #8ea2ff, transparent 60%), linear-gradient(160deg, #3a5bef, #16207a); }
+    .art-wiz .spark { position: absolute; font-size: 11cqw; color: #fff; opacity: 0.85; }
+    .art-wiz .fan { position: relative; width: 36cqw; aspect-ratio: 5 / 7; }
+    .art-wiz .fan > * { position: absolute; inset: 0; border-radius: 4.5cqw; transform-origin: 50% 120%; }
+    .art-wiz .fan i { background: rgba(0, 0, 0, 0.28); box-shadow: inset 0 0 0 0.6cqw rgba(255, 255, 255, 0.12); }
+    .art-wiz .fan i:nth-child(1) { rotate: -24deg; }
+    .art-wiz .fan i:nth-child(2) { rotate: 24deg; }
+    .art-wiz .fan b { display: grid; place-items: center; background: rgba(255, 255, 255, 0.95); color: #2a3fd0; font: 800 28cqw/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3); }
+    /* Flip 7: eine Karte wird umgedreht, vorne die 7 */
+    .art-flip { background: radial-gradient(110% 80% at 20% 0%, #6ff0d8, transparent 60%), linear-gradient(160deg, #10a99c, #08474f); }
+    .art-flip::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0 8%, transparent 8% 16%); }
+    .art-flip .flip { position: relative; width: 38cqw; aspect-ratio: 5 / 7; }
+    .art-flip .flip > * { position: absolute; inset: 0; border-radius: 4.5cqw; }
+    .art-flip .flip i { background: rgba(0, 0, 0, 0.28); box-shadow: inset 0 0 0 0.6cqw rgba(255, 255, 255, 0.12); rotate: -14deg; translate: -14% 2%; }
+    .art-flip .flip b { display: grid; place-items: center; background: rgba(255, 255, 255, 0.95); color: #0a7d74; font: 800 30cqw/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; rotate: 8deg; translate: 10% -2%; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3); }
+    .art-flip .plus { position: absolute; right: 9%; top: 10%; padding: 1cqw 3cqw; border-radius: 999px; background: rgba(0, 0, 0, 0.28); color: #fff; font: 800 7.5cqw/1.2 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; }
     .art-ttt { background: radial-gradient(110% 80% at 20% 0%, #5ee08a, transparent 60%), linear-gradient(160deg, #1fa855, #0b4d2a); }
     .art-ttt::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.06) 0 14%, transparent 14% 28%); }
     .ttt { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 66%; aspect-ratio: 1; }
     .ttt span { display: grid; place-items: center; border-radius: 10px; background: rgba(0, 0, 0, 0.28); font: 800 15cqw/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; color: #fff; }
     .ttt span:nth-child(4n+1) { background: rgba(255, 255, 255, 0.92); color: #0b4d2a; }
     /* Cover = Spiel-Icon im Klirr-Stil (quadratisch, die Kachel rundet die Ecken) */
-    .art-icon img { position: absolute; inset: 0; width: 100%; height: 100%; }
     .art-soon { background: linear-gradient(160deg, #2c2c2e, #1c1c1e); color: rgba(235, 235, 245, 0.35); font-size: 2.6rem; }
 
     /* Mitspieler-Liste wie in Apple Music */
@@ -86,7 +102,6 @@
     .links .ico { width: 30px; height: 30px; border-radius: 8px; background: var(--t); display: grid; place-items: center; }
     .links .ico svg { width: 19px; height: 19px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     .links .prow small { display: block; }
-    .nowplaying .mini-art.art-icon img { position: static; width: 100%; height: 100%; }
     /* Einblenden der Kacheln, leicht gestaffelt */
     .covers .cover-card { animation: kl-rise 0.5s cubic-bezier(0.32, 0.72, 0, 1) both; animation-delay: calc(var(--i, 0) * 45ms); }
     .nowplaying:not([hidden]) { animation: kl-rise 0.45s 0.15s cubic-bezier(0.32, 0.72, 0, 1) both; }
@@ -190,12 +205,20 @@
   <h2 class="shelf-title">Kartenspiele</h2>
   <div class="covers">
     <a class="cover-card" href="/wizard/">
-      <div class="cover art-icon"><span class="badge-live" id="liveWizard" hidden>Läuft</span><img src="/wizard/cover.png" alt="" width="720" height="720" decoding="async" /></div>
+      <div class="cover art-wiz">
+        <span class="badge-live" id="liveWizard" hidden>Läuft</span>
+        <span class="spark" style="left:14%;top:16%" aria-hidden="true">✦</span><span class="spark" style="right:16%;top:24%;font-size:8cqw" aria-hidden="true">✦</span>
+        <div class="fan" aria-hidden="true"><i></i><i></i><b>✦</b></div>
+      </div>
       <b>Wizard</b>
       <small>Punktezähler</small>
     </a>
     <a class="cover-card" href="/flip7/">
-      <div class="cover art-icon"><span class="badge-live" id="liveFlip" hidden>Läuft</span><img src="/flip7/cover.png" alt="" width="720" height="720" decoding="async" /></div>
+      <div class="cover art-flip">
+        <span class="badge-live" id="liveFlip" hidden>Läuft</span>
+        <div class="flip" aria-hidden="true"><i></i><b>7</b></div>
+        <span class="plus" aria-hidden="true">+15</span>
+      </div>
       <b>Flip 7</b>
       <small>Punktezähler</small>
     </a>
@@ -246,14 +269,14 @@
   const playIcon = () => { const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); s.setAttribute('viewBox', '0 0 24 24'); s.innerHTML = '<path d="M8 5.5v13l10.5-6.5z"/>'; return s; };
   const icoGames = [
     [tttRunning, '/tictactoe/', 'Tic Tac Toe', 'Spiel läuft', 'art-ttt', '#'],
-    [wizRunning, '/wizard/', 'Wizard', 'Spiel läuft', 'art-icon', '/wizard/cover.png'],
-    [flipRunning, '/flip7/', 'Flip 7', 'Spiel läuft', 'art-icon', '/flip7/cover.png'],
+    [wizRunning, '/wizard/', 'Wizard', 'Spiel läuft', 'art-wiz', '✦'],
+    [flipRunning, '/flip7/', 'Flip 7', 'Spiel läuft', 'art-flip', '7'],
   ].find((g) => g[0]);
   if (!dummRunning && !ktRunning && icoGames) {
     const [, href, title, sub, cls, src] = icoGames;
     np.href = href;
     const art = el('span', { className: `mini-art ${cls}` });
-    art.append(src === '#' ? el('span', { textContent: '✕○', style: 'font:800 .8rem/1 -apple-system,ui-rounded,sans-serif' }) : el('img', { src, alt: '' }));
+    art.append(el('span', { textContent: src === '#' ? '✕○' : src, style: `font:800 ${src === '#' ? '.8rem' : '1.3rem'}/1 -apple-system,ui-rounded,sans-serif; color:#fff` }));
     np.append(art, el('span', {}, el('small', { textContent: sub }), el('b', { textContent: title })), el('span', { className: 'play' }, playIcon()));
     np.setAttribute('aria-label', `Weiterspielen: ${title}`);
     np.hidden = false;
