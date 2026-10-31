@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="darkreader-lock" />
   <meta name="color-scheme" content="dark" />
-  <meta name="theme-color" content="#000000" />
+  <meta name="theme-color" content="#14121f" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Trinkspiele" />
@@ -13,7 +13,7 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <title>Trinkspiele</title>
   <meta name="description" content="Trinkspiel-Hub: Konferenztrinken zu Bundesliga und Champions League und das Quiz „Der Dümmste fliegt“." />
-  <link rel="icon" type="image/png" href="/icon-192.png" />
+  <link rel="icon" type="image/svg+xml" href="/icon.svg" />
   <link rel="stylesheet" href="/app.css" />
   <style>
     /* Hub im Stil von Apple Music: große Titel, Cover-Kacheln, schlichte Listen, Glas-Kapsel für „Läuft gerade“ */
@@ -37,7 +37,7 @@
     .cover-card b { display: block; margin-top: 8px; font-size: 0.95rem; font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .cover-card small { display: block; color: rgba(235, 235, 245, 0.6); font-size: 0.85rem; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .badge-live { position: absolute; left: 10px; top: 10px; z-index: 2; padding: 4px 9px; border-radius: 999px; background: rgba(0, 0, 0, 0.45); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.02em; }
-    .badge-live::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #ff453a; margin-right: 5px; vertical-align: 1px; }
+    .badge-live::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 8px var(--amber-2); margin-right: 5px; vertical-align: 1px; }
 
     /* Cover-Motive */
     .art-konf { background: radial-gradient(120% 80% at 20% 0%, #ff8a4c, transparent 60%), linear-gradient(160deg, #ff3b30, #a5001f); }
@@ -48,7 +48,7 @@
     .scoreboard .min { grid-column: 1 / -1; justify-self: center; margin-top: 4px; padding: 2px 8px; border-radius: 999px; background: #ff453a; font-size: 0.68rem; font-weight: 700; }
     .art-konf .ball { position: absolute; right: -14%; bottom: -14%; width: 52%; aspect-ratio: 1; opacity: 0.22; }
 
-    .art-dumm { background: radial-gradient(110% 80% at 80% 0%, #8f8cff, transparent 60%), linear-gradient(160deg, #5e5ce6, #241a7a); }
+    .art-dumm { background: radial-gradient(110% 80% at 80% 0%, #b69cff, transparent 60%), linear-gradient(160deg, #7c3aed, #2e1065); }
     .art-dumm .q { font: 800 7.2rem/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; color: #fff; text-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); transform: rotate(-8deg); }
     .art-dumm .hearts { position: absolute; bottom: 10%; left: 0; right: 0; text-align: center; font-size: 1.05rem; letter-spacing: 4px; color: #ff6b8a; text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35); }
     .art-dumm .spark { position: absolute; font-size: 1.4rem; opacity: 0.85; }
@@ -63,9 +63,9 @@
     .prow b { font-size: 1.05rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .prow small { display: block; color: rgba(235, 235, 245, 0.6); font-size: 0.85rem; }
     .prow button { width: 44px; height: 44px; border: 0; border-radius: 50%; background: transparent; color: rgba(235, 235, 245, 0.6); font-size: 1.4rem; line-height: 1; }
-    .prow.add .av { background: rgba(118, 118, 128, 0.24); color: #ff453a; font-size: 1.6rem; }
+    .prow.add .av { background: rgba(118, 118, 128, 0.24); color: var(--amber); font-size: 1.6rem; }
     .prow.add input { width: 100%; min-height: 44px; border: 0; background: transparent; color: #fff; font: inherit; font-size: 1.05rem; }
-    .prow.add input::placeholder { color: #ff453a; }
+    .prow.add input::placeholder { color: var(--amber); }
     .prow.add input:focus::placeholder { color: rgba(235, 235, 245, 0.3); }
 
     .links .prow { grid-template-columns: 30px minmax(0, 1fr) 20px; min-height: 52px; text-decoration: none; color: #fff; }
@@ -84,6 +84,13 @@
     footer { margin-top: 28px; }
   </style>
   <link rel="stylesheet" href="/apple.css" />
+  <style>
+    /* Hub = Marke pur: Bernstein als einziger Akzent */
+    :root { --accent: var(--amber); --accent-ink: #1a1206; --tint: var(--amber); }
+    .brand { display: flex; align-items: center; gap: 12px; margin: 0 4px 2px; }
+    .brand img { width: 52px; height: 52px; flex: none; border-radius: 12px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45), inset 0 0 0 0.5px rgba(255, 255, 255, 0.18); }
+    .brand .hero-title { margin: 0; }
+  </style>
 </head>
 <body>
 <main>
@@ -92,7 +99,10 @@
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6M12 7.5v.01"/></svg>
     </a>
   </div>
-  <h1 class="hero-title">Trinkspiele</h1>
+  <div class="brand">
+    <img src="/icon.svg" alt="" width="52" height="52" />
+    <h1 class="hero-title">Trinkspiele</h1>
+  </div>
   <p class="hero-sub" id="heroSub">Such dir ein Spiel aus.</p>
 
   <h2 class="shelf-title">Spiele</h2>

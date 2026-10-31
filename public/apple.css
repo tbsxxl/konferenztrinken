@@ -3,9 +3,15 @@
 
 :root {
   color-scheme: dark;
-  --bg: #000000;
-  --cell: #1c1c1e;
-  --cell2: #2c2c2e;
+  /* Marke „Mitternacht“: dunkler Grund, Glas, Bernstein nur für den einen wichtigen Moment */
+  --night: #14121f;
+  --night-deep: #0a0a10;
+  --amber: #ffb340;
+  --amber-2: #ff7a1a;
+  --violet: #7c3aed;
+  --bg: #0a0a10;
+  --cell: #1b1926;
+  --cell2: #282636;
   --fill: rgba(118, 118, 128, 0.24);
   --label: #ffffff;
   --secondary: rgba(235, 235, 245, 0.6);
@@ -13,7 +19,9 @@
   --sep: rgba(84, 84, 88, 0.65);
   --accent: #ff453a;
   --accent-ink: #ffffff;
-  --accent-text: #ff453a;
+  /* --tint = Akzent als Textfarbe auf dunklem Grund; je Seite überschreibbar */
+  --tint: #ff453a;
+  --accent-text: var(--tint);
   --red: #ff453a;
   --green: #30d158;
   --display: -apple-system, BlinkMacSystemFont, "SF Pro Display", Inter, system-ui, sans-serif;
@@ -23,14 +31,15 @@
   --edge: transparent;
 }
 
-html, body { background: #000; }
+html { background: var(--night-deep); }
+body { background: radial-gradient(120% 60% at 50% -10%, #221d3a 0%, transparent 60%), linear-gradient(var(--night), var(--night-deep) 420px) var(--night-deep) no-repeat; min-height: 100vh; }
 body { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, system-ui, sans-serif; letter-spacing: -0.015em; }
 body::before { display: none; }
 
 /* Karten: flach und ruhig wie in iOS */
 .list, .empty, .game, .ticker, .todo, .surface, .sheet, .game-tile + .soon {
   --label: #ffffff; --secondary: rgba(235, 235, 245, 0.6); --tertiary: rgba(235, 235, 245, 0.3);
-  --sep: rgba(84, 84, 88, 0.65); --fill: rgba(118, 118, 128, 0.24); --accent-text: #ff453a;
+  --sep: rgba(84, 84, 88, 0.65); --fill: rgba(118, 118, 128, 0.24); --accent-text: var(--tint);
   background: var(--cell) !important;
   border: 0 !important;
   box-shadow: none !important;
@@ -73,12 +82,12 @@ h2.sec small { font: 500 0.9rem/1.2 var(--display); color: var(--secondary); tex
 
 /* Knöpfe: flach, iOS-Rundung */
 .btn { background: var(--accent); box-shadow: none; border-radius: 14px; font-weight: 600; letter-spacing: -0.01em; min-height: 50px; }
-.btn.ghost { background: var(--cell); border: 0; color: var(--accent); }
+.btn.ghost { background: var(--cell); border: 0; color: var(--tint); }
 .btn.small { border-radius: 999px; box-shadow: none; }
 .judge button, .vote .grid button, .verdict, .winner, .turn, .dp, .p, .row, .rchip, .game-tile { box-shadow: none; }
 .judge .right { background: #248a3d; }
 .judge .wrong { background: #d70015; }
-.mini button { background: var(--cell); color: var(--accent); }
+.mini button { background: var(--cell); color: var(--tint); }
 
 /* Segment-Schalter wie in iOS */
 .seg { background: var(--fill); border-radius: 9px; padding: 2px; gap: 2px; }
@@ -90,11 +99,11 @@ h2.sec small { font: 500 0.9rem/1.2 var(--display); color: var(--secondary); tex
 .cats button[aria-pressed="true"] { background: var(--accent); }
 
 /* Navigation */
-.back-link { background: none; border: 0; padding: 0; margin: 0 0 -8px -2px; color: var(--accent); font-weight: 400; font-size: 1.06rem; }
+.back-link { background: none; border: 0; padding: 0; margin: 0 0 -8px -2px; color: var(--tint); font-weight: 400; font-size: 1.06rem; }
 .pill { background: var(--cell); border: 0; box-shadow: none; color: var(--secondary); -webkit-backdrop-filter: none; backdrop-filter: none; }
 .tabbar { background: rgba(28, 28, 30, 0.78); border: 0.5px solid rgba(255, 255, 255, 0.12); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
 .tabbar button { color: rgba(235, 235, 245, 0.6); }
-.tabbar button[aria-selected="true"] { background: rgba(255, 255, 255, 0.1); color: var(--accent); }
+.tabbar button[aria-selected="true"] { background: rgba(255, 255, 255, 0.1); color: var(--tint); }
 
 /* Banner: Glanz und Raster zurücknehmen, nur Farbe */
 .turn::before, .dp::before { background: none; }
