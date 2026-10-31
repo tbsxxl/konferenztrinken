@@ -62,5 +62,20 @@
     noteTimer = setTimeout(() => n.classList.remove('is-open'), 4500);
   }
 
-  window.Klirr = { undoToast, moment, note };
+  // Trinkmodus je Spiel (Tic Tac Toe, Wizard, Flip 7). Standard: aus.
+  // Schalter im Menü: <input type="checkbox" data-klirr-drink="wizard">; <html data-drink="on|off"> für CSS.
+  const key = (game) => `klirr-drink:${game}`;
+  function drink(game) { try { return localStorage.getItem(key(game)) === '1'; } catch { return false; } }
+  function setDrink(game, on) { try { localStorage.setItem(key(game), on ? '1' : '0'); } catch {} document.documentElement.dataset.drink = on ? 'on' : 'off'; }
+  function bindDrink() {
+    document.querySelectorAll('input[data-klirr-drink]').forEach((input) => {
+      const game = input.dataset.klirrDrink;
+      input.checked = drink(game);
+      document.documentElement.dataset.drink = input.checked ? 'on' : 'off';
+      input.addEventListener('change', () => { setDrink(game, input.checked); document.dispatchEvent(new CustomEvent('klirr-drink', { detail: { game, on: input.checked } })); });
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bindDrink); else bindDrink();
+
+  window.Klirr = { undoToast, moment, note, drink };
 })();

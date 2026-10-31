@@ -327,7 +327,7 @@
     const miss = state.players
       .map((p) => ({ name: p.name, d: Math.abs((round.bids[p.id] ?? 0) - (round.tricks[p.id] ?? 0)) }))
       .filter((x) => x.d > 0);
-    if (miss.length && window.Klirr) {
+    if (miss.length && window.Klirr?.drink("wizard")) {
       Klirr.note(`Daneben: ${miss.map((x) => `${x.name} trinkt ${x.d}`).join(" · ")}`);
       Klirr.moment();
     }

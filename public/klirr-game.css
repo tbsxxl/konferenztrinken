@@ -34,3 +34,6 @@ body {
 @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
   .glass, .toolbar, .bottombar__row, .toast, .sheet { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; background: #1b1926 !important; }
 }
+
+/* Trinkmodus-Schalter: Unterzeile */
+.settingRow__sub { font-weight: 400; color: var(--ink-2); font-size: .8rem; margin-top: 2px; }

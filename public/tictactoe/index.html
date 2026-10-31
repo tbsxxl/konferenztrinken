@@ -75,7 +75,7 @@
       <p id="result" class="result__text"></p>
     </section>
 
-    <section class="group">
+    <section class="group drink-only">
       <h2 class="group__header">Trinkregeln</h2>
       <div class="group__body drink-rules">
         <p><b>Passen</b> (kein Spieler eingefallen) → 1 Schluck</p>
@@ -132,6 +132,14 @@
 
       <section class="group">
         <div class="group__body">
+          <label class="list-row">
+            <span>Trinkmodus<small class="list-row__sub">Passen, Verlieren und Unentschieden kosten Schlucke</small></span>
+            <span class="ios-switch">
+              <input type="checkbox" data-klirr-drink="tictactoe" />
+              <span class="ios-switch__track" aria-hidden="true"></span>
+              <span class="ios-switch__thumb" aria-hidden="true"></span>
+            </span>
+          </label>
           <label class="list-row">
             <span>Nur Logos anzeigen</span>
             <span class="ios-switch">

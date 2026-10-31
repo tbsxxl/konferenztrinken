@@ -987,6 +987,9 @@ body.ios{
 .drink-rules p{ margin: 0; padding: 11px 16px; }
 .drink-rules p + p{ border-top: 0.5px solid var(--separator); }
 .drink-rules b{ font-weight: 600; }
+/* Trinkmodus: Regeln nur zeigen, wenn eingeschaltet */
+:root:not([data-drink="on"]) .drink-only{ display: none; }
+.list-row__sub{ display: block; color: var(--label-2); font-size: .8125rem; margin-top: 2px; }
 /* HIG-Prüfung: kleine iPhones ohne Querscrollen, ausreichender Kontrast */
 .status-row{ flex-wrap: wrap; }
 .scoreboard__side--x .scoreboard__mark{ background: #d92d20; }
