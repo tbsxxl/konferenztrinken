@@ -77,6 +77,14 @@
     .art-flip .flip > * { position: absolute; inset: 0; border-radius: 4.5cqw; }
     .art-flip .flip i { background: rgba(0, 0, 0, 0.28); box-shadow: inset 0 0 0 0.6cqw rgba(255, 255, 255, 0.12); rotate: -14deg; translate: -14% 2%; }
     .art-flip .flip b { display: grid; place-items: center; background: rgba(255, 255, 255, 0.95); color: #0a7d74; font: 800 30cqw/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; rotate: 8deg; translate: 10% -2%; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3); }
+    /* Imposter: drei Figuren, eine gehört nicht dazu */
+    .art-imp { background: radial-gradient(110% 80% at 80% 0%, #ff7aa8, transparent 60%), linear-gradient(160deg, #c2185b, #4d0a27); }
+    .art-imp::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0 12%, transparent 12% 24%); }
+    .imp { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 3.5cqw; width: 86%; }
+    .imp span { aspect-ratio: 3 / 4; border-radius: 5cqw; display: grid; place-items: center; overflow: hidden; }
+    .imp .pa { background: rgba(255, 255, 255, 0.92); fill: #a3154f; }
+    .imp .pa svg { display: block; width: 100%; height: auto; margin-top: 38%; }
+    .imp .pq { background: rgba(0, 0, 0, 0.32); color: #fff; font: 800 18cqw/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; translate: 0 -8%; box-shadow: 0 2cqw 6cqw rgba(0, 0, 0, 0.3); }
     .art-ttt { background: radial-gradient(110% 80% at 20% 0%, #5ee08a, transparent 60%), linear-gradient(160deg, #1fa855, #0b4d2a); }
     .art-ttt::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.06) 0 14%, transparent 14% 28%); }
     .ttt { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 66%; aspect-ratio: 1; }
@@ -225,6 +233,13 @@
       </div>
       <b>Der Dümmste fliegt</b>
     </a>
+    <a class="cover-card" href="/imposter.html">
+      <div class="cover art-imp">
+        <span class="badge-live" id="liveImp" hidden>Läuft</span>
+        <div class="imp" aria-hidden="true"><span class="pa"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.2" r="4.3"/><path d="M3.8 21.5c0-4.6 3.7-7.6 8.2-7.6s8.2 3 8.2 7.6z"/></svg></span><span class="pq">?</span><span class="pa"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.2" r="4.3"/><path d="M3.8 21.5c0-4.6 3.7-7.6 8.2-7.6s8.2 3 8.2 7.6z"/></svg></span></div>
+      </div>
+      <b>Imposter</b>
+    </a>
     <a class="cover-card" href="/tictactoe/">
       <div class="cover art-ttt">
         <span class="badge-live" id="liveTtt" hidden>Läuft</span>
@@ -283,11 +298,14 @@
   const tttRunning = !!(ttt && Array.isArray(ttt.moveHistory) && ttt.moveHistory.length && !ttt.gameLocked);
   const wiz = read('wizard_state_v2');
   const wizRunning = !!(wiz && wiz.started && !wiz.finished);
+  const imp = read('imp-state');
+  const impRunning = !!(imp && ['reveal', 'talk', 'vote', 'guess'].includes(imp.phase));
   const flip = read('flip7_game_v2');
   const flipRunning = !!(flip && flip.game && Array.isArray(flip.game.rounds) && flip.game.rounds.length);
   $('liveKonferenz').hidden = !ktRunning;
   $('liveDumm').hidden = !dummRunning;
   $('liveTtt').hidden = !tttRunning;
+  $('liveImp').hidden = !impRunning;
   $('liveWizard').hidden = !wizRunning;
   $('liveFlip').hidden = !flipRunning;
 
@@ -295,6 +313,7 @@
   const np = $('nowPlaying');
   const playIcon = () => { const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); s.setAttribute('viewBox', '0 0 24 24'); s.innerHTML = '<path d="M8 5.5v13l10.5-6.5z"/>'; return s; };
   const icoGames = [
+    [impRunning, '/imposter.html', 'Imposter', 'Runde läuft', 'art-imp', '?'],
     [tttRunning, '/tictactoe/', 'Tic Tac Toe', 'Spiel läuft', 'art-ttt', '#'],
     [wizRunning, '/wizard/', 'Wizard', 'Spiel läuft', 'art-wiz', '✦'],
     [flipRunning, '/flip7/', 'Flip 7', 'Spiel läuft', 'art-flip', '7'],

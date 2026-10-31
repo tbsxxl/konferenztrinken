@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="darkreader-lock" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#14121f" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#f7f6fb" media="(prefers-color-scheme: light)" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <title>Imposter · Klirr</title>
+  <meta name="description" content="Alle kennen das geheime Wort – nur der Imposter nicht. Reihum ein Begriff, dann wird abgestimmt." />
+  <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+  <link rel="stylesheet" href="/app.css" />
+  <link rel="stylesheet" href="/apple.css" />
+  <script src="/klirr.js" defer></script>
+  <style>
+    /* Eigener Akzent für „Imposter“: Magenta (weiße Schrift 5.9:1) */
+    :root { --accent: #c2185b; --accent-fill: #c2185b; --accent-ink: #fff; --tint: #ff6fa3; }
+    @media (prefers-color-scheme: light) { :root { --tint: #ad1457; } }
+    :root[data-drink="off"] .drink-only { display: none !important; }
+
+    .cell .sub { display: block; color: var(--secondary); font-size: 0.8rem; margin-top: 2px; }
+    .mode-info { padding: 0 18px 14px; color: var(--secondary); font-size: 0.9rem; line-height: 1.4; }
+    .cell.wrap .seg { flex: 1 1 100%; }
+    .seg { display: flex; gap: 4px; background: var(--fill); border-radius: 14px; padding: 3px; }
+    .seg button { flex: 1; min-width: 44px; min-height: 44px; border: 0; border-radius: 11px; background: transparent; color: var(--label); font: inherit; font-weight: 600; font-size: 0.9rem; }
+    .cats { display: flex; flex-wrap: wrap; gap: 8px; padding: 14px; }
+    .cats button { min-height: 44px; padding: 0 14px; border: 0; border-radius: 999px; background: var(--fill); color: var(--label); font: inherit; font-weight: 600; font-size: 0.9rem; }
+    .cats button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+    .cta-bar { position: sticky; bottom: 0; z-index: 5; margin: 18px -16px 0; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: linear-gradient(transparent, rgba(10, 10, 16, 0.85) 30%); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+    @media (prefers-color-scheme: light) { .cta-bar { background: linear-gradient(rgba(242, 242, 247, 0), rgba(242, 242, 247, 0.9) 30%); } }
+    .cta-bar .btn { margin-top: 0; }
+    .cta-bar .btn + .btn { margin-top: 8px; }
+    .mini { display: flex; gap: 8px; margin-top: 12px; }
+    .mini button { flex: 1; min-height: 44px; border: 0; border-radius: 999px; background: var(--fill); color: var(--label); font: inherit; font-weight: 600; }
+
+    /* Karte zum Aufdecken */
+    .card { position: relative; margin-top: 14px; min-height: 340px; border-radius: 28px; padding: 26px 22px; display: grid; place-items: center; text-align: center; color: #fff; overflow: hidden;
+      background: radial-gradient(110% 80% at 80% 0%, #ff7aa8, transparent 60%), linear-gradient(160deg, #c2185b, #5a0a2c); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35); }
+    /* Imposter- und Wort-Karte sehen gleich aus – sonst verrät die Farbe die Rolle */
+    .card .who { font: 700 1rem/1.2 -apple-system, "SF Pro Text", Inter, sans-serif; opacity: 0.85; }
+    .card .big { display: block; margin: 10px 0 6px; font: 800 2.6rem/1.05 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+    .card .small { font-weight: 600; opacity: 0.9; }
+    .card .tip { display: inline-block; margin-top: 12px; padding: 8px 16px; border-radius: 999px; background: rgba(0, 0, 0, 0.28); font-weight: 700; }
+    .card .figure { width: 96px; height: 96px; margin: 0 auto 14px; border-radius: 24px; background: rgba(0, 0, 0, 0.25); display: grid; place-items: center; overflow: hidden; }
+    .card .figure svg { width: 92%; margin-top: 30%; fill: #fff; }
+    .card .hint { margin-top: 8px; opacity: 0.85; font-size: 0.9rem; }
+    @keyframes flip { from { transform: rotateY(90deg); opacity: 0.4; } }
+    .card.flip { animation: flip 0.35s cubic-bezier(0.3, 1.3, 0.5, 1); }
+    @media (prefers-reduced-motion: reduce) { .card.flip { animation: none; } }
+
+    /* Reihenfolge und Abstimmung */
+    .order { display: flex; flex-wrap: wrap; gap: 8px; padding: 14px; }
+    .order .rchip .n { opacity: 0.8; margin-right: 2px; }
+    .vote-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin-top: 12px; }
+    .vote-grid button { min-height: 60px; border: 0; border-radius: 18px; background: var(--c); color: #fff; font: 700 1.1rem/1.1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2); }
+    .verdict { margin-top: 14px; border-radius: var(--r); padding: 20px; color: #fff; background: var(--c, #c2185b); box-shadow: 0 10px 26px rgba(0, 0, 0, 0.28); animation: pop 0.4s cubic-bezier(0.3, 1.4, 0.6, 1); }
+    .verdict b { display: block; font: 800 1.9rem/1.1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; }
+    .verdict p { margin: 8px 0 0; font-weight: 600; }
+    .verdict .drinks { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.25); }
+    .guess { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+    .guess button { min-height: 52px; border: 0; border-radius: 16px; font: 700 1rem/1 inherit; color: #fff; }
+    .guess .yes { background: #1f8a4c; }
+    .guess .no { background: #c4001a; }
+    .score { display: grid; grid-template-columns: 1fr auto; padding: 12px 18px; position: relative; }
+    .score + .score::before { content: ""; position: absolute; top: 0; left: 18px; right: 0; border-top: 0.5px solid var(--sep); }
+    .score b { font-variant-numeric: tabular-nums; }
+  </style>
+</head>
+<body>
+<main>
+  <a class="back-link" href="/">‹ Alle Spiele</a>
+
+  <!-- EINRICHTEN -->
+  <section id="setup">
+    <header class="lt"><div><div class="eyebrow">Wer gehört nicht dazu?</div><h1>Imposter</h1></div></header>
+    <div class="list"><div class="mode-info" style="padding-top:14px">Alle bekommen dasselbe geheime Wort – nur der Imposter nicht, er bekommt höchstens einen vagen Tipp. Reihum sagt jede Person einen Begriff zum Wort. Danach zeigt ihr auf den Verdächtigen. Wird der Imposter erwischt, darf er noch das Wort raten.</div></div>
+
+    <h2 class="sec">Mitspieler <small id="rosterCount"></small></h2>
+    <div class="list">
+      <div class="add-row">
+        <input type="text" id="rosterInput" placeholder="Name eingeben …" aria-label="Mitspieler hinzufügen" autocomplete="off" enterkeyhint="done" />
+        <button class="btn small" id="rosterAdd">Hinzufügen</button>
+      </div>
+      <div class="roster" id="roster"></div>
+    </div>
+    <p class="foot">Die Liste gilt für alle Spiele.</p>
+
+    <h2 class="sec">Regeln</h2>
+    <div class="list">
+      <label class="cell"><span>Trinkmodus<small class="sub">Gilt für alle Spiele, wie das Logo im Hub.</small></span><input type="checkbox" class="switch" data-klirr-drink /></label>
+      <div class="cell wrap"><span>Anzahl Imposter</span><div class="seg" id="impSeg" role="group" aria-label="Anzahl Imposter"></div></div>
+      <label class="cell"><span>Tipp für den Imposter<small class="sub">Aus: Er weiß gar nichts – schwerer.</small></span><input type="checkbox" class="switch" id="optTip" /></label>
+      <label class="cell"><span>Kategorie für alle zeigen<small class="sub">Hilft auch dem Imposter.</small></span><input type="checkbox" class="switch" id="optCat" /></label>
+      <div class="mode-info drink-only" style="padding-top:10px">Trinken: Imposter erwischt und Wort falsch → Imposter trinkt 3. Imposter entkommt oder errät das Wort → alle anderen trinken 2.</div>
+    </div>
+
+    <h2 class="sec">Kategorien <small id="wCount"></small></h2>
+    <div class="list"><div class="cats" id="cats"></div></div>
+
+    <div class="cta-bar">
+      <button class="btn" id="start">Spiel starten</button>
+      <button class="btn ghost" id="resume" hidden>Laufende Runde fortsetzen</button>
+    </div>
+    <div class="error" id="setupError" role="alert"></div>
+  </section>
+
+  <!-- SPIEL -->
+  <section id="game" hidden>
+    <header class="lt"><div><div class="eyebrow" id="roundLabel"></div><h1 id="stageTitle">Imposter</h1></div></header>
+    <div id="stage"></div>
+    <div class="mini"><button id="quit">Runde abbrechen</button></div>
+  </section>
+
+  <footer>Trinkt verantwortungsvoll · Wasser zwischendurch · Alkoholfrei zählt auch.<br /><a class="legal" href="/datenschutz.html">Datenschutz</a></footer>
+</main>
+
+<script src="/imposter-woerter.js"></script>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const el = (tag, props = {}, ...children) => { const n = Object.assign(document.createElement(tag), props); n.append(...children.filter((c) => c !== null && c !== undefined && c !== false)); return n; };
+  const store = {
+    get(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; } },
+    set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch {} },
+  };
+  const norm = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+  const shuffle = (arr) => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const PALETTE = ['#0a6ed1', '#8e44c9', '#b85400', '#0b7285', '#4c4cdb', '#946800', '#c2185b', '#7a5a35'];
+  const lines = (text) => String(text || '').split('\n').map((s) => s.trim()).filter(Boolean);
+  const initial = (name) => [...name][0] || '?';
+  const PERSON = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.2" r="4.3"/><path d="M3.8 21.5c0-4.6 3.7-7.6 8.2-7.6s8.2 3 8.2 7.6z"/></svg>';
+  const drinkOn = () => !!window.Klirr?.drink();
+
+  // ---------- Einstellungen ----------
+  const CATS = [...new Set(WOERTER.map((w) => w.k))];
+  const DEFAULTS = { imps: 1, tip: true, cat: false, cats: CATS };
+  const settings = { ...DEFAULTS, ...store.get('imp-settings', {}) };
+  settings.cats = (settings.cats || []).filter((c) => CATS.includes(c));
+  if (!settings.cats.length) settings.cats = CATS;
+  const saveSettings = () => { store.set('imp-settings', settings); renderSetup(); };
+
+  // ---------- Mitspieler (gemeinsam mit dem Hub) ----------
+  let roster = lines(store.get('kt-names', ''));
+  const colorOf = (name) => PALETTE[Math.max(0, roster.indexOf(name)) % PALETTE.length];
+  function saveRoster() { store.set('kt-names', roster.join('\n')); renderSetup(); }
+  function addRoster() {
+    const name = $('rosterInput').value.trim().slice(0, 24);
+    $('rosterInput').value = '';
+    if (name && !roster.some((n) => norm(n) === norm(name))) { roster.push(name); saveRoster(); }
+    $('rosterInput').focus();
+  }
+  $('rosterAdd').addEventListener('click', addRoster);
+  $('rosterInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') addRoster(); });
+
+  function renderSetup() {
+    $('roster').replaceChildren(...roster.map((name, i) => {
+      const x = el('button', { textContent: '✕', onclick: () => { roster.splice(i, 1); saveRoster(); window.Klirr?.undoToast(`${name} entfernt`, () => { roster.splice(Math.min(i, roster.length), 0, name); saveRoster(); }); } });
+      x.setAttribute('aria-label', `${name} entfernen`);
+      return el('span', { className: 'rchip', style: `--c: ${PALETTE[i % PALETTE.length]}` }, el('span', { className: 'ini', textContent: initial(name) }), name, x);
+    }));
+    $('rosterCount').textContent = roster.length ? `${roster.length} dabei` : '';
+    $('impSeg').replaceChildren(...[1, 2].map((n) => {
+      const b = el('button', { textContent: n === 1 ? '1 Imposter' : '2 Imposter', onclick: () => { settings.imps = n; saveSettings(); } });
+      b.setAttribute('aria-pressed', String(settings.imps === n));
+      return b;
+    }));
+    $('optTip').checked = settings.tip;
+    $('optCat').checked = settings.cat;
+    $('cats').replaceChildren(...CATS.map((c) => {
+      const b = el('button', { textContent: c, onclick: () => {
+        settings.cats = settings.cats.includes(c) ? settings.cats.filter((x) => x !== c) : [...settings.cats, c];
+        if (!settings.cats.length) settings.cats = [c];
+        saveSettings();
+      } });
+      b.setAttribute('aria-pressed', String(settings.cats.includes(c)));
+      return b;
+    }));
+    $('wCount').textContent = `${WOERTER.filter((w) => settings.cats.includes(w.k)).length} Wörter`;
+    $('resume').hidden = !(state && ['reveal', 'talk', 'vote', 'guess'].includes(state.phase));
+  }
+  $('optTip').addEventListener('change', (e) => { settings.tip = e.target.checked; saveSettings(); });
+  $('optCat').addEventListener('change', (e) => { settings.cat = e.target.checked; saveSettings(); });
+
+  // ---------- Spielzustand ----------
+  // phase: reveal (Handy geht reihum) → talk (Begriffe sagen) → vote (auf wen gezeigt?) → guess (Imposter rät) → result
+  let state = store.get('imp-state', null);
+  const save = () => store.set('imp-state', state);
+  const show = (id) => { ['setup', 'game'].forEach((s) => { $(s).hidden = s !== id; }); window.scrollTo(0, 0); };
+
+  function pickWord() {
+    const pool = WOERTER.filter((w) => settings.cats.includes(w.k));
+    let used = store.get('imp-used', []);
+    let fresh = pool.filter((w) => !used.includes(w.w));
+    if (!fresh.length) { used = []; fresh = pool; }
+    const w = fresh[Math.floor(Math.random() * fresh.length)];
+    store.set('imp-used', [...used, w.w]);
+    return w;
+  }
+
+  function startRound() {
+    const names = roster.slice();
+    $('setupError').textContent = '';
+    if (names.length < 3) { $('setupError').textContent = 'Es braucht mindestens drei Mitspieler.'; return; }
+    const imps = settings.imps === 2 && names.length >= 5 ? 2 : 1;
+    if (settings.imps === 2 && names.length < 5) $('setupError').textContent = 'Zwei Imposter erst ab fünf Personen – diese Runde mit einem.';
+    const w = pickWord();
+    const order = shuffle(names);
+    const impostors = shuffle(names).slice(0, imps);
+    const scores = state?.scores || {};
+    names.forEach((n) => { scores[n] = scores[n] || 0; });
+    state = {
+      phase: 'reveal', round: (state?.round || 0) + 1, word: w.w, tip: w.t, cat: w.k,
+      cfg: { tip: settings.tip, cat: settings.cat, drink: drinkOn() },
+      players: names, order, impostors, idx: 0, open: false,
+      starter: order[Math.floor(Math.random() * order.length)], accused: null, guessed: null, scores,
+    };
+    save(); render();
+  }
+  $('start').addEventListener('click', startRound);
+  $('resume').addEventListener('click', () => render());
+  $('quit').addEventListener('click', () => { if (state) { state.phase = 'setup'; save(); } show('setup'); renderSetup(); });
+
+  // ---------- Anzeige ----------
+  function render() {
+    if (!state || state.phase === 'setup') { show('setup'); renderSetup(); return; }
+    show('game');
+    $('quit').parentElement.hidden = state.phase === 'result';
+    $('roundLabel').textContent = `Runde ${state.round}${state.cfg.cat ? ` · ${state.cat}` : ''}`;
+    const stage = { reveal: stageReveal, talk: stageTalk, vote: stageVote, guess: stageGuess, result: stageResult }[state.phase]();
+    $('stage').replaceChildren(...stage);
+  }
+
+  function stageReveal() {
+    $('stageTitle').textContent = 'Karten verteilen';
+    const name = state.order[state.idx];
+    const isImp = state.impostors.includes(name);
+    const next = state.order[state.idx + 1];
+    if (!state.open) {
+      const card = el('div', { className: 'card' });
+      card.innerHTML = `<div><div class="figure">${PERSON}</div><span class="big"></span><div class="hint"></div></div>`;
+      card.querySelector('.big').textContent = name;
+      card.querySelector('.hint').textContent = `Handy an ${name} geben. Nur ${name} schaut hin.`;
+      return [card, el('button', { className: 'btn', textContent: 'Karte aufdecken', onclick: () => { state.open = true; save(); render(); } })];
+    }
+    const card = el('div', { className: 'card flip' });
+    const inner = el('div');
+    if (isImp) {
+      inner.append(el('div', { className: 'who', textContent: name }), el('span', { className: 'big', textContent: 'Du bist der Imposter' }));
+      if (state.impostors.length > 1) inner.append(el('div', { className: 'small', textContent: 'Es gibt noch einen zweiten Imposter.' }));
+      inner.append(el('div', { className: 'tip', textContent: state.cfg.tip ? `Tipp: ${state.tip}` : 'Kein Tipp – hör gut zu.' }));
+      if (state.cfg.cat) inner.append(el('div', { className: 'hint', textContent: `Kategorie: ${state.cat}` }));
+    } else {
+      inner.append(el('div', { className: 'who', textContent: `${name}, dein Wort` }), el('span', { className: 'big', textContent: state.word }));
+      if (state.cfg.cat) inner.append(el('div', { className: 'small', textContent: `Kategorie: ${state.cat}` }));
+    }
+    card.append(inner);
+    return [card, el('button', { className: 'btn', textContent: next ? `Verdecken – weiter an ${next}` : 'Verdecken – alle haben ihre Karte', onclick: () => {
+      state.open = false;
+      if (next) state.idx++; else state.phase = 'talk';
+      save(); render();
+    } })];
+  }
+
+  function stageTalk() {
+    $('stageTitle').textContent = 'Begriffe sagen';
+    const start = state.order.indexOf(state.starter);
+    const seq = state.order.slice(start).concat(state.order.slice(0, start));
+    return [
+      el('div', { className: 'list' },
+        el('div', { className: 'mode-info', style: 'padding-top:14px', textContent: `${state.starter} fängt an. Reihum sagt jede Person einen Begriff zum Wort – nicht zu offensichtlich, aber auch nicht zu vage. Spielt ein, zwei Runden, dann diskutiert und zeigt auf den Verdächtigen.` }),
+        el('div', { className: 'order' }, ...seq.map((n, i) => el('span', { className: 'rchip', style: `--c: ${colorOf(n)}` }, el('span', { className: 'ini', textContent: initial(n) }), el('span', { className: 'n', textContent: `${i + 1}.` }), n)))),
+      el('button', { className: 'btn', textContent: 'Zur Abstimmung', onclick: () => { state.phase = 'vote'; save(); render(); } }),
+    ];
+  }
+
+  function stageVote() {
+    $('stageTitle').textContent = 'Abstimmen';
+    return [
+      el('div', { className: 'list' }, el('div', { className: 'mode-info', style: 'padding-top:14px', textContent: 'Auf drei zeigen alle gleichzeitig auf eine Person. Wen hat die Mehrheit gewählt?' })),
+      el('div', { className: 'vote-grid' }, ...state.players.map((n) => el('button', { style: `--c: ${colorOf(n)}`, textContent: n, onclick: () => accuse(n) }))),
+    ];
+  }
+
+  function accuse(name) {
+    state.accused = name;
+    if (state.impostors.includes(name)) state.phase = 'guess';
+    else finish(false);
+    save(); render();
+  }
+
+  function stageGuess() {
+    $('stageTitle').textContent = 'Erwischt?';
+    const v = el('div', { className: 'verdict', style: `--c: ${colorOf(state.accused)}` },
+      el('b', { textContent: `${state.accused} ist ein Imposter!` }),
+      el('p', { textContent: `${state.accused}, du hast eine Chance: Wie heißt das geheime Wort? Sag es laut – die anderen tippen, ob es stimmt.` }));
+    return [v,
+      el('div', { className: 'guess' },
+        el('button', { className: 'yes', textContent: 'Richtig geraten', onclick: () => { state.guessed = true; finish(true); save(); render(); } }),
+        el('button', { className: 'no', textContent: 'Falsch geraten', onclick: () => { state.guessed = false; finish(true); save(); render(); } }))];
+  }
+
+  // Ergebnis und Punkte: Crew gewinnt (Imposter erwischt und Wort falsch) → je 1 Punkt; sonst Imposter je 2 Punkte.
+  function finish(caught) {
+    const crewWins = caught && state.guessed === false;
+    state.crewWins = crewWins;
+    state.players.forEach((n) => {
+      const imp = state.impostors.includes(n);
+      if (crewWins && !imp) state.scores[n] = (state.scores[n] || 0) + 1;
+      if (!crewWins && imp) state.scores[n] = (state.scores[n] || 0) + 2;
+    });
+    state.phase = 'result';
+    if (state.cfg.drink) setTimeout(() => window.Klirr?.moment(), 200);
+  }
+
+  function stageResult() {
+    $('stageTitle').textContent = state.crewWins ? 'Imposter erwischt' : 'Imposter gewinnt';
+    const imps = state.impostors.join(' & ');
+    const others = state.players.filter((n) => !state.impostors.includes(n));
+    let text;
+    if (state.crewWins) text = `${imps} wurde erwischt und kannte das Wort nicht.`;
+    else if (state.guessed) text = `${state.accused} wurde erwischt – hat das Wort aber erraten!`;
+    else text = `${state.accused} war unschuldig. Der Imposter war ${imps}.`;
+    const v = el('div', { className: 'verdict', style: `--c: ${state.crewWins ? '#1f6feb' : '#c2185b'}` },
+      el('b', { textContent: state.crewWins ? 'Die Runde gewinnt!' : `${imps} gewinnt!` }),
+      el('p', { textContent: text }),
+      el('p', { textContent: `Das Wort war „${state.word}“${state.cfg.tip ? ` · Tipp: ${state.tip}` : ''}.` }));
+    if (state.cfg.drink) v.append(el('p', { className: 'drinks', textContent: state.crewWins ? `🍺 ${imps} trinkt 3.` : `🍺 ${others.join(', ')} trinken je 2.` }));
+    const ranked = Object.entries(state.scores).filter(([n]) => state.players.includes(n)).sort((a, b) => b[1] - a[1]);
+    return [v,
+      el('h2', { className: 'sec', textContent: 'Punkte' }),
+      el('div', { className: 'list' }, ...ranked.map(([n, p]) => el('div', { className: 'score' }, el('span', { textContent: n }), el('b', { textContent: `${p}` })))),
+      el('p', { className: 'foot', textContent: 'Runde gewonnen: je 1 Punkt. Imposter gewinnt: 2 Punkte.' }),
+      el('button', { className: 'btn', textContent: 'Nächste Runde', onclick: startRound }),
+      el('button', { className: 'btn ghost', textContent: 'Einstellungen', onclick: () => { state.phase = 'setup'; save(); render(); } })];
+  }
+
+  render();
+</script>
+</body>
+</html>
