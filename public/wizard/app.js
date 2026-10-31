@@ -40,7 +40,7 @@
   /* ---------- Zustand ---------- */
 
   const prefs = Object.assign({ theme: "system", wake: true, haptics: true, names: [] }, read(PREFS_KEY) || {});
-  prefs.theme = "dark"; // Klirr: immer dunkel
+  prefs.theme = "system"; // Klirr: folgt der iPhone-Einstellung
   let state = loadState();
   let undoStack = (read(UNDO_KEY) || [])
     .map((e) => (typeof e === "string" ? { s: e, label: "" } : e))

@@ -92,7 +92,7 @@ function savePrefs() { storageSet(PREFS_KEY, prefs); }
 function load() {
   const p = storageGet(PREFS_KEY);
   if (p) prefs = { ...prefs, ...p };
-  prefs.theme = "dark"; // Klirr: immer dunkel
+  prefs.theme = "system"; // Klirr: folgt der iPhone-Einstellung
 
   const s = storageGet(STORE_KEY);
   if (s && s.game && Array.isArray(s.game.players)) {

@@ -1548,8 +1548,8 @@ function init(){
   // Darstellung: "light" (Standard), "dark" oder "system" (folgt der iOS-/OS-Einstellung).
   const themeBtn = document.getElementById("themeBtn");
   const systemDark = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
-  // In Klirr immer dunkel (Mitternacht-Look wie Hub und andere Spiele).
-  let themePref = "dark";
+  // In Klirr: immer der iPhone-Einstellung folgen (kein eigener Schalter).
+  let themePref = "system";
   const applyTheme = () => {
     const dark = themePref === "dark" || (themePref === "system" && !!(systemDark && systemDark.matches));
     if (dark) document.documentElement.dataset.theme = "dark";

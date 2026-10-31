@@ -4,27 +4,29 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="darkreader-lock" />
-  <meta name="color-scheme" content="dark" />
+  <meta name="color-scheme" content="light dark" />
   <title>Datenschutz · Klirr</title>
   <link rel="icon" type="image/svg+xml" href="/icon.svg" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="manifest" href="/manifest.webmanifest" />
-  <meta name="theme-color" content="#14121f" />
+  <meta name="theme-color" content="#14121f" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#f7f6fb" media="(prefers-color-scheme: light)" />
   <style>
     html { font-size: 17px; }
     @supports (font: -apple-system-body) { html { font: -apple-system-body; } }
     * { box-sizing: border-box; }
-    body { margin: 0; background: #000; color: #fff; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, system-ui, sans-serif; font-size: 1rem; line-height: 1.5; letter-spacing: -0.015em; }
+    body { margin: 0; background: var(--bg, #0a0a10); color: var(--label, #fff); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, system-ui, sans-serif; font-size: 1rem; line-height: 1.5; letter-spacing: -0.015em; }
     main { max-width: 680px; margin: 0 auto; padding: calc(env(safe-area-inset-top) + 20px) 16px calc(env(safe-area-inset-bottom) + 40px); }
     a { color: inherit; }
-    .back { display: inline-flex; align-items: center; min-height: 44px; text-decoration: none; color: var(--amber, #ffb340); font-size: 1.06rem; }
+    .back { display: inline-flex; align-items: center; min-height: 44px; text-decoration: none; color: var(--amber-ink, #ffb340); font-size: 1.06rem; }
     h1 { font: 700 2.125rem/1.15 -apple-system, "SF Pro Display", Inter, system-ui, sans-serif; margin: 6px 0 20px; }
     section { background: var(--cell, #1b1926); border-radius: 22px; padding: 16px 18px; margin-bottom: 12px; }
     h2 { font: 700 1.2rem/1.25 -apple-system, "SF Pro Display", Inter, system-ui, sans-serif; margin: 0 0 6px; }
-    p, li { color: rgba(235, 235, 245, 0.75); margin: 6px 0; }
+    p, li { color: var(--secondary, rgba(235, 235, 245, 0.75)); margin: 6px 0; }
     ul { padding-left: 20px; margin: 6px 0; }
     .todo { color: #ff6961; font-weight: 600; }
-    footer { color: rgba(235, 235, 245, 0.3); font-size: 0.8rem; text-align: center; margin-top: 20px; }
+    @media (prefers-color-scheme: light) { .todo { color: #c4001a; } }
+    footer { color: var(--secondary, rgba(235, 235, 245, 0.6)); font-size: 0.8rem; text-align: center; margin-top: 20px; }
   </style>
   <link rel="stylesheet" href="/apple.css" />
 </head>

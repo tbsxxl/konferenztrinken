@@ -979,7 +979,7 @@ body.only-logos .team-fallback, body.compact .team-fallback{
   --glass-bg: rgba(40, 37, 58, 0.55);
   --sheet-bg: rgba(27, 25, 38, 0.92);
 }
-body.ios{
+:root[data-theme="dark"] body.ios{
   background: radial-gradient(120% 60% at 50% -10%, #221d3a 0%, transparent 60%), linear-gradient(#14121f, #0a0a10 420px) #0a0a10 no-repeat;
   min-height: 100vh;
 }
@@ -995,3 +995,9 @@ body.ios{
 .scoreboard__side--x .scoreboard__mark{ background: #d92d20; }
 .scoreboard__side--o .scoreboard__mark{ background: #0071e3; }
 .cell-content:not(.player-x):not(.player-o){ opacity: 1; color: var(--label-2); }
+
+:root:not([data-theme="dark"]) .back-link{ color: #137a40; }
+
+/* Klirr-Prüfung (heller Modus): Zweittexte und Rot kräftiger, Vereinsnamen mind. 11 px */
+:root:not([data-theme="dark"]){ --label-2: rgba(60,60,67,0.78); --label-3: rgba(60,60,67,0.55); --red: #d70015; }
+.team-logo span{ font-size: clamp(11px, calc(var(--cell) * 0.1), 12px); }

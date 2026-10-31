@@ -8,7 +8,7 @@
   --glass: rgba(40, 37, 58, .55);
   --glass-strong: rgba(27, 25, 38, .82);
 }
-body {
+html[data-theme="dark"] body {
   background: radial-gradient(120% 60% at 50% -10%, #221d3a 0%, transparent 60%), linear-gradient(#14121f, #0a0a10 420px) #0a0a10 no-repeat;
 }
 .klirr-back {
@@ -37,3 +37,11 @@ body {
 
 /* Trinkmodus-Schalter: Unterzeile */
 .settingRow__sub { font-weight: 400; color: var(--ink-2); font-size: .8rem; margin-top: 2px; }
+
+/* Heller Modus: Zurück-Link dunkler, damit er auf Hell lesbar bleibt */
+:root:not([data-theme="dark"]) .klirr-back { color: var(--klirr-tint-light, #1c1c1e); }
+
+/* Flip 7: Entfernen- und Bust-Knöpfe mit 44-pt-Tippfläche (optisch gleich groß) */
+.seat__x { position: relative; }
+.seat__x::after, .quickBust::after { content: ""; position: absolute; inset: -5px; }
+.quickBust { min-height: 44px; }

@@ -7,8 +7,8 @@
   <meta name="description" content="Offline-fähiger Punktezähler für das Kartenspiel Wizard: Ansagen und Stiche antippen, Punkte, Geber und Rangliste werden automatisch geführt." />
   <meta name="theme-color" content="#14121f" />
   <meta name="darkreader-lock" />
-  <meta name="color-scheme" content="dark" />
-  <script>document.documentElement.dataset.theme = "dark"; /* Klirr: immer dunkel */</script>
+  <meta name="color-scheme" content="light dark" />
+  <script>try { if (matchMedia("(prefers-color-scheme: dark)").matches) document.documentElement.dataset.theme = "dark"; } catch (e) {} /* Klirr: folgt dem iPhone */</script>
 
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -24,7 +24,7 @@
 
   <link rel="stylesheet" href="/wizard/styles.css" />
   <link rel="stylesheet" href="/klirr-game.css" />
-  <style>:root { --klirr-tint: #8aa2ff; }</style>
+  <style>:root { --klirr-tint: #8aa2ff; --klirr-tint-light: #2a3fd0; }</style>
   <script src="/wizard/rules.js" defer></script>
   <script src="/wizard/app.js" defer></script>
   <script src="/klirr.js" defer></script>

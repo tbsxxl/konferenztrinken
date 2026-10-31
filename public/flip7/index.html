@@ -6,9 +6,9 @@
   <title>Flip 7 · Klirr</title>
   <meta name="description" content="Schneller, offline-fähiger Punktezähler für das Kartenspiel Flip 7: Karten antippen, Bust und +15-Bonus werden automatisch erkannt, mit Live-Ranking und Rundenverlauf." />
   <meta name="theme-color" content="#14121f" />
-  <meta name="color-scheme" content="dark" />
+  <meta name="color-scheme" content="light dark" />
   <meta name="darkreader-lock" />
-  <script>document.documentElement.dataset.theme = "dark"; /* Klirr: immer dunkel */</script>
+  <script>try { if (matchMedia("(prefers-color-scheme: dark)").matches) document.documentElement.dataset.theme = "dark"; } catch (e) {} /* Klirr: folgt dem iPhone */</script>
 
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -24,7 +24,7 @@
 
   <link rel="stylesheet" href="/flip7/styles.css" />
   <link rel="stylesheet" href="/klirr-game.css" />
-  <style>:root { --klirr-tint: #4fe0c8; }</style>
+  <style>:root { --klirr-tint: #4fe0c8; --klirr-tint-light: #08695f; }</style>
   <script src="/flip7/rules.js" defer></script>
   <script src="/flip7/app.js" defer></script>
   <script src="/klirr.js" defer></script>

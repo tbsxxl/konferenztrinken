@@ -2,12 +2,13 @@
    Satzschreibung, iOS-Bedienelemente. Wird als letztes Stylesheet geladen. */
 
 :root {
-  color-scheme: dark;
+  color-scheme: light dark;
   /* Marke „Mitternacht“: dunkler Grund, Glas, Bernstein nur für den einen wichtigen Moment */
   --night: #14121f;
   --night-deep: #0a0a10;
   --amber: #ffb340;
   --amber-2: #ff7a1a;
+  --amber-ink: #ffb340; /* Bernstein als Textfarbe (hell: dunkler, ≥ 4.5:1) */
   --violet: #7c3aed;
   --bg: #0a0a10;
   --cell: #1b1926;
@@ -147,3 +148,35 @@ footer { color: var(--secondary); } /* tertiary (2.4:1) war zu schwach für Text
 
 /* Tab-Leiste: aktives Symbol gefüllt (Apple: „Prefer filled symbols“) */
 .tabbar button[aria-selected="true"]:not([data-tab="zaehler"]) svg :is(rect, circle, path:first-of-type) { fill: currentColor; fill-opacity: 0.3; }
+
+
+/* ---------- Heller Modus (folgt der iPhone-Einstellung, kein eigener Schalter) ---------- */
+@media (prefers-color-scheme: light) {
+  :root {
+    --night: #f7f6fb; --night-deep: #f2f2f7; --bg: #f2f2f7;
+    --cell: #ffffff; --cell2: #f2f2f7;
+    --fill: rgba(120, 120, 128, 0.12);
+    --label: #000000; --secondary: rgba(60, 60, 67, 0.78); --tertiary: rgba(60, 60, 67, 0.45);
+    --sep: rgba(60, 60, 67, 0.22);
+    --board-1: #ffffff; --board-2: #ffffff;
+    --amber-ink: #a85400;
+  }
+  body { background: radial-gradient(120% 60% at 50% -10%, #ebe6ff 0%, transparent 60%), linear-gradient(#f7f6fb, #f2f2f7 420px) #f2f2f7 no-repeat; color: var(--label); }
+  .list, .empty, .game, .ticker, .todo, .surface, .sheet, .game-tile + .soon {
+    --label: #000000; --secondary: rgba(60, 60, 67, 0.78); --tertiary: rgba(60, 60, 67, 0.45);
+    --sep: rgba(60, 60, 67, 0.22); --fill: rgba(120, 120, 128, 0.12);
+  }
+  .seg button { color: #000; }
+  .seg button[aria-pressed="true"] { background: #fff; color: #000; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12), 0 3px 1px rgba(0, 0, 0, 0.04); }
+  .cats button { color: #000; }
+  .tabbar button { color: rgba(60, 60, 67, 0.8); }
+  .tabbar button[aria-selected="true"] { background: rgba(0, 0, 0, 0.06); }
+  .tabbar { background: rgba(249, 249, 249, 0.82); border-color: rgba(0, 0, 0, 0.08); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12); }
+  .glass { background: rgba(255, 255, 255, 0.72) !important; border-color: rgba(0, 0, 0, 0.08) !important; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.6) !important; }
+}
+@media (prefers-color-scheme: light) and (prefers-contrast: more) {
+  :root { --secondary: rgba(60, 60, 67, 0.9); --tertiary: rgba(60, 60, 67, 0.7); --sep: rgba(60, 60, 67, 0.45); }
+}
+@media (prefers-color-scheme: light) and (prefers-reduced-transparency: reduce), (prefers-color-scheme: light) and (prefers-contrast: more) {
+  .glass, .nowplaying, .cta-bar, .tabbar, .sheet { background: #ffffff !important; }
+}

@@ -4,8 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="darkreader-lock" />
-  <meta name="color-scheme" content="dark" />
-  <meta name="theme-color" content="#14121f" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#14121f" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#f7f6fb" media="(prefers-color-scheme: light)" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Klirr" />
@@ -19,26 +20,27 @@
     /* Hub im Stil von Apple Music: große Titel, Cover-Kacheln, schlichte Listen, Glas-Kapsel für „Läuft gerade“ */
     main { padding-bottom: calc(140px + env(safe-area-inset-bottom)); }
     .topbar { display: flex; justify-content: flex-end; gap: 10px; margin: 2px 0 6px; }
-    .glass-btn { display: inline-grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; color: #fff; text-decoration: none; font-size: 1.25rem; }
+    .glass-btn { display: inline-grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; color: var(--label); text-decoration: none; font-size: 1.25rem; }
     .glass { background: rgba(120, 120, 128, 0.28); border: 0.5px solid rgba(255, 255, 255, 0.16); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12); -webkit-backdrop-filter: blur(22px) saturate(180%); backdrop-filter: blur(22px) saturate(180%); }
     .glass-btn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     .hero-title { font: 700 2.4rem/1.1 -apple-system, BlinkMacSystemFont, "SF Pro Display", Inter, system-ui, sans-serif; letter-spacing: -0.01em; margin: 0 4px 2px; }
-    .hero-sub { margin: 0 4px 22px; color: rgba(235, 235, 245, 0.6); font-size: 1rem; }
+    .hero-sub { margin: 0 4px 22px; color: var(--secondary); font-size: 1rem; }
 
     .shelf-title { display: flex; align-items: center; gap: 6px; margin: 26px 4px 12px; font: 700 1.35rem/1.2 -apple-system, "SF Pro Display", Inter, system-ui, sans-serif; letter-spacing: -0.01em; }
-    .shelf-title span { color: rgba(235, 235, 245, 0.6); font-weight: 600; }
+    .shelf-title span { color: var(--secondary); font-weight: 600; }
 
     /* Cover-Kacheln wie Alben */
     /* Zwei Spalten bei normaler Schrift, eine bei großer (Dynamic Type) */
     .covers { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.6em), 1fr)); gap: 18px 14px; }
     .cover { container-type: inline-size; }
     .covers .cover-card b, .covers .cover-card small { white-space: normal; }
-    .cover-card { color: #fff; text-decoration: none; min-width: 0; }
+    .cover-card { color: var(--label); text-decoration: none; min-width: 0; }
+    .cover { color: #fff; }
     .cover-card:active .cover { transform: scale(0.97); }
     .cover { position: relative; aspect-ratio: 1; border-radius: 14px; overflow: hidden; display: grid; place-items: center; transition: transform 0.2s; box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45); }
     .cover::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.18); pointer-events: none; }
     .cover-card b { display: block; margin-top: 8px; font-size: 0.95rem; font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .cover-card small { display: block; color: rgba(235, 235, 245, 0.6); font-size: 0.85rem; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cover-card small { display: block; color: var(--secondary); font-size: 0.85rem; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .badge-live { position: absolute; left: 10px; top: 10px; z-index: 2; padding: 4px 9px; border-radius: 999px; background: rgba(0, 0, 0, 0.55); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); font-size: max(11px, 6.5cqw); font-weight: 700; letter-spacing: 0.02em; }
     .badge-live::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 8px var(--amber-2); margin-right: 5px; vertical-align: 1px; }
 
@@ -89,14 +91,14 @@
     .prow + .prow::before { content: ""; position: absolute; top: 0; left: 62px; right: 0; border-top: 0.5px solid rgba(84, 84, 88, 0.65); }
     .prow .av { width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center; background: var(--c); color: #fff; font: 700 1.3rem/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.18); text-transform: uppercase; }
     .prow b { font-size: 1.05rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .prow small { display: block; color: rgba(235, 235, 245, 0.6); font-size: 0.85rem; }
-    .prow button { width: 44px; height: 44px; border: 0; border-radius: 50%; background: transparent; color: rgba(235, 235, 245, 0.6); font-size: 1.4rem; line-height: 1; }
-    .prow.add .av { background: rgba(118, 118, 128, 0.24); color: var(--amber); font-size: 1.6rem; }
-    .prow.add input { width: 100%; min-height: 44px; border: 0; background: transparent; color: #fff; font: inherit; font-size: 1.05rem; }
-    .prow.add input::placeholder { color: var(--amber); }
-    .prow.add input:focus::placeholder { color: rgba(235, 235, 245, 0.3); }
+    .prow small { display: block; color: var(--secondary); font-size: 0.85rem; }
+    .prow button { width: 44px; height: 44px; border: 0; border-radius: 50%; background: transparent; color: var(--secondary); font-size: 1.4rem; line-height: 1; }
+    .prow.add .av { background: rgba(118, 118, 128, 0.24); color: var(--amber-ink); font-size: 1.6rem; }
+    .prow.add input { width: 100%; min-height: 44px; border: 0; background: transparent; color: var(--label); font: inherit; font-size: 1.05rem; }
+    .prow.add input::placeholder { color: var(--amber-ink); }
+    .prow.add input:focus::placeholder { color: var(--tertiary); }
 
-    .links .prow { grid-template-columns: 30px minmax(0, 1fr) 20px; min-height: 52px; text-decoration: none; color: #fff; }
+    .links .prow { grid-template-columns: 30px minmax(0, 1fr) 20px; min-height: 52px; text-decoration: none; color: var(--label); }
     .links .prow + .prow::before { left: 44px; }
     .links .ico { width: 30px; height: 30px; border-radius: 8px; background: var(--t); display: grid; place-items: center; }
     .links .ico svg { width: 19px; height: 19px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -105,23 +107,23 @@
     .covers .cover-card { animation: kl-rise 0.5s cubic-bezier(0.32, 0.72, 0, 1) both; animation-delay: calc(var(--i, 0) * 45ms); }
     .nowplaying:not([hidden]) { animation: kl-rise 0.45s 0.15s cubic-bezier(0.32, 0.72, 0, 1) both; }
     @media (prefers-reduced-motion: reduce) { .covers .cover-card, .nowplaying { animation: none !important; } }
-    .links .chev { color: rgba(235, 235, 245, 0.3); font-size: 1.3rem; }
+    .links .chev { color: var(--tertiary); font-size: 1.3rem; }
 
     /* „Läuft gerade“ als Glas-Kapsel wie der Mini-Player */
-    .nowplaying { position: fixed; left: 12px; right: 12px; bottom: calc(14px + env(safe-area-inset-bottom)); z-index: 20; max-width: 560px; margin: 0 auto; display: grid; grid-template-columns: 46px minmax(0, 1fr) 48px; gap: 12px; align-items: center; padding: 8px 8px 8px 10px; border-radius: 999px; color: #fff; text-decoration: none; }
+    .nowplaying { position: fixed; left: 12px; right: 12px; bottom: calc(14px + env(safe-area-inset-bottom)); z-index: 20; max-width: 560px; margin: 0 auto; display: grid; grid-template-columns: 46px minmax(0, 1fr) 48px; gap: 12px; align-items: center; padding: 8px 8px 8px 10px; border-radius: 999px; color: var(--label); text-decoration: none; }
     .nowplaying .mini-art { position: relative; width: 46px; height: 46px; border-radius: 50%; overflow: hidden; display: grid; place-items: center; }
     .nowplaying .mini-art .scoreboard { width: 100%; height: 100%; border-radius: 0; padding: 0; background: none; box-shadow: none; display: grid; place-items: center; }
-    .nowplaying small { display: block; color: rgba(235, 235, 245, 0.6); font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .nowplaying small { display: block; color: var(--secondary); font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .nowplaying b { display: block; font-size: 1rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .nowplaying .play { width: 48px; height: 48px; display: grid; place-items: center; }
-    .nowplaying .play svg { width: 26px; height: 26px; fill: #fff; }
+    .nowplaying .play svg { width: 26px; height: 26px; fill: var(--label); }
     footer { margin-top: 28px; }
   </style>
   <link rel="stylesheet" href="/apple.css" />
   <script src="/klirr.js" defer></script>
   <style>
     /* Hub = Marke pur: Bernstein als einziger Akzent */
-    :root { --accent: var(--amber); --accent-ink: #1a1206; --tint: var(--amber); }
+    :root { --accent: var(--amber); --accent-ink: #1a1206; --tint: var(--amber-ink); }
     .brand { display: flex; align-items: center; gap: 12px; margin: 0 4px 2px; }
     /* Logo = Trinkmodus-Schalter. Aus: Kreise getrennt, nichts leuchtet. An: Kreise stoßen an, Schnittmenge leuchtet. */
     .brand-mark { flex: none; width: 56px; height: 56px; padding: 0; border: 0; border-radius: 13px; overflow: hidden; background: none; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45), inset 0 0 0 0.5px rgba(255, 255, 255, 0.18); }
@@ -174,7 +176,7 @@
     .links .prow { grid-template-columns: 28px minmax(0, 1fr) 20px; min-height: 54px; }
     .links .prow + .prow::before { left: 42px; }
     .links .ico { width: 28px; height: 28px; background: none; }
-    .links .ico svg { width: 25px; height: 25px; stroke: var(--amber); }
+    .links .ico svg { width: 25px; height: 25px; stroke: var(--amber-ink); }
     .links .chev { font-size: 1.5rem; }
     .shelf-title { margin-top: 30px; }
   </style>
