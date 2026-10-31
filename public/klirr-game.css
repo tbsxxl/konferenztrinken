@@ -1,0 +1,17 @@
+/* Gemeinsame Klirr-Schicht für übernommene Spiele (Wizard, Flip 7): Mitternacht-Look und Zurück-Link. */
+[hidden] { display: none !important; }
+:root[data-theme="dark"] {
+  --bg: #0a0a10;
+  --surface: #1b1926;
+  --surface-2: #282636;
+  --sheet-bg: rgba(27, 25, 38, .94);
+  --glass: rgba(40, 37, 58, .55);
+  --glass-strong: rgba(27, 25, 38, .82);
+}
+body {
+  background: radial-gradient(120% 60% at 50% -10%, #221d3a 0%, transparent 60%), linear-gradient(#14121f, #0a0a10 420px) #0a0a10 no-repeat;
+}
+.klirr-back {
+  display: inline-flex; align-items: center; min-height: 32px; margin: 0 0 2px -2px;
+  color: var(--klirr-tint, #ffb340); text-decoration: none; font-size: .95rem; font-weight: 500;
+}
