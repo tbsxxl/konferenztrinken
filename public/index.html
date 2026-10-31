@@ -140,15 +140,33 @@
     /* Wortmarke: gerundete Schrift, Bernstein-Perle als Schlusspunkt */
     .wordmark { font-family: "SF Pro Rounded", ui-rounded, -apple-system, Inter, system-ui, sans-serif; font-weight: 800; font-size: 2.6rem; letter-spacing: -0.02em; }
     .wordmark .perl { display: inline-block; width: 0.2em; height: 0.2em; margin-left: 0.06em; border-radius: 50%; background: var(--amber); box-shadow: 0 0 12px var(--amber-2); vertical-align: 0.62em; }
+    /* ---------- Apple-Music-Gefühl: ruhiger Kopf, 3er-Raster, freie Listen ---------- */
+    .brand { gap: 12px; margin: 6px 4px 2px; }
+    .brand .glass-btn { margin-left: auto; width: 44px; height: 44px; flex: none; }
+    .brand-mark { width: 44px; height: 44px; border-radius: 10px; }
+    .wordmark { font-size: 2.125rem; }
+    .hero-sub { margin: 4px 4px 22px; font-size: 0.94rem; }
+    .covers { grid-template-columns: repeat(auto-fill, minmax(min(100%, 6.2em), 1fr)); gap: 16px 12px; }
+    .cover { border-radius: 10px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4); }
+    .covers .cover-card > b { margin-top: 7px; hyphens: auto; -webkit-hyphens: auto; text-align: center; font-size: 0.88rem; font-weight: 400; line-height: 1.25; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .badge-live { left: 6px; top: 6px; padding: 3px 7px; }
+    .badge-live::before { margin-right: 4px; }
+    /* Listen frei auf dem Grund, Symbole in Akzentfarbe, Pfeile, eingerückte Trennlinien */
+    main .list.rows, main .list.links { background: transparent !important; padding: 0 !important; border-radius: 0; }
+    .prow .av { width: 44px; height: 44px; border-radius: 50%; font-size: 1.15rem; }
+    .prow { grid-template-columns: 44px minmax(0, 1fr) 44px; min-height: 60px; }
+    .prow + .prow::before { left: 58px; }
+    .prow.add .av { background: rgba(255, 179, 64, 0.14); }
+    .links .prow { grid-template-columns: 28px minmax(0, 1fr) 20px; min-height: 54px; }
+    .links .prow + .prow::before { left: 42px; }
+    .links .ico { width: 28px; height: 28px; background: none; }
+    .links .ico svg { width: 25px; height: 25px; stroke: var(--amber); }
+    .links .chev { font-size: 1.5rem; }
+    .shelf-title { margin-top: 30px; }
   </style>
 </head>
 <body>
 <main>
-  <div class="topbar">
-    <a class="glass-btn glass" href="/datenschutz.html" aria-label="Datenschutz und Infos">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6M12 7.5v.01"/></svg>
-    </a>
-  </div>
   <div class="brand">
     <button type="button" class="brand-mark" id="drinkMark" aria-pressed="false" aria-label="Trinkmodus einschalten">
       <svg viewBox="0 0 1024 1024" aria-hidden="true">
@@ -167,19 +185,20 @@
       </svg>
     </button>
     <h1 class="hero-title wordmark">Klirr<span class="perl" aria-hidden="true"></span></h1>
+    <a class="glass-btn glass" href="/datenschutz.html" aria-label="Datenschutz und Infos">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6M12 7.5v.01"/></svg>
+    </a>
   </div>
   <p class="hero-sub" id="heroSub">Trinkspiele für deine Runde.</p>
 
-  <h2 class="shelf-title">Spiele</h2>
-  <div class="covers">
+  <div class="covers" aria-label="Spiele">
     <a class="cover-card" href="/konferenz.html">
       <div class="cover art-konf">
         <span class="badge-live" id="liveKonferenz" hidden>Läuft</span>
         <svg class="ball" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="none" stroke="#fff" stroke-width="5"/><path d="M50 30 L66 42 L60 61 L40 61 L34 42 Z" fill="#fff"/></svg>
         <div class="scoreboard" aria-hidden="true"><span class="team"><svg class="shield" viewBox="0 0 24 28"><path d="M12 1.5 L22 5 V13 C22 20 17.5 24.5 12 26.5 C6.5 24.5 2 20 2 13 V5 Z"/></svg></span><span class="score">2:1</span><span class="team"><svg class="shield alt" viewBox="0 0 24 28"><path d="M12 1.5 L22 5 V13 C22 20 17.5 24.5 12 26.5 C6.5 24.5 2 20 2 13 V5 Z"/></svg></span><span class="min">67'</span></div>
       </div>
-      <b>Konferenztrinken</b>
-      <small>Bundesliga · Champions League</small>
+      <b>Konferenz&shy;trinken</b>
     </a>
     <a class="cover-card" href="/dumm.html">
       <div class="cover art-dumm">
@@ -189,7 +208,6 @@
         <span class="hearts" aria-hidden="true">♥♥♡</span>
       </div>
       <b>Der Dümmste fliegt</b>
-      <small>Quiz · 650 Fragen · Mehrspieler</small>
     </a>
     <a class="cover-card" href="/tictactoe/">
       <div class="cover art-ttt">
@@ -197,12 +215,7 @@
         <div class="ttt" aria-hidden="true"><span>X</span><span></span><span>O</span><span></span><span>X</span><span></span><span>O</span><span></span><span>X</span></div>
       </div>
       <b>Tic Tac Toe</b>
-      <small>Bundesliga · Quiz für zwei</small>
     </a>
-  </div>
-
-  <h2 class="shelf-title">Kartenspiele</h2>
-  <div class="covers">
     <a class="cover-card" href="/wizard/">
       <div class="cover art-wiz">
         <span class="badge-live" id="liveWizard" hidden>Läuft</span>
@@ -210,7 +223,6 @@
         <div class="fan" aria-hidden="true"><i></i><i></i><b>✦</b></div>
       </div>
       <b>Wizard</b>
-      <small>Punktezähler</small>
     </a>
     <a class="cover-card" href="/flip7/">
       <div class="cover art-flip">
@@ -218,7 +230,6 @@
         <div class="flip" aria-hidden="true"><i></i><b>7</b></div>
       </div>
       <b>Flip 7</b>
-      <small>Punktezähler</small>
     </a>
   </div>
 
