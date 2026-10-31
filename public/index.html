@@ -274,7 +274,9 @@
 
   // Laufende Runden auf diesem Gerät
   const kt = read('kt-players');
-  const ktRunning = Array.isArray(kt) && kt.length > 0;
+  // Läuft = Runde mit Spielern, zuletzt in den letzten 18 Stunden benutzt (sonst gilt sie als vorbei)
+  const ktLast = read('kt-last', 0);
+  const ktRunning = Array.isArray(kt) && kt.length > 0 && Date.now() - ktLast < 18 * 3600e3;
   const dumm = read('dumm-state');
   const dummRunning = !!(dumm && !dumm.finished && dumm.phase && dumm.phase !== 'lobby');
   const ttt = read('bttt_state_v1');

@@ -64,6 +64,7 @@
       <label class="cell"><span>Push-Nachrichten<small class="cell-sub" id="pushInfo">Tore, Karten, Halbzeit, Abpfiff aufs Handy</small></span><input type="checkbox" class="switch" id="pushToggle" /></label>
       <button class="cell action" id="autoPickNow">Fehlende Picks auslosen</button>
       <button class="cell danger" id="resetCounts">Zähler auf 0 setzen</button>
+      <button class="cell danger" id="endRound">Runde beenden</button>
       <a class="cell action" href="/datenschutz.html" style="text-decoration:none">Datenschutz</a>
     </div>
     <div class="error" id="pickError" role="alert"></div>
@@ -1024,6 +1025,7 @@
     store.set('kt-players', players);
     store.set('kt-feed', feed);
     store.set('kt-processed', [...processed]);
+    store.set('kt-last', Date.now()); // für „Läuft“ im Hub
   }
 
   let toastTimer = null;
@@ -1434,6 +1436,19 @@
     if (!(await ask({ title: 'Zähler auf 0?', text: 'Alle Schlucke und Ex werden auf 0 gesetzt.', ok: 'Zurücksetzen', danger: true }))) return;
     players.forEach((p) => { p.count = 0; p.ex = 0; });
     renderAll();
+  });
+
+  // Runde beenden: Spieler, Zähler, Ticker und Push zurücksetzen. Die Mitspielerliste bleibt.
+  $('endRound').addEventListener('click', async () => {
+    if (!(await ask({ title: 'Runde beenden?', text: 'Teams, Picks, Zähler und Ticker werden gelöscht. Die Namen der Mitspieler bleiben.', ok: 'Beenden', danger: true }))) return;
+    players = []; feed = []; processed = new Set();
+    // Push abmelden (höchstens 3 s warten, damit Beenden nie hängen bleibt)
+    try { await Promise.race([disablePush(), new Promise((r) => setTimeout(r, 3000))]); } catch {}
+    $('pushToggle').checked = false;
+    store.set('kt-players', []); store.set('kt-feed', []); store.set('kt-processed', []);
+    try { localStorage.removeItem('kt-last'); } catch {}
+    renderAll();
+    showTab('auslosung');
   });
 
   // Start: ohne Runde zuerst zur Einrichtung, sonst Live.
