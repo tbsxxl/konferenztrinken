@@ -190,12 +190,12 @@
   <h2 class="shelf-title">Kartenspiele</h2>
   <div class="covers">
     <a class="cover-card" href="/wizard/">
-      <div class="cover art-icon"><span class="badge-live" id="liveWizard" hidden>Läuft</span><img src="/wizard/icon.svg" alt="" /></div>
+      <div class="cover art-icon"><span class="badge-live" id="liveWizard" hidden>Läuft</span><img src="/wizard/cover.png" alt="" width="720" height="720" decoding="async" /></div>
       <b>Wizard</b>
       <small>Punktezähler</small>
     </a>
     <a class="cover-card" href="/flip7/">
-      <div class="cover art-icon"><span class="badge-live" id="liveFlip" hidden>Läuft</span><img src="/flip7/icon.svg" alt="" /></div>
+      <div class="cover art-icon"><span class="badge-live" id="liveFlip" hidden>Läuft</span><img src="/flip7/cover.png" alt="" width="720" height="720" decoding="async" /></div>
       <b>Flip 7</b>
       <small>Punktezähler</small>
     </a>
@@ -246,8 +246,8 @@
   const playIcon = () => { const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); s.setAttribute('viewBox', '0 0 24 24'); s.innerHTML = '<path d="M8 5.5v13l10.5-6.5z"/>'; return s; };
   const icoGames = [
     [tttRunning, '/tictactoe/', 'Tic Tac Toe', 'Spiel läuft', 'art-ttt', '#'],
-    [wizRunning, '/wizard/', 'Wizard', 'Spiel läuft', 'art-icon', '/wizard/icon.svg'],
-    [flipRunning, '/flip7/', 'Flip 7', 'Spiel läuft', 'art-icon', '/flip7/icon.svg'],
+    [wizRunning, '/wizard/', 'Wizard', 'Spiel läuft', 'art-icon', '/wizard/cover.png'],
+    [flipRunning, '/flip7/', 'Flip 7', 'Spiel läuft', 'art-icon', '/flip7/cover.png'],
   ].find((g) => g[0]);
   if (!dummRunning && !ktRunning && icoGames) {
     const [, href, title, sub, cls, src] = icoGames;
