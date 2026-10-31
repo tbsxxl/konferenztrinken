@@ -909,6 +909,12 @@
 
   /* ---------- Start ---------- */
 
+  // Klirr: Mitspieler aus dem Hub übernehmen, wenn ein neues Spiel noch leer ist
+  if (!state.started && !state.players.length) {
+    const hub = String(read("kt-names") || "").split("\n").map(cleanName).filter(Boolean);
+    for (const name of hub.slice(0, MAX_PLAYERS)) if (!findDup(name)) state.players.push({ id: uid(), name });
+  }
+
   applyTheme();
   save();
   render();

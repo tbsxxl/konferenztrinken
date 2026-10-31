@@ -1156,6 +1156,16 @@ if (!navigator.vibrate) $("hapticsRow").hidden = true;
 
 buildGrids();
 load();
+// Klirr: Mitspieler aus dem Hub übernehmen, wenn ein neues Spiel noch leer ist
+if (!game.locked && !game.players.length) {
+  const hub = String(storageGet("kt-names") || "").split("\n").map((s) => s.trim().replace(/\s+/g, " ")).filter(Boolean);
+  for (const name of hub.slice(0, MAX_PLAYERS)) {
+    const p = { id: uid(), name, color: nextColor(), total: 0, rounds: [], cur: emptyEntry() };
+    game.players.push(p);
+    if (!game.dealer) game.dealer = p.id;
+  }
+  if (game.players.length) save();
+}
 applyPrefs();
 render();
 
