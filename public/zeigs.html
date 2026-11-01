@@ -43,16 +43,18 @@
 
     /* Punktetafel */
     .board { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
-    .board .t { border-radius: 16px; padding: 10px 12px; background: var(--c); color: #fff; }
-    .board .t.on { outline: 3px solid var(--label); outline-offset: 2px; }
-    .board .t small { display: block; font-weight: 600; opacity: 0.9; }
+    .board .t { border-radius: 16px; padding: 10px 12px; background: var(--cell); color: var(--label); }
+    .board .t.on { box-shadow: inset 0 0 0 2px var(--c); }
+    .board .t small { display: flex; align-items: center; gap: 6px; font-weight: 600; color: var(--secondary); }
+    .board .t small::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--c); }
     .board .t b { font: 800 1.8rem/1.1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; }
-    .board .bar { height: 5px; border-radius: 3px; background: rgba(255, 255, 255, 0.3); margin-top: 6px; overflow: hidden; }
-    .board .bar i { display: block; height: 100%; background: #fff; }
+    .board .bar { height: 5px; border-radius: 3px; background: var(--fill); margin-top: 6px; overflow: hidden; }
+    .board .bar i { display: block; height: 100%; background: var(--c); }
 
     /* Zug */
     .turnbox { margin-top: 14px; border-radius: 26px; padding: 22px 18px; text-align: center; color: #fff; background: var(--c); box-shadow: 0 14px 34px rgba(0, 0, 0, 0.3); }
     .turnbox .mode { font-size: 3.2rem; line-height: 1; }
+    .turnbox .mode .kl-ico { width: 3.4rem; height: 3.4rem; }
     .turnbox b { display: block; margin-top: 8px; font: 800 1.9rem/1.1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; }
     .turnbox p { margin: 6px 0 0; font-weight: 600; opacity: 0.92; }
     .turnbox .all { display: inline-block; margin-top: 10px; padding: 6px 14px; border-radius: 999px; background: rgba(0, 0, 0, 0.3); font-weight: 700; }
@@ -131,7 +133,6 @@
     <div class="mini" id="gameMini"><button id="quit">Spiel beenden</button></div>
   </section>
 
-  <footer><span class="drink-only">Trinkt verantwortungsvoll · Wasser zwischendurch · Alkoholfrei zählt auch.<br /></span><a class="legal" href="/datenschutz.html">Datenschutz</a></footer>
 </main>
 
 <script src="/zeigs-begriffe.js"></script>
@@ -145,7 +146,7 @@
   const shuffle = (arr) => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   const lines = (text) => String(text || '').split('\n').map((s) => s.trim()).filter(Boolean);
   const TEAMS = [['Team Blau', '#0a6ed1'], ['Team Orange', '#b85400'], ['Team Violett', '#8e44c9'], ['Team Türkis', '#0b7285']];
-  const MODES = { talk: ['🗣️', 'Erklären', 'Ohne den Begriff oder Teile davon zu sagen.'], draw: ['✏️', 'Zeichnen', 'Keine Buchstaben, keine Zahlen.'], act: ['🎭', 'Vormachen', 'Ohne Worte und Geräusche.'] };
+  const MODES = { talk: ['talk', 'Erklären', 'Ohne den Begriff oder Teile davon zu sagen.'], draw: ['draw', 'Zeichnen', 'Keine Buchstaben, keine Zahlen.'], act: ['act', 'Vormachen', 'Ohne Worte und Geräusche.'] };
   const LEVELS = { 1: 'leicht', 2: 'mittel', 3: 'schwer' };
 
   // ---------- Einstellungen ----------
@@ -302,7 +303,7 @@
     const [icon, label, rule] = MODES[S.mode];
     $('stageTitle').textContent = `${t.name} ist dran`;
     return [el('div', { className: 'turnbox', style: `--c: ${t.color}` },
-      el('div', { className: 'mode', textContent: icon }),
+      el('div', { className: 'mode' }, window.Klirr ? Klirr.icon(icon) : null),
       el('b', { textContent: `${S.actor} – ${label}` }),
       el('p', { textContent: rule }),
       S.everyone ? el('span', { className: 'all', textContent: 'Alle raten mit!' }) : null),
@@ -318,14 +319,15 @@
   function stageReady() {
     const [icon, label, rule] = MODES[S.mode];
     $('stageTitle').textContent = `Bereit, ${S.actor}?`;
-    return [el('div', { className: 'list' }, el('div', { className: 'mode-info', style: 'padding-top:14px', textContent: `${icon} ${label} · ${LEVELS[S.level]}. ${rule} Nur du schaust aufs Handy. „Erraten“ oder „Überspringen“ – sofort kommt der nächste Begriff.` })),
+    return [el('div', { className: 'list' }, el('div', { className: 'mode-info', style: 'padding-top:14px', textContent: `${label} · ${LEVELS[S.level]}. ${rule} Nur du schaust aufs Handy. „Erraten“ oder „Überspringen“ – sofort kommt der nächste Begriff.` })),
       el('button', { className: 'btn', textContent: `Los – ${S.cfg.time} Sekunden`, onclick: () => { S.deadline = Date.now() + S.cfg.time * 1000; S.log = []; S.word = pickWord(S.level); S.phase = 'play'; save(); render(); } })];
   }
 
   function stagePlay() {
     const [icon, label] = MODES[S.mode];
     const got = S.log.filter((x) => x.by !== null).length;
-    $('stageTitle').textContent = `${icon} ${label} · ${got} geschafft`;
+    $('stageTitle').textContent = label;
+    $('roundLabel').textContent = `Zug ${S.turn} · ${got} geschafft`;
     const parts = [el('div', { className: 'timer', id: 'timer', textContent: Math.ceil(Math.max(0, S.deadline - Date.now()) / 1000) }), el('div', { className: 'tbar' }, el('i', { id: 'tbar' }))];
     const drawing = S.mode === 'draw' && S.cfg.pad;
     if (drawing) {
@@ -403,7 +405,7 @@
     const v = el('div', { className: 'verdict', style: `--c: ${L.color}` },
       el('b', { textContent: `+${own} für ${L.team}` }),
       el('p', { textContent: L.skipped ? `${L.skipped} übersprungen.` : 'Nichts übersprungen!' }),
-      L.drink ? el('p', { textContent: `🍺 ${L.drink}.` }) : null);
+      L.drink ? el('p', { textContent: `${L.drink}.` }) : null);
     const list = el('div', { className: 'list', style: 'margin-top:12px' }, ...L.log.map((x) => el('div', { className: 'score' },
       el('span', { textContent: x.w }), el('b', { textContent: x.by === null ? '–' : (S.teams[x.by].name === L.team ? `+${L.pts}` : `+${L.pts} ${S.teams[x.by].name}`) }))));
     const nt = S.teams[(S.team + 1) % S.teams.length];
@@ -417,13 +419,14 @@
     const v = el('div', { className: 'verdict', style: `--c: ${w.color}` },
       el('b', { textContent: `${w.name} gewinnt!` }),
       el('p', { textContent: `${w.players.join(', ')} – mit ${w.score} Punkten.` }),
-      S.cfg.drink ? el('p', { textContent: `🍺 Exen: ${losers.join(', ')}.` }) : null);
+      S.cfg.drink ? el('p', { textContent: `Exen: ${losers.join(', ')}.` }) : null);
     return [v,
       el('button', { className: 'btn', textContent: 'Nochmal mit denselben Teams', onclick: () => { split = S.teams.map((t) => t.players); store.set('zeigs-split', split); startGame(); } }),
       el('button', { className: 'btn ghost', textContent: 'Teams & Regeln', onclick: () => { S.aborted = true; save(); render(); } })];
   }
 
   // ---------- Start ----------
+  window.addEventListener('DOMContentLoaded', () => { window.Klirr?.moreMenu(document.querySelector('#game .lt'), $('gameMini'), [{ label: 'Datenschutz', href: '/datenschutz.html' }]); render(); });
   render();
 </script>
 </body>

@@ -178,7 +178,6 @@
     <div class="mini" id="hostMini"><button id="quit">Runde abbrechen</button></div>
   </section>
 
-  <footer><span class="drink-only">Trinkt verantwortungsvoll · Wasser zwischendurch · Alkoholfrei zählt auch.<br /></span><a class="legal" href="/datenschutz.html">Datenschutz</a></footer>
 </main>
 
 <script src="/imposter-woerter.js"></script>
@@ -610,7 +609,7 @@
       el('b', { textContent: V.crewWins ? 'Die Runde gewinnt!' : `${imps} gewinnt!` }),
       el('p', { textContent: text }),
       el('p', { textContent: `Das Wort war „${R.word}“${V.cfg.tip ? ` · Tipp: ${R.tip}` : ''}.` }));
-    if (V.cfg.drink) v.append(el('p', { className: 'drinks', textContent: V.crewWins ? `🍺 ${imps} trinkt 3.` : `🍺 ${others.join(', ')} trinken je 2.` }));
+    if (V.cfg.drink) v.append(el('p', { className: 'drinks', textContent: V.crewWins ? `${imps} trinkt 3.` : `${others.join(', ')} trinken je 2.` }));
     const parts = [v];
     if (R.votes && Object.keys(R.votes).length) {
       const counts = {};
@@ -645,6 +644,7 @@
   $('joinName').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('joinBtn').click(); });
 
   // ---------- Start ----------
+  window.addEventListener('DOMContentLoaded', () => { window.Klirr?.moreMenu(document.querySelector('#game .lt'), $('hostMini'), [{ label: 'Datenschutz', href: '/datenschutz.html' }]); render(); });
   const roomParam = (new URLSearchParams(location.search).get('raum') || '').toUpperCase();
   if (roomParam && !(host && host.code === roomParam && settings.play === 'online')) {
     if (guest && guest.code === roomParam) startGuest();

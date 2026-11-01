@@ -24,7 +24,13 @@
 
   <link rel="stylesheet" href="/wizard/styles.css" />
   <link rel="stylesheet" href="/klirr-game.css" />
-  <style>:root { --klirr-tint: #8aa2ff; --klirr-tint-light: #2a3fd0; }</style>
+  <style>
+    /* Klirr-Grundlage: gleiche Flächen wie die übrigen Spiele, Wizard-Blau als einziger Akzent */
+    :root { --klirr-tint: #8aa2ff; --klirr-tint-light: #2a3fd0; }
+    :root:not([data-theme="dark"]) { --bg: #f2f2f7; --surface: #ffffff; --surface-2: #f2f2f7; --ink: #000000; --ink-2: rgba(60, 60, 67, 0.78); --ink-3: rgba(60, 60, 67, 0.76); --primary: #2a3fd0; --primary-soft: rgba(42, 63, 208, 0.12); }
+    :root[data-theme="dark"] { --primary: #8aa2ff; --primary-ink: #0a0e2a; --primary-soft: rgba(138, 162, 255, 0.18); }
+    .topbar::after { display: none; } /* Farbstreifen der Kartenfarben weg – ruhiger Kopf */
+  </style>
   <script src="/wizard/rules.js" defer></script>
   <script src="/wizard/app.js" defer></script>
   <script src="/klirr.js" defer></script>

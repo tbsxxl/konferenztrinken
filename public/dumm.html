@@ -117,6 +117,7 @@
     .winner { margin-top: 6px; border-radius: 26px; padding: 24px 18px; text-align: center; background: var(--c); color: #fff; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2); }
     .winner .ini { width: 76px; height: 76px; margin: 0 auto 10px; border-radius: 50%; background: #fff; color: var(--c); display: grid; place-items: center; font: 800 42px/1 var(--display); text-transform: uppercase; }
     .winner .crown { font-size: 2rem; display: block; margin-bottom: 4px; }
+    .winner .crown .kl-ico { width: 2.2rem; height: 2.2rem; }
     .winner b { display: block; font: 800 2.3rem/1 var(--display); text-transform: uppercase; }
     .winner span { display: block; margin-top: 6px; font-weight: 600; opacity: 0.92; }
     .rank { display: grid; grid-template-columns: 36px 1fr auto; gap: 10px; align-items: center; padding: 12px 18px; position: relative; }
@@ -242,7 +243,6 @@
     <button class="btn ghost" id="toSetup">Einstellungen</button>
   </section>
 
-  <footer><span class="drink-only">Trinkt verantwortungsvoll · Wasser zwischendurch · Alkoholfrei zählt auch.<br /></span><a class="legal" href="/datenschutz.html">Datenschutz</a></footer>
 </main>
 
 <script src="/dumm-fragen.js"></script>
@@ -412,7 +412,7 @@
         el('div', { className: 'code', textContent: host.code }),
         el('div', { className: 'hint', textContent: link.replace(/^https?:\/\//, '') }),
         el('div', { className: 'btns' },
-          el('button', { textContent: '🔗 Link teilen', onclick: async () => {
+          el('button', { textContent: 'Link teilen', onclick: async () => {
             try { if (navigator.share) await navigator.share({ title: 'Der Dümmste fliegt', text: `Komm in meinen Raum ${host.code}`, url: link }); else { await navigator.clipboard.writeText(link); flash('Link kopiert'); } } catch {}
           } }),
           el('button', { textContent: 'Neuer Raum', onclick: () => createRoom(true) })));
@@ -538,7 +538,7 @@
       if (state.final) state.final.scores[p.name]++;
       state.verdict = { kind: 'right', name: p.name, left: c.right };
     } else {
-      if (c.wrong === 11) { p.ex++; addFx(p.name, 'Ex! 🍺', 'ex'); } else if (c.wrong) { p.sips += c.wrong; addFx(p.name, `${plural(c.wrong, 'Schluck', 'Schlucke')} trinken`); }
+      if (c.wrong === 11) { p.ex++; addFx(p.name, 'Ex!', 'ex'); } else if (c.wrong) { p.sips += c.wrong; addFx(p.name, `${plural(c.wrong, 'Schluck', 'Schlucke')} trinken`); }
       let out = false;
       if (state.mode === 'classic') {
         p.lives--;
@@ -555,7 +555,7 @@
   function eliminate(p) {
     p.out = true;
     state.outOrder.push(p.name);
-    if (state.cfg.exOnOut) { p.ex++; addFx(p.name, 'Du fliegst – Ex! 🍺', 'ex'); } else addFx(p.name, 'Du fliegst!', 'out');
+    if (state.cfg.exOnOut) { p.ex++; addFx(p.name, 'Du fliegst – Ex!', 'ex'); } else addFx(p.name, 'Du fliegst!', 'out');
   }
   function give(target) {
     const v = state.verdict;
@@ -649,7 +649,7 @@
     if (out) eliminate(target);
     else {
       const l = state.cfg.lifeLoss ?? 2;
-      if (l === 11) { target.ex++; addFx(target.name, 'Dümmster der Runde – Ex! 🍺', 'ex'); }
+      if (l === 11) { target.ex++; addFx(target.name, 'Dümmster der Runde – Ex!', 'ex'); }
       else if (l) { target.sips += l; addFx(target.name, `Dümmster der Runde – ${plural(l, 'Schluck', 'Schlucke')}`, 'ex'); }
     }
     state.voteRes = { target: target.name, counts, reason, out, lives: target.lives };
@@ -771,10 +771,10 @@
       }
     } else if (v.kind === 'wrong') {
       const w = state.cfg.wrong;
-      const drink = !drinkOn() ? (mine ? 'liegst daneben' : 'liegt daneben') : w === 11 ? (mine ? 'musst exen 🍺' : 'muss exen 🍺') : w ? (mine ? `trinkst ${w}` : `trinkt ${w}`) : (mine ? 'kommst davon' : 'kommt davon');
+      const drink = !drinkOn() ? (mine ? 'liegst daneben' : 'liegt daneben') : w === 11 ? (mine ? 'musst exen' : 'muss exen') : w ? (mine ? `trinkst ${w}` : `trinkt ${w}`) : (mine ? 'kommst davon' : 'kommt davon');
       card.append(el('b', { textContent: 'Falsch!' }), el('p', { textContent: `${mine ? 'Du' : v.name} ${drink}${state.mode === 'classic' ? ` · noch ${plural(who.lives, 'Leben', 'Leben')}` : ''}` }));
     } else {
-      card.append(el('b', { textContent: mine ? 'Du fliegst!' : `${v.name} fliegt!` }), el('p', { textContent: state.cfg.exOnOut ? 'Keine Leben mehr – Ex! 🍺' : 'Keine Leben mehr.' }));
+      card.append(el('b', { textContent: mine ? 'Du fliegst!' : `${v.name} fliegt!` }), el('p', { textContent: state.cfg.exOnOut ? 'Keine Leben mehr – Ex!' : 'Keine Leben mehr.' }));
     }
     return card;
   }
@@ -825,8 +825,8 @@
       el('div', { className: 'verdict', style: `--c: ${colorOf(r.target)}` },
         el('b', { textContent: r.out === false ? (mine ? 'Du bist der Dümmste!' : `${r.target} ist der Dümmste!`) : mine ? 'Du fliegst!' : `${r.target} fliegt!` }),
         el('p', { textContent: r.out === false
-          ? `Ein Leben weg – noch ${plural(r.lives, 'Leben', 'Leben')}. ${state.cfg.lifeLoss === 11 ? 'Ex! 🍺' : state.cfg.lifeLoss ? `${plural(state.cfg.lifeLoss, 'Schluck', 'Schlucke')} trinken.` : ''} ${r.reason}`
-          : `${state.cfg.exOnOut ? 'Ex! 🍺 ' : ''}${r.reason}` })),
+          ? `Ein Leben weg – noch ${plural(r.lives, 'Leben', 'Leben')}. ${state.cfg.lifeLoss === 11 ? 'Ex!' : state.cfg.lifeLoss ? `${plural(state.cfg.lifeLoss, 'Schluck', 'Schlucke')} trinken.` : ''} ${r.reason}`
+          : `${state.cfg.exOnOut ? 'Ex! ' : ''}${r.reason}` })),
       el('div', { className: 'vote surface' }, el('h3', { textContent: 'Stimmen' }),
         el('div', { className: 'bars' }, ...Object.entries(r.counts).sort((a, b) => b[1] - a[1]).map(([n, c]) =>
           el('div', { className: 'bar', style: `--c: ${colorOf(n)}` }, el('span', { textContent: n }), el('i', { style: `width: ${(c / max) * 100}%` }), el('span', { textContent: c }))))),
@@ -846,7 +846,7 @@
     const win = state.players.find((p) => p.name === state.winner) || state.players[0];
     const w = $('winner');
     w.style.setProperty('--c', colorOf(win.name));
-    w.replaceChildren(el('span', { className: 'crown', textContent: '👑' }), el('div', { className: 'ini', textContent: initial(win.name) }), el('b', { textContent: win.name === me() ? 'Du gewinnst!' : win.name }),
+    w.replaceChildren(el('span', { className: 'crown' }, window.Klirr ? Klirr.icon('crown') : null), el('div', { className: 'ini', textContent: initial(win.name) }), el('b', { textContent: win.name === me() ? 'Du gewinnst!' : win.name }),
       el('span', { textContent: state.mode === 'classic' ? (win.out ? 'hat am längsten durchgehalten' : `gewinnt mit ${plural(win.lives, 'Leben', 'Leben')} übrig`) : 'ist der Klügste der Runde' }));
     $('ranking').replaceChildren(...state.rank.map((name, i) => {
       const p = state.players.find((x) => x.name === name);
@@ -953,6 +953,7 @@
   $('joinName').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('joinBtn').click(); });
 
   // ---------- Start ----------
+  window.addEventListener('DOMContentLoaded', () => { window.Klirr?.moreMenu(document.querySelector('#game .lt'), $('hostMini'), [{ label: 'Datenschutz', href: '/datenschutz.html' }]); if (state) renderAny(); });
   const roomParam = (new URLSearchParams(location.search).get('raum') || '').toUpperCase();
   if (roomParam && !(host && host.code === roomParam && settings.play === 'online')) {
     if (guest && guest.code === roomParam) startGuest();

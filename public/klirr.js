@@ -103,5 +103,73 @@
   document.documentElement.dataset.drink = drink() ? 'on' : 'off';
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bindDrink); else bindDrink();
 
-  window.Klirr = { undoToast, moment, note, drink };
+  // ---------- Symbole (eigene Linien-Symbole im Stil von SF Symbols, statt Emojis) ----------
+  const ICONS = {
+    talk: '<path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 3.5V16h0A2.5 2.5 0 0 1 4 13.5z"/><path d="M8.5 10h.01M12 10h.01M15.5 10h.01" stroke-width="2.6"/>',
+    draw: '<path d="M4 20l1-4.2L15.6 5.2a2 2 0 0 1 2.8 0l.4.4a2 2 0 0 1 0 2.8L8.2 19z"/><path d="M13.5 7.3l3.2 3.2"/>',
+    act: '<circle cx="12" cy="4.6" r="2.1"/><path d="M12 7.5v6.5M12 14l-3.4 6M12 14l3.4 6M5.5 10.5l6.5-2.2 6.5-2.6"/>',
+    crown: '<path d="M3.5 8l4.3 3.8L12 5l4.2 6.8L20.5 8l-1.8 10.5H5.3z"/>',
+    drink: '<path d="M6 4h12l-1.6 15a1.8 1.8 0 0 1-1.8 1.6H9.4a1.8 1.8 0 0 1-1.8-1.6z"/><path d="M6.6 9h10.8"/>',
+    check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+    more: '<circle cx="5.5" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="18.5" cy="12" r="1.4" fill="currentColor" stroke="none"/>',
+  };
+  function icon(name, cls = '') {
+    const w = document.createElement('span');
+    w.className = 'kl-ico ' + cls;
+    w.setAttribute('aria-hidden', 'true');
+    w.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${ICONS[name] || ''}</svg>`;
+    return w;
+  }
+
+  // ---------- Aktionsblatt (wie iOS: Aktionen unten, „Abbrechen“ separat) ----------
+  function actionSheet(items, title) {
+    document.querySelector('.kl-sheet-bg')?.remove();
+    const bg = document.createElement('div');
+    bg.className = 'kl-sheet-bg';
+    const sheet = document.createElement('div');
+    sheet.className = 'kl-sheet';
+    sheet.setAttribute('role', 'dialog');
+    sheet.setAttribute('aria-modal', 'true');
+    const group = document.createElement('div');
+    group.className = 'kl-sheet-group';
+    if (title) { const t = document.createElement('div'); t.className = 'kl-sheet-title'; t.textContent = title; group.append(t); }
+    const close = () => { bg.classList.remove('is-open'); setTimeout(() => bg.remove(), 250); };
+    for (const it of items) {
+      const b = document.createElement(it.href ? 'a' : 'button');
+      b.className = 'kl-sheet-btn' + (it.danger ? ' danger' : '');
+      b.textContent = it.label;
+      if (it.href) b.href = it.href; else { b.type = 'button'; b.onclick = () => { close(); setTimeout(it.onClick, 0); }; }
+      group.append(b);
+    }
+    const cancel = document.createElement('button');
+    cancel.type = 'button'; cancel.className = 'kl-sheet-btn cancel'; cancel.textContent = 'Abbrechen'; cancel.onclick = close;
+    sheet.append(group, cancel);
+    bg.append(sheet);
+    bg.addEventListener('click', (e) => { if (e.target === bg) close(); });
+    document.addEventListener('keydown', function esc(e) { if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); } });
+    document.body.append(bg);
+    requestAnimationFrame(() => bg.classList.add('is-open'));
+    cancel.focus();
+  }
+
+  // •••-Knopf im Spielkopf: sammelt die (sichtbaren) Knöpfe einer bisherigen Leiste als Aktionen.
+  function moreMenu(header, source, extra = []) {
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'kl-more'; btn.setAttribute('aria-label', 'Mehr');
+    btn.append(icon('more'));
+    btn.onclick = () => {
+      const items = [];
+      if (source && !source.hidden) for (const b of source.querySelectorAll('button')) {
+        if (b.hidden || b.disabled) continue;
+        items.push({ label: b.textContent.trim(), danger: /beenden|abbrechen/i.test(b.textContent), onClick: () => b.click() });
+      }
+      items.push(...extra);
+      actionSheet(items);
+    };
+    header.append(btn);
+    if (source) source.classList.add('kl-hidden-bar');
+    return btn;
+  }
+
+  window.Klirr = { undoToast, moment, note, drink, icon, actionSheet, moreMenu };
 })();

@@ -24,7 +24,12 @@
 
   <link rel="stylesheet" href="/flip7/styles.css" />
   <link rel="stylesheet" href="/klirr-game.css" />
-  <style>:root { --klirr-tint: #4fe0c8; --klirr-tint-light: #08695f; }</style>
+  <style>
+    /* Klirr-Grundlage: Türkis als einziger Akzent */
+    :root { --klirr-tint: #4fe0c8; --klirr-tint-light: #08695f; }
+    :root:not([data-theme="dark"]) { --primary: #08695f; --primary-bg: #0b7a71; --primary-soft: rgba(11, 122, 113, 0.12); }
+    :root[data-theme="dark"] { --primary: #4fe0c8; --primary-bg: #0b7a71; --primary-soft: rgba(79, 224, 200, 0.16); }
+  </style>
   <script src="/flip7/rules.js" defer></script>
   <script src="/flip7/app.js" defer></script>
   <script src="/klirr.js" defer></script>

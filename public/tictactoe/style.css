@@ -999,5 +999,10 @@ body.only-logos .team-fallback, body.compact .team-fallback{
 :root:not([data-theme="dark"]) .back-link{ color: #137a40; }
 
 /* Klirr-Prüfung (heller Modus): Zweittexte und Rot kräftiger, Vereinsnamen mind. 11 px */
-:root:not([data-theme="dark"]){ --label-2: rgba(60,60,67,0.78); --label-3: rgba(60,60,67,0.55); --red: #d70015; }
+:root:not([data-theme="dark"]){ --label-2: rgba(60,60,67,0.78); --label-3: rgba(60,60,67,0.55); --red: #c4001a; }
 .team-logo span{ font-size: clamp(11px, calc(var(--cell) * 0.1), 12px); }
+
+/* Klirr-Grundlage: Grün als einziger App-Akzent (X/O behalten ihre Spielfarben) */
+:root:not([data-theme="dark"]){ --tint: #137a40; }
+:root[data-theme="dark"]{ --tint: #30d158; }
+:root[data-theme="dark"] .btn-primary{ color: #04220f; }

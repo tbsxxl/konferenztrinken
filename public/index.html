@@ -356,7 +356,7 @@
     const quiz = dummRunning;
     np.href = quiz ? '/dumm.html' : '/konferenz.html';
     const art = el('span', { className: `mini-art ${quiz ? 'art-dumm' : 'art-konf'}` });
-    art.append(quiz ? el('span', { textContent: '?', style: 'font:800 1.6rem/1 -apple-system,ui-rounded,sans-serif' }) : el('span', { textContent: '⚽', style: 'font-size:1.3rem' }));
+    art.append(quiz ? el('span', { textContent: '?', style: 'font:800 1.6rem/1 -apple-system,ui-rounded,sans-serif' }) : el('span', { textContent: '2:1', style: 'font:800 .8rem/1 -apple-system,ui-rounded,sans-serif;color:#fff' }));
     const who = quiz ? dumm.players?.filter((p) => !p.out).length : kt.length;
     np.append(art,
       el('span', {}, el('small', { textContent: quiz ? 'Quiz läuft' : 'Runde läuft' }), el('b', { textContent: quiz ? `Der Dümmste fliegt · ${who} im Spiel` : `Konferenztrinken · ${who} dabei` })),

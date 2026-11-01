@@ -1119,7 +1119,7 @@ function commitMove(force = false){
   const winner = checkWin(lastSize);
   if (winner) {
     const drinkOn = !!window.Klirr?.drink("tictactoe");
-    const winText = drinkOn ? `🏆 Spieler ${winner} gewinnt! Spieler ${winner === "X" ? "O" : "X"} muss exen 🍺` : `🏆 Spieler ${winner} gewinnt!`;
+    const winText = drinkOn ? `Spieler ${winner} gewinnt! Spieler ${winner === "X" ? "O" : "X"} muss exen.` : `Spieler ${winner} gewinnt!`;
     roundOutcome = { winner };
     adjustScore(winner, +1);
     setResult(winText, winner === "X" ? "x" : "o");
@@ -1133,7 +1133,7 @@ function commitMove(force = false){
 
   if (boardState.every(row => row.every(v => v !== "?"))) {
     const drawOn = !!window.Klirr?.drink("tictactoe");
-    const drawText = drawOn ? "🤝 Unentschieden – beide trinken 2!" : "🤝 Unentschieden – alle Felder belegt!";
+    const drawText = drawOn ? "Unentschieden – beide trinken 2." : "Unentschieden – alle Felder belegt.";
     roundOutcome = { winner: null };
     setResult(drawText, "draw");
     if (drawOn) window.Klirr?.moment();
@@ -1208,7 +1208,7 @@ function skipTurn(){
   moveHistory.push({ type: "skip", player: currentPlayer });
   setUndoButtonState();
   if (window.Klirr?.drink("tictactoe")) {
-    setResult(`🍺 Spieler ${currentPlayer} passt und trinkt 1 Schluck.`, currentPlayer === "X" ? "x" : "o");
+    setResult(`Spieler ${currentPlayer} passt und trinkt 1 Schluck.`, currentPlayer === "X" ? "x" : "o");
     window.Klirr.moment();
   }
 
