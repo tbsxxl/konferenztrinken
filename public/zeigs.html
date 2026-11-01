@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="darkreader-lock" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#14121f" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#f7f6fb" media="(prefers-color-scheme: light)" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <title>Zeig’s! · Klirr</title>
+  <meta name="description" content="Erklären, zeichnen, vormachen – im Team gegen die Uhr." />
+  <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+  <link rel="stylesheet" href="/app.css" />
+  <link rel="stylesheet" href="/apple.css" />
+  <script src="/klirr.js" defer></script>
+  <style>
+    /* Eigener Akzent für „Zeig’s!“: Gelb mit dunkler Schrift (12:1) */
+    :root { --accent: #ffcc00; --accent-fill: #ffcc00; --accent-ink: #1a1400; --tint: #ffd60a; }
+    @media (prefers-color-scheme: light) { :root { --tint: #7a5f00; } }
+    :root[data-drink="off"] .drink-only { display: none !important; }
+    .cell .sub { display: block; color: var(--secondary); font-size: 0.8rem; margin-top: 2px; }
+    .mode-info { padding: 0 18px 14px; color: var(--secondary); font-size: 0.9rem; line-height: 1.4; }
+    .cell.wrap .seg { flex: 1 1 100%; }
+    .seg { display: flex; gap: 4px; background: var(--fill); border-radius: 14px; padding: 3px; }
+    .seg button { flex: 1; min-width: 44px; min-height: 44px; border: 0; border-radius: 11px; background: transparent; color: var(--label); font: inherit; font-weight: 600; font-size: 0.9rem; }
+    .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+    .cta-bar { position: sticky; bottom: 0; z-index: 5; margin: 18px -16px 0; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: linear-gradient(transparent, rgba(10, 10, 16, 0.85) 30%); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+    @media (prefers-color-scheme: light) { .cta-bar { background: linear-gradient(rgba(242, 242, 247, 0), rgba(242, 242, 247, 0.9) 30%); } }
+    .cta-bar .btn { margin-top: 0; }
+    .mini { display: flex; gap: 8px; margin-top: 12px; }
+    .mini button { flex: 1; min-height: 44px; border: 0; border-radius: 999px; background: var(--fill); color: var(--label); font: inherit; font-weight: 600; }
+
+    /* Teams */
+    .teams { display: grid; gap: 10px; padding: 14px; }
+    .team { border-radius: 18px; padding: 12px 14px; background: color-mix(in srgb, var(--c) 18%, transparent); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--c) 55%, transparent); }
+    .team b { display: block; color: var(--label); font-size: 1rem; margin-bottom: 8px; }
+    .team .who { display: flex; flex-wrap: wrap; gap: 6px; }
+    .team .who span { padding: 5px 11px; border-radius: 999px; background: var(--c); color: #fff; font-weight: 600; font-size: 0.9rem; }
+
+    /* Punktetafel */
+    .board { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+    .board .t { border-radius: 16px; padding: 10px 12px; background: var(--c); color: #fff; }
+    .board .t.on { outline: 3px solid var(--label); outline-offset: 2px; }
+    .board .t small { display: block; font-weight: 600; opacity: 0.9; }
+    .board .t b { font: 800 1.8rem/1.1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; }
+    .board .bar { height: 5px; border-radius: 3px; background: rgba(255, 255, 255, 0.3); margin-top: 6px; overflow: hidden; }
+    .board .bar i { display: block; height: 100%; background: #fff; }
+
+    /* Zug */
+    .turnbox { margin-top: 14px; border-radius: 26px; padding: 22px 18px; text-align: center; color: #fff; background: var(--c); box-shadow: 0 14px 34px rgba(0, 0, 0, 0.3); }
+    .turnbox .mode { font-size: 3.2rem; line-height: 1; }
+    .turnbox b { display: block; margin-top: 8px; font: 800 1.9rem/1.1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; }
+    .turnbox p { margin: 6px 0 0; font-weight: 600; opacity: 0.92; }
+    .turnbox .all { display: inline-block; margin-top: 10px; padding: 6px 14px; border-radius: 999px; background: rgba(0, 0, 0, 0.3); font-weight: 700; }
+    .levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
+    .levels button { min-height: 72px; border: 0; border-radius: 18px; background: var(--fill); color: var(--label); font: 700 1rem/1.2 inherit; }
+    .levels button small { display: block; font-weight: 500; color: var(--secondary); margin-top: 2px; }
+    .word { margin-top: 14px; border-radius: 26px; padding: 26px 18px; text-align: center; background: var(--cell); }
+    .word small { display: block; color: var(--secondary); font-weight: 600; }
+    .word b { display: block; margin: 8px 0 4px; font: 800 2.4rem/1.1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; overflow-wrap: anywhere; }
+    .timer { margin-top: 14px; text-align: center; font: 800 4.4rem/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; font-variant-numeric: tabular-nums; }
+    .timer.low { color: #ff453a; }
+    @media (prefers-color-scheme: light) { .timer.low { color: #c4001a; } }
+    .tbar { height: 8px; border-radius: 4px; background: var(--fill); overflow: hidden; margin-top: 10px; }
+    .tbar i { display: block; height: 100%; background: var(--accent); transition: width 0.25s linear; }
+    .judge { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+    .judge button { min-height: 60px; border: 0; border-radius: 18px; color: #fff; font: 700 1.05rem/1 inherit; }
+    .judge .yes { background: #1f8a4c; }
+    .judge .no { background: #c4001a; }
+    .whowon { display: grid; gap: 8px; margin-top: 14px; }
+    .whowon button { min-height: 56px; border: 0; border-radius: 18px; background: var(--c, var(--fill)); color: #fff; font: 700 1.05rem/1 inherit; }
+    .whowon button.none { background: var(--fill); color: var(--label); }
+    .peek { margin-top: 10px; width: 100%; min-height: 48px; border: 0; border-radius: 999px; background: var(--fill); color: var(--label); font: inherit; font-weight: 700; -webkit-user-select: none; user-select: none; touch-action: none; }
+
+    /* Zeichenfläche */
+    .pad { position: relative; margin-top: 12px; border-radius: 20px; overflow: hidden; background: #fff; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08); touch-action: none; }
+    .pad canvas { display: block; width: 100%; height: min(58vh, 520px); touch-action: none; }
+    .padtools { display: flex; gap: 8px; margin-top: 8px; }
+    .padtools button { flex: 1; min-height: 44px; border: 0; border-radius: 999px; background: var(--fill); color: var(--label); font: inherit; font-weight: 600; }
+    .verdict { margin-top: 14px; border-radius: var(--r); padding: 20px; color: #fff; background: var(--c); box-shadow: 0 10px 26px rgba(0, 0, 0, 0.28); animation: pop 0.4s cubic-bezier(0.3, 1.4, 0.6, 1); }
+    .verdict b { display: block; font: 800 1.9rem/1.1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; }
+    .verdict p { margin: 8px 0 0; font-weight: 600; }
+  </style>
+</head>
+<body>
+<main>
+  <a class="back-link" href="/">‹ Alle Spiele</a>
+
+  <!-- EINRICHTEN -->
+  <section id="setup" hidden>
+    <header class="lt"><div><div class="eyebrow">Erklären · Zeichnen · Vormachen</div><h1>Zeig’s!</h1></div></header>
+    <div class="list"><div class="mode-info" style="padding-top:14px">Ihr spielt in Teams. Wer dran ist, bekommt per Zufall eine Art – erklären, zeichnen oder vormachen – wählt die Schwierigkeit und hat die Zeit, um dem eigenen Team den Begriff rüberzubringen. Schwerer gibt mehr Punkte. Manchmal dürfen alle mitraten.</div></div>
+
+    <h2 class="sec">Teams <small id="teamInfo"></small></h2>
+    <div class="list">
+      <div class="cell wrap"><span>Anzahl Teams</span><div class="seg" id="teamSeg" role="group" aria-label="Anzahl Teams"></div></div>
+      <div class="teams" id="teams"></div>
+      <button class="cell action" id="shuffle">Teams neu mischen</button>
+    </div>
+    <p class="foot">Mitspieler kommen aus dem Hub. <a href="/" style="color:var(--tint)">Dort ändern</a></p>
+
+    <h2 class="sec">Regeln</h2>
+    <div class="list">
+      <div class="cell wrap"><span>Zeit pro Zug</span><div class="seg" id="timeSeg" role="group" aria-label="Zeit pro Zug"></div></div>
+      <div class="cell wrap"><span>Spielziel</span><div class="seg" id="goalSeg" role="group" aria-label="Spielziel"></div></div>
+      <label class="cell"><span>Zeichnen auf dem Handy<small class="sub">Aus: auf Papier zeichnen.</small></span><input type="checkbox" class="switch" id="optPad" /></label>
+      <label class="cell"><span>Alle-raten-mit-Runden<small class="sub">Ab und zu darf jedes Team mitraten.</small></span><input type="checkbox" class="switch" id="optAll" /></label>
+      <label class="cell"><span>Trinkmodus<small class="sub">Gilt für alle Spiele, wie das Logo im Hub.</small></span><input type="checkbox" class="switch" data-klirr-drink /></label>
+      <div class="mode-info drink-only" style="padding-top:10px">Trinken: Nicht erraten → das Team trinkt je 1 Schluck. Am Ende exen alle aus den Verliererteams.</div>
+    </div>
+
+    <div class="cta-bar">
+      <button class="btn" id="start">Spiel starten</button>
+      <button class="btn ghost" id="resume" hidden>Laufendes Spiel fortsetzen</button>
+    </div>
+    <div class="error" id="setupError" role="alert"></div>
+  </section>
+
+  <!-- SPIEL -->
+  <section id="game" hidden>
+    <header class="lt"><div><div class="eyebrow" id="roundLabel"></div><h1 id="stageTitle">Zeig’s!</h1></div></header>
+    <div class="board" id="board"></div>
+    <div id="stage"></div>
+    <div class="mini" id="gameMini"><button id="quit">Spiel beenden</button></div>
+  </section>
+
+  <footer>Trinkt verantwortungsvoll · Wasser zwischendurch · Alkoholfrei zählt auch.<br /><a class="legal" href="/datenschutz.html">Datenschutz</a></footer>
+</main>
+
+<script src="/zeigs-begriffe.js"></script>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const el = (tag, props = {}, ...children) => { const n = Object.assign(document.createElement(tag), props); n.append(...children.filter((c) => c !== null && c !== undefined && c !== false)); return n; };
+  const store = {
+    get(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; } },
+    set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch {} },
+  };
+  const shuffle = (arr) => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const lines = (text) => String(text || '').split('\n').map((s) => s.trim()).filter(Boolean);
+  const TEAMS = [['Team Blau', '#0a6ed1'], ['Team Orange', '#b85400'], ['Team Violett', '#8e44c9'], ['Team Türkis', '#0b7285']];
+  const MODES = { talk: ['🗣️', 'Erklären', 'Ohne den Begriff oder Teile davon zu sagen.'], draw: ['✏️', 'Zeichnen', 'Keine Buchstaben, keine Zahlen.'], act: ['🎭', 'Vormachen', 'Ohne Worte und Geräusche.'] };
+  const LEVELS = { 1: 'leicht', 2: 'mittel', 3: 'schwer' };
+
+  // ---------- Einstellungen ----------
+  const settings = { teams: 2, time: 60, goal: 15, pad: true, all: true, ...store.get('zeigs-settings', {}) };
+  let roster = lines(store.get('kt-names', ''));
+  let split = store.get('zeigs-split', null); // [[Namen Team 1], [Namen Team 2], …]
+  function makeSplit() {
+    const n = Math.max(2, Math.min(settings.teams, Math.max(2, roster.length)));
+    const out = Array.from({ length: n }, () => []);
+    shuffle(roster).forEach((name, i) => out[i % n].push(name));
+    split = out; store.set('zeigs-split', split);
+  }
+  // Mischung neu machen, wenn sich Mitspieler oder Teamzahl geändert haben
+  const splitValid = () => split && split.length === settings.teams && split.flat().length === roster.length && roster.every((n) => split.flat().includes(n));
+  const saveSettings = () => { store.set('zeigs-settings', settings); renderSetup(); };
+
+  const segButtons = (box, options, current, onPick) => box.replaceChildren(...options.map(([v, label]) => {
+    const b = el('button', { textContent: label, onclick: () => onPick(v) });
+    b.setAttribute('aria-pressed', String(current === v));
+    return b;
+  }));
+
+  function renderSetup() {
+    if (!splitValid()) makeSplit();
+    segButtons($('teamSeg'), [[2, '2'], [3, '3'], [4, '4']], settings.teams, (v) => { settings.teams = v; makeSplit(); saveSettings(); });
+    segButtons($('timeSeg'), [[45, '45 s'], [60, '60 s'], [90, '90 s']], settings.time, (v) => { settings.time = v; saveSettings(); });
+    segButtons($('goalSeg'), [[10, '10 P'], [15, '15 P'], [20, '20 P'], [30, '30 P']], settings.goal, (v) => { settings.goal = v; saveSettings(); });
+    $('optPad').checked = settings.pad;
+    $('optAll').checked = settings.all;
+    $('teams').replaceChildren(...split.map((names, i) => el('div', { className: 'team', style: `--c: ${TEAMS[i][1]}` },
+      el('b', { textContent: TEAMS[i][0] }),
+      el('div', { className: 'who' }, ...(names.length ? names.map((n) => el('span', { textContent: n })) : [el('small', { textContent: 'noch leer' })])))));
+    $('teamInfo').textContent = `${roster.length} Mitspieler`;
+    $('resume').hidden = !(S && S.phase !== 'end');
+  }
+  $('shuffle').addEventListener('click', () => { makeSplit(); renderSetup(); });
+  $('optPad').addEventListener('change', (e) => { settings.pad = e.target.checked; saveSettings(); });
+  $('optAll').addEventListener('change', (e) => { settings.all = e.target.checked; saveSettings(); });
+
+  // ---------- Spielzustand ----------
+  // phase: intro (wer, welche Art) → level (Schwierigkeit) → peek (nur Darsteller schaut) → play (Uhr läuft) → judge → after → … → end
+  let S = store.get('zeigs-state', null);
+  const save = () => store.set('zeigs-state', S);
+  const show = (id) => { ['setup', 'game'].forEach((s) => { $(s).hidden = s !== id; }); };
+
+  function pickWord(level) {
+    let used = store.get('zeigs-used', []);
+    let pool = ZEIGS.filter((x) => x.s === level && !used.includes(x.w));
+    if (!pool.length) { used = used.filter((w) => !ZEIGS.some((x) => x.s === level && x.w === w)); pool = ZEIGS.filter((x) => x.s === level); }
+    const w = pool[Math.floor(Math.random() * pool.length)];
+    store.set('zeigs-used', [...used, w.w]);
+    return w;
+  }
+
+  function startGame() {
+    $('setupError').textContent = '';
+    if (!splitValid()) makeSplit();
+    if (split.some((t) => !t.length)) { $('setupError').textContent = 'Jedes Team braucht mindestens eine Person. Trag im Hub mehr Mitspieler ein oder nimm weniger Teams.'; return; }
+    S = {
+      phase: 'intro', teams: split.map((names, i) => ({ name: TEAMS[i][0], color: TEAMS[i][1], players: names, score: 0, next: 0 })),
+      cfg: { time: settings.time, goal: settings.goal, pad: settings.pad, all: settings.all, drink: !!window.Klirr?.drink() },
+      team: Math.floor(Math.random() * split.length), turn: 0, last: null,
+    };
+    nextTurn(true);
+  }
+  $('start').addEventListener('click', startGame);
+  $('resume').addEventListener('click', () => render());
+  $('quit').addEventListener('click', () => { if (S) { S.phase = 'end'; S.aborted = true; save(); } stopTimer(); show('setup'); renderSetup(); });
+
+  function nextTurn(first = false) {
+    if (!first) S.team = (S.team + 1) % S.teams.length;
+    const t = S.teams[S.team];
+    S.turn++;
+    S.actor = t.players[t.next % t.players.length];
+    t.next++;
+    const modes = Object.keys(MODES);
+    S.mode = modes[Math.floor(Math.random() * modes.length)];
+    S.everyone = S.cfg.all && S.teams.length > 1 && Math.random() < 0.18;
+    S.level = null; S.word = null; S.deadline = null;
+    S.phase = 'intro';
+    save(); render();
+  }
+
+  // ---------- Uhr ----------
+  let tickHandle = null, wake = null;
+  function startTimer() {
+    stopTimer();
+    tickHandle = setInterval(tick, 200);
+    try { navigator.wakeLock?.request('screen').then((w) => { wake = w; }).catch(() => {}); } catch {}
+    tick();
+  }
+  function stopTimer() { clearInterval(tickHandle); tickHandle = null; try { wake?.release(); } catch {} wake = null; }
+  function tick() {
+    if (!S || S.phase !== 'play') { stopTimer(); return; }
+    const left = Math.max(0, S.deadline - Date.now());
+    const sec = Math.ceil(left / 1000);
+    const t = $('timer'), bar = $('tbar');
+    if (t) { t.textContent = sec; t.classList.toggle('low', sec <= 10); }
+    if (bar) bar.style.width = `${(left / (S.cfg.time * 1000)) * 100}%`;
+    if (left <= 0) { beep(); S.phase = 'judge'; S.timeUp = true; save(); render(); }
+  }
+  function beep() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      [0, 0.18, 0.36].forEach((d) => { const o = ctx.createOscillator(); const g = ctx.createGain(); o.frequency.value = 880; g.gain.value = 0.12; o.connect(g).connect(ctx.destination); o.start(ctx.currentTime + d); o.stop(ctx.currentTime + d + 0.12); });
+    } catch {}
+  }
+
+  // ---------- Punkte ----------
+  function award(teamIdx) {
+    const pts = S.level;
+    if (teamIdx !== null) S.teams[teamIdx].score += pts;
+    const own = S.teams[S.team];
+    S.last = { word: S.word.w, by: teamIdx === null ? null : S.teams[teamIdx].name, pts, team: own.name, color: own.color };
+    // Nicht erraten (vom eigenen Team): das Team trinkt je 1 Schluck
+    S.last.drink = S.cfg.drink && (S.everyone ? teamIdx === null : teamIdx !== S.team) ? `${own.name} trinkt je 1 Schluck` : null;
+    if (S.last.drink) window.Klirr?.moment();
+    const winner = S.teams.findIndex((t) => t.score >= S.cfg.goal);
+    S.phase = winner >= 0 ? 'end' : 'after';
+    S.winner = winner >= 0 ? winner : null;
+    if (winner >= 0 && S.cfg.drink) setTimeout(() => window.Klirr?.moment(), 600);
+    save(); render();
+  }
+
+  // ---------- Anzeige ----------
+  function render() {
+    if (!S || (S.phase === 'end' && S.aborted)) { show('setup'); renderSetup(); return; }
+    show('game');
+    $('roundLabel').textContent = `Zug ${S.turn} · Ziel ${S.cfg.goal} Punkte`;
+    $('board').replaceChildren(...S.teams.map((t, i) => el('div', { className: `t${i === S.team && S.phase !== 'end' ? ' on' : ''}`, style: `--c: ${t.color}` },
+      el('small', { textContent: t.name }), el('b', { textContent: t.score }),
+      el('div', { className: 'bar' }, el('i', { style: `width:${Math.min(100, (t.score / S.cfg.goal) * 100)}%` })))));
+    $('gameMini').hidden = S.phase === 'end';
+    const stage = { intro: stageIntro, level: stageLevel, peek: stagePeek, play: stagePlay, judge: stageJudge, after: stageAfter, end: stageEnd }[S.phase]();
+    $('stage').replaceChildren(...stage);
+    if (S.phase === 'play') startTimer(); else stopTimer();
+  }
+
+  function stageIntro() {
+    const t = S.teams[S.team];
+    const [icon, label, rule] = MODES[S.mode];
+    $('stageTitle').textContent = `${t.name} ist dran`;
+    return [el('div', { className: 'turnbox', style: `--c: ${t.color}` },
+      el('div', { className: 'mode', textContent: icon }),
+      el('b', { textContent: `${S.actor} – ${label}` }),
+      el('p', { textContent: rule }),
+      S.everyone ? el('span', { className: 'all', textContent: 'Alle raten mit!' }) : null),
+      el('button', { className: 'btn', textContent: `${S.actor} wählt die Schwierigkeit`, onclick: () => { S.phase = 'level'; save(); render(); } })];
+  }
+
+  function stageLevel() {
+    $('stageTitle').textContent = 'Wie schwer?';
+    return [el('div', { className: 'list' }, el('div', { className: 'mode-info', style: 'padding-top:14px', textContent: `${S.actor}, wähle: Je schwerer, desto mehr Punkte. Danach schaust nur du auf den Begriff.` })),
+      el('div', { className: 'levels' }, ...[1, 2, 3].map((l) => el('button', { onclick: () => { S.level = l; S.word = pickWord(l); S.phase = 'peek'; save(); render(); } }, LEVELS[l][0].toUpperCase() + LEVELS[l].slice(1), el('small', { textContent: `${l} ${l === 1 ? 'Punkt' : 'Punkte'}` }))))];
+  }
+
+  function stagePeek() {
+    const [icon, label] = MODES[S.mode];
+    $('stageTitle').textContent = `Nur ${S.actor} schaut`;
+    return [el('div', { className: 'word' }, el('small', { textContent: `${icon} ${label} · ${LEVELS[S.level]} · ${S.word.k}` }), el('b', { textContent: S.word.w })),
+      el('button', { className: 'btn', textContent: `Los – ${S.cfg.time} Sekunden`, onclick: () => { S.deadline = Date.now() + S.cfg.time * 1000; S.timeUp = false; S.phase = 'play'; save(); render(); } }),
+      el('button', { className: 'btn ghost', textContent: 'Anderen Begriff', onclick: () => { S.word = pickWord(S.level); save(); render(); } })];
+  }
+
+  function stagePlay() {
+    const [icon, label] = MODES[S.mode];
+    $('stageTitle').textContent = `${icon} ${label}`;
+    const parts = [el('div', { className: 'timer', id: 'timer', textContent: Math.ceil(Math.max(0, S.deadline - Date.now()) / 1000) }), el('div', { className: 'tbar' }, el('i', { id: 'tbar' }))];
+    if (S.mode === 'draw' && S.cfg.pad) {
+      parts.push(...drawPad());
+      // Begriff nur beim Gedrückthalten zeigen, damit die anderen ihn beim Herzeigen nicht sehen
+      const peek = el('button', { className: 'peek', textContent: 'Gedrückt halten: Begriff zeigen' });
+      const on = () => { peek.textContent = S.word.w; }, off = () => { peek.textContent = 'Gedrückt halten: Begriff zeigen'; };
+      peek.addEventListener('pointerdown', on); ['pointerup', 'pointerleave', 'pointercancel'].forEach((e) => peek.addEventListener(e, off));
+      parts.push(peek);
+    }
+    parts.push(el('div', { className: 'judge' },
+      el('button', { className: 'yes', textContent: 'Erraten!', onclick: () => { S.timeUp = false; if (S.everyone) { S.phase = 'judge'; save(); render(); } else award(S.team); } }),
+      el('button', { className: 'no', textContent: 'Aufgeben', onclick: () => { S.phase = 'judge'; S.timeUp = true; S.gaveUp = true; save(); render(); } })));
+    return parts;
+  }
+
+  // Zeichenfläche mit Rückgängig und Löschen
+  function drawPad() {
+    const wrap = el('div', { className: 'pad' });
+    const cv = el('canvas');
+    wrap.append(cv);
+    const strokes = [];
+    let cur = null;
+    const ctx = cv.getContext('2d');
+    const fit = () => {
+      const r = cv.getBoundingClientRect(); const dpr = window.devicePixelRatio || 1;
+      if (!r.width) return;
+      cv.width = r.width * dpr; cv.height = r.height * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); redraw();
+    };
+    const redraw = () => {
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.lineWidth = 5; ctx.strokeStyle = '#111';
+      for (const s of strokes) { ctx.beginPath(); s.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); if (s.length === 1) ctx.lineTo(s[0][0] + 0.1, s[0][1]); ctx.stroke(); }
+    };
+    const pos = (e) => { const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+    cv.addEventListener('pointerdown', (e) => { cv.setPointerCapture(e.pointerId); cur = [pos(e)]; strokes.push(cur); redraw(); });
+    cv.addEventListener('pointermove', (e) => { if (!cur) return; cur.push(pos(e)); redraw(); });
+    ['pointerup', 'pointercancel'].forEach((ev) => cv.addEventListener(ev, () => { cur = null; }));
+    requestAnimationFrame(fit);
+    const tools = el('div', { className: 'padtools' },
+      el('button', { textContent: 'Rückgängig', onclick: () => { strokes.pop(); redraw(); } }),
+      el('button', { textContent: 'Löschen', onclick: () => { strokes.length = 0; redraw(); } }));
+    return [wrap, tools];
+  }
+
+  function stageJudge() {
+    $('stageTitle').textContent = S.timeUp ? (S.gaveUp ? 'Aufgegeben' : 'Zeit ist um!') : 'Erraten!';
+    const parts = [el('div', { className: 'word' }, el('small', { textContent: 'Der Begriff war' }), el('b', { textContent: S.word.w }))];
+    if (S.everyone) {
+      parts.push(el('div', { className: 'list' }, el('div', { className: 'mode-info', style: 'padding-top:14px', textContent: 'Welches Team hat zuerst richtig gerufen?' })),
+        el('div', { className: 'whowon' }, ...S.teams.map((t, i) => el('button', { style: `--c: ${t.color}`, textContent: t.name, onclick: () => award(i) })),
+          el('button', { className: 'none', textContent: 'Niemand', onclick: () => award(null) })));
+    } else if (S.timeUp) {
+      parts.push(el('div', { className: 'judge' },
+        el('button', { className: 'yes', textContent: 'Doch noch erraten', onclick: () => award(S.team) }),
+        el('button', { className: 'no', textContent: 'Nicht erraten', onclick: () => award(null) })));
+    } else {
+      // (nur nach Neuladen möglich) – Punkte nach dem Aufbau vergeben, nicht mittendrin
+      setTimeout(() => award(S.team));
+    }
+    return parts;
+  }
+
+  function stageAfter() {
+    const L = S.last;
+    $('stageTitle').textContent = L.by ? 'Punkte!' : 'Leider nicht';
+    const v = el('div', { className: 'verdict', style: `--c: ${L.by ? (S.teams.find((t) => t.name === L.by)?.color || L.color) : '#3a3a3c'}` },
+      el('b', { textContent: L.by ? `+${L.pts} für ${L.by}` : 'Nicht erraten' }),
+      el('p', { textContent: `„${L.word}“` }),
+      L.drink ? el('p', { textContent: `🍺 ${L.drink}.` }) : null);
+    const nt = S.teams[(S.team + 1) % S.teams.length];
+    return [v, el('button', { className: 'btn', textContent: `Weiter – ${nt.name} ist dran`, onclick: () => nextTurn() })];
+  }
+
+  function stageEnd() {
+    const w = S.teams[S.winner];
+    $('stageTitle').textContent = 'Spielende';
+    const losers = S.teams.filter((_, i) => i !== S.winner).flatMap((t) => t.players);
+    const v = el('div', { className: 'verdict', style: `--c: ${w.color}` },
+      el('b', { textContent: `${w.name} gewinnt!` }),
+      el('p', { textContent: `${w.players.join(', ')} – mit ${w.score} Punkten.` }),
+      S.cfg.drink ? el('p', { textContent: `🍺 Exen: ${losers.join(', ')}.` }) : null);
+    return [v,
+      el('button', { className: 'btn', textContent: 'Nochmal mit denselben Teams', onclick: () => { split = S.teams.map((t) => t.players); store.set('zeigs-split', split); startGame(); } }),
+      el('button', { className: 'btn ghost', textContent: 'Teams & Regeln', onclick: () => { S.aborted = true; save(); render(); } })];
+  }
+
+  // ---------- Start ----------
+  render();
+</script>
+</body>
+</html>
