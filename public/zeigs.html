@@ -74,6 +74,7 @@
     .whowon { display: grid; gap: 8px; margin-top: 14px; }
     .whowon button { min-height: 56px; border: 0; border-radius: 18px; background: var(--c, var(--fill)); color: #fff; font: 700 1.05rem/1 inherit; }
     .whowon button.none { background: var(--fill); color: var(--label); }
+    .peek.open { background: var(--accent); color: var(--accent-ink); font-size: 1.3rem; }
     .peek { margin-top: 10px; width: 100%; min-height: 48px; border: 0; border-radius: 999px; background: var(--fill); color: var(--label); font: inherit; font-weight: 700; -webkit-user-select: none; user-select: none; touch-action: none; }
 
     /* Zeichenfläche */
@@ -109,7 +110,7 @@
     <div class="list">
       <div class="cell wrap"><span>Zeit pro Zug</span><div class="seg" id="timeSeg" role="group" aria-label="Zeit pro Zug"></div></div>
       <div class="cell wrap"><span>Spielziel</span><div class="seg" id="goalSeg" role="group" aria-label="Spielziel"></div></div>
-      <label class="cell"><span>Zeichnen auf dem Handy<small class="sub">Aus: auf Papier zeichnen.</small></span><input type="checkbox" class="switch" id="optPad" /></label>
+      <div class="cell wrap"><span>Zeichnen<small class="sub" id="padInfo"></small></span><div class="seg" id="padSeg" role="group" aria-label="Zeichnen"></div></div>
       <label class="cell"><span>Alle-raten-mit-Runden<small class="sub">Jede dritte Runde: Alle Teams raten mit – wer zuerst ruft, bekommt den Punkt.</small></span><input type="checkbox" class="switch" id="optAll" /></label>
       <label class="cell drink-only"><span>Trinkmodus<small class="sub">Ausschalten geht auch über das Logo im Hub.</small></span><input type="checkbox" class="switch" data-klirr-drink /></label>
       <div class="mode-info drink-only" style="padding-top:10px">Trinken: Pro übersprungenem Begriff trinkt das Team je 1 Schluck. Am Ende exen alle aus den Verliererteams.</div>
@@ -148,7 +149,8 @@
   const LEVELS = { 1: 'leicht', 2: 'mittel', 3: 'schwer' };
 
   // ---------- Einstellungen ----------
-  const settings = { teams: 2, time: 60, goal: 30, pad: true, all: true, ...store.get('zeigs-settings', {}) };
+  const settings = { teams: 2, time: 60, goal: 30, pad: false, all: true, ...store.get('zeigs-settings', {}) };
+  if (!settings.padV2) { settings.pad = false; settings.padV2 = true; } // neuer Standard: auf Papier
   if (![20, 30, 40, 50].includes(settings.goal)) settings.goal = 30; // mehr Punkte pro Zug als früher
   let roster = lines(store.get('kt-names', ''));
   let split = store.get('zeigs-split', null); // [[Namen Team 1], [Namen Team 2], …]
@@ -173,7 +175,10 @@
     segButtons($('teamSeg'), [[2, '2'], [3, '3'], [4, '4']], settings.teams, (v) => { settings.teams = v; makeSplit(); saveSettings(); });
     segButtons($('timeSeg'), [[45, '45 s'], [60, '60 s'], [90, '90 s']], settings.time, (v) => { settings.time = v; saveSettings(); });
     segButtons($('goalSeg'), [[20, '20 P'], [30, '30 P'], [40, '40 P'], [50, '50 P']], settings.goal, (v) => { settings.goal = v; saveSettings(); });
-    $('optPad').checked = settings.pad;
+    segButtons($('padSeg'), [[false, 'Auf Papier'], [true, 'Auf dem Handy']], settings.pad, (v) => { settings.pad = v; saveSettings(); });
+    $('padInfo').textContent = settings.pad
+      ? 'Begriff erst verdeckt – antippen zeigt ihn 3 Sekunden. Kurz wegschauen!'
+      : 'Das Handy bleibt bei der zeichnenden Person, gezeichnet wird auf Papier.';
     $('optAll').checked = settings.all;
     $('teams').replaceChildren(...split.map((names, i) => el('div', { className: 'team', style: `--c: ${TEAMS[i][1]}` },
       el('b', { textContent: TEAMS[i][0] }),
@@ -182,7 +187,6 @@
     $('resume').hidden = !(S && S.phase !== 'end');
   }
   $('shuffle').addEventListener('click', () => { makeSplit(); renderSetup(); });
-  $('optPad').addEventListener('change', (e) => { settings.pad = e.target.checked; saveSettings(); });
   $('optAll').addEventListener('change', (e) => { settings.all = e.target.checked; saveSettings(); });
 
   // ---------- Spielzustand ----------
@@ -326,11 +330,16 @@
     const drawing = S.mode === 'draw' && S.cfg.pad;
     if (drawing) {
       parts.push(...drawPad());
-      // Begriff nur beim Gedrückthalten, damit die anderen ihn beim Herzeigen nicht sehen
-      const peek = el('button', { className: 'peek', textContent: 'Gedrückt halten: Begriff zeigen' });
-      const on = () => { peek.textContent = S.word.w; }, off = () => { peek.textContent = 'Gedrückt halten: Begriff zeigen'; };
-      peek.addEventListener('pointerdown', on); ['pointerup', 'pointerleave', 'pointercancel'].forEach((e) => peek.addEventListener(e, off));
-      parts.push(peek);
+      // Begriff verdeckt: Antippen zeigt ihn 3 Sekunden, dann wieder zu – kein Gedrückthalten beim Zeichnen nötig
+      const hidden = 'Begriff ansehen – nur du schaust';
+      const peek = el('button', { className: 'peek', textContent: hidden });
+      let t = null;
+      peek.addEventListener('click', () => {
+        clearTimeout(t);
+        if (peek.classList.toggle('open')) { peek.textContent = S.word.w; t = setTimeout(() => { peek.classList.remove('open'); peek.textContent = hidden; }, 3000); }
+        else peek.textContent = hidden;
+      });
+      parts.splice(2, 0, peek);
     } else {
       parts.push(el('div', { className: 'word' }, el('small', { textContent: `${S.word.k} · ${LEVELS[S.level]}` }), el('b', { textContent: S.word.w })));
     }
