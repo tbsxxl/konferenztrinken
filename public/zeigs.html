@@ -84,6 +84,8 @@
     .verdict { margin-top: 14px; border-radius: var(--r); padding: 20px; color: #fff; background: var(--c); box-shadow: 0 10px 26px rgba(0, 0, 0, 0.28); animation: pop 0.4s cubic-bezier(0.3, 1.4, 0.6, 1); }
     .verdict b { display: block; font: 800 1.9rem/1.1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; }
     .verdict p { margin: 8px 0 0; font-weight: 600; }
+    .score { display: grid; grid-template-columns: 1fr auto; padding: 12px 18px; position: relative; }
+    .score + .score::before { content: ""; position: absolute; top: 0; left: 18px; right: 0; border-top: 0.5px solid var(--sep); }
   </style>
 </head>
 <body>
@@ -93,7 +95,7 @@
   <!-- EINRICHTEN -->
   <section id="setup" hidden>
     <header class="lt"><div><div class="eyebrow">Erklären · Zeichnen · Vormachen</div><h1>Zeig’s!</h1></div></header>
-    <div class="list"><div class="mode-info" style="padding-top:14px">Ihr spielt in Teams. Wer dran ist, bekommt per Zufall eine Art – erklären, zeichnen oder vormachen – wählt die Schwierigkeit und hat die Zeit, um dem eigenen Team den Begriff rüberzubringen. Schwerer gibt mehr Punkte. Manchmal dürfen alle mitraten.</div></div>
+    <div class="list"><div class="mode-info" style="padding-top:14px">Ihr spielt in Teams. Wer dran ist, bekommt per Zufall eine Art – erklären, zeichnen oder vormachen – und wählt die Schwierigkeit. Dann läuft die Uhr: So viele Begriffe wie möglich, jeder erratene bringt Punkte, schwer zählt mehr. Überspringen geht jederzeit. Manchmal dürfen alle mitraten.</div></div>
 
     <h2 class="sec">Teams <small id="teamInfo"></small></h2>
     <div class="list">
@@ -108,9 +110,9 @@
       <div class="cell wrap"><span>Zeit pro Zug</span><div class="seg" id="timeSeg" role="group" aria-label="Zeit pro Zug"></div></div>
       <div class="cell wrap"><span>Spielziel</span><div class="seg" id="goalSeg" role="group" aria-label="Spielziel"></div></div>
       <label class="cell"><span>Zeichnen auf dem Handy<small class="sub">Aus: auf Papier zeichnen.</small></span><input type="checkbox" class="switch" id="optPad" /></label>
-      <label class="cell"><span>Alle-raten-mit-Runden<small class="sub">Ab und zu darf jedes Team mitraten.</small></span><input type="checkbox" class="switch" id="optAll" /></label>
+      <label class="cell"><span>Alle-raten-mit-Runden<small class="sub">Ab und zu darf jedes Team mitraten – wer zuerst ruft, bekommt den Punkt.</small></span><input type="checkbox" class="switch" id="optAll" /></label>
       <label class="cell drink-only"><span>Trinkmodus<small class="sub">Ausschalten geht auch über das Logo im Hub.</small></span><input type="checkbox" class="switch" data-klirr-drink /></label>
-      <div class="mode-info drink-only" style="padding-top:10px">Trinken: Nicht erraten → das Team trinkt je 1 Schluck. Am Ende exen alle aus den Verliererteams.</div>
+      <div class="mode-info drink-only" style="padding-top:10px">Trinken: Pro übersprungenem Begriff trinkt das Team je 1 Schluck. Am Ende exen alle aus den Verliererteams.</div>
     </div>
 
     <div class="cta-bar">
@@ -146,7 +148,8 @@
   const LEVELS = { 1: 'leicht', 2: 'mittel', 3: 'schwer' };
 
   // ---------- Einstellungen ----------
-  const settings = { teams: 2, time: 60, goal: 15, pad: true, all: true, ...store.get('zeigs-settings', {}) };
+  const settings = { teams: 2, time: 60, goal: 30, pad: true, all: true, ...store.get('zeigs-settings', {}) };
+  if (![20, 30, 40, 50].includes(settings.goal)) settings.goal = 30; // mehr Punkte pro Zug als früher
   let roster = lines(store.get('kt-names', ''));
   let split = store.get('zeigs-split', null); // [[Namen Team 1], [Namen Team 2], …]
   function makeSplit() {
@@ -169,7 +172,7 @@
     if (!splitValid()) makeSplit();
     segButtons($('teamSeg'), [[2, '2'], [3, '3'], [4, '4']], settings.teams, (v) => { settings.teams = v; makeSplit(); saveSettings(); });
     segButtons($('timeSeg'), [[45, '45 s'], [60, '60 s'], [90, '90 s']], settings.time, (v) => { settings.time = v; saveSettings(); });
-    segButtons($('goalSeg'), [[10, '10 P'], [15, '15 P'], [20, '20 P'], [30, '30 P']], settings.goal, (v) => { settings.goal = v; saveSettings(); });
+    segButtons($('goalSeg'), [[20, '20 P'], [30, '30 P'], [40, '40 P'], [50, '50 P']], settings.goal, (v) => { settings.goal = v; saveSettings(); });
     $('optPad').checked = settings.pad;
     $('optAll').checked = settings.all;
     $('teams').replaceChildren(...split.map((names, i) => el('div', { className: 'team', style: `--c: ${TEAMS[i][1]}` },
@@ -183,7 +186,7 @@
   $('optAll').addEventListener('change', (e) => { settings.all = e.target.checked; saveSettings(); });
 
   // ---------- Spielzustand ----------
-  // phase: intro (wer, welche Art) → level (Schwierigkeit) → peek (nur Darsteller schaut) → play (Uhr läuft) → judge → after → … → end
+  // phase: intro (wer, welche Art) → level (Schwierigkeit) → ready → play (Uhr läuft, Begriff für Begriff) → last (Zeit um) → after (Bilanz) → … → end
   let S = store.get('zeigs-state', null);
   const save = () => store.set('zeigs-state', S);
   const show = (id) => { ['setup', 'game'].forEach((s) => { $(s).hidden = s !== id; }); };
@@ -221,7 +224,7 @@
     const modes = Object.keys(MODES);
     S.mode = modes[Math.floor(Math.random() * modes.length)];
     S.everyone = S.cfg.all && S.teams.length > 1 && Math.random() < 0.18;
-    S.level = null; S.word = null; S.deadline = null;
+    S.level = null; S.word = null; S.deadline = null; S.log = [];
     S.phase = 'intro';
     save(); render();
   }
@@ -242,7 +245,7 @@
     const t = $('timer'), bar = $('tbar');
     if (t) { t.textContent = sec; t.classList.toggle('low', sec <= 10); }
     if (bar) bar.style.width = `${(left / (S.cfg.time * 1000)) * 100}%`;
-    if (left <= 0) { beep(); S.phase = 'judge'; S.timeUp = true; save(); render(); }
+    if (left <= 0) { beep(); S.phase = 'last'; save(); render(); }
   }
   function beep() {
     try {
@@ -252,15 +255,20 @@
   }
 
   // ---------- Punkte ----------
-  function award(teamIdx) {
-    const pts = S.level;
-    if (teamIdx !== null) S.teams[teamIdx].score += pts;
+  // Ein Begriff ist geschafft (teamIdx = wer ihn erraten hat) oder übersprungen (null) → nächster Begriff.
+  function mark(teamIdx) {
+    S.log.push({ w: S.word.w, by: teamIdx });
+    if (teamIdx !== null) S.teams[teamIdx].score += S.level;
+    if (navigator.vibrate) navigator.vibrate(teamIdx === null ? 8 : 15);
+  }
+  function nextWord() { S.word = pickWord(S.level); save(); render(); }
+  function endTurn() {
     const own = S.teams[S.team];
-    S.last = { word: S.word.w, by: teamIdx === null ? null : S.teams[teamIdx].name, pts, team: own.name, color: own.color };
-    // Nicht erraten (vom eigenen Team): das Team trinkt je 1 Schluck
-    S.last.drink = S.cfg.drink && (S.everyone ? teamIdx === null : teamIdx !== S.team) ? `${own.name} trinkt je 1 Schluck` : null;
+    const skipped = S.log.filter((x) => x.by === null).length;
+    S.last = { team: own.name, color: own.color, log: S.log, pts: S.level, skipped,
+      drink: S.cfg.drink && skipped ? `${own.name} trinkt je ${skipped} ${skipped === 1 ? 'Schluck' : 'Schlucke'}` : null };
     if (S.last.drink) window.Klirr?.moment();
-    const winner = S.teams.findIndex((t) => t.score >= S.cfg.goal);
+    const winner = S.teams.reduce((best, t, i) => (t.score >= S.cfg.goal && (best < 0 || t.score > S.teams[best].score) ? i : best), -1);
     S.phase = winner >= 0 ? 'end' : 'after';
     S.winner = winner >= 0 ? winner : null;
     if (winner >= 0 && S.cfg.drink) setTimeout(() => window.Klirr?.moment(), 600);
@@ -276,7 +284,7 @@
       el('small', { textContent: t.name }), el('b', { textContent: t.score }),
       el('div', { className: 'bar' }, el('i', { style: `width:${Math.min(100, (t.score / S.cfg.goal) * 100)}%` })))));
     $('gameMini').hidden = S.phase === 'end';
-    const stage = { intro: stageIntro, level: stageLevel, peek: stagePeek, play: stagePlay, judge: stageJudge, after: stageAfter, end: stageEnd }[S.phase]();
+    const stage = ({ intro: stageIntro, level: stageLevel, ready: stageReady, play: stagePlay, last: stageLast, after: stageAfter, end: stageEnd }[S.phase] || stageIntro)();
     $('stage').replaceChildren(...stage);
     if (S.phase === 'play') startTimer(); else stopTimer();
   }
@@ -290,38 +298,47 @@
       el('b', { textContent: `${S.actor} – ${label}` }),
       el('p', { textContent: rule }),
       S.everyone ? el('span', { className: 'all', textContent: 'Alle raten mit!' }) : null),
-      el('button', { className: 'btn', textContent: `${S.actor} wählt die Schwierigkeit`, onclick: () => { S.phase = 'level'; save(); render(); } })];
+      el('button', { className: 'btn', textContent: `${S.actor}: Schwierigkeit wählen`, onclick: () => { S.phase = 'level'; save(); render(); } })];
   }
 
   function stageLevel() {
     $('stageTitle').textContent = 'Wie schwer?';
-    return [el('div', { className: 'list' }, el('div', { className: 'mode-info', style: 'padding-top:14px', textContent: `${S.actor}, wähle: Je schwerer, desto mehr Punkte. Danach schaust nur du auf den Begriff.` })),
-      el('div', { className: 'levels' }, ...[1, 2, 3].map((l) => el('button', { onclick: () => { S.level = l; S.word = pickWord(l); S.phase = 'peek'; save(); render(); } }, LEVELS[l][0].toUpperCase() + LEVELS[l].slice(1), el('small', { textContent: `${l} ${l === 1 ? 'Punkt' : 'Punkte'}` }))))];
+    return [el('div', { className: 'list' }, el('div', { className: 'mode-info', style: 'padding-top:14px', textContent: `${S.actor}, die Schwierigkeit gilt für alle Begriffe in deinen ${S.cfg.time} Sekunden. Jeder erratene Begriff bringt die Punkte.` })),
+      el('div', { className: 'levels' }, ...[1, 2, 3].map((l) => el('button', { onclick: () => { S.level = l; S.phase = 'ready'; save(); render(); } }, LEVELS[l][0].toUpperCase() + LEVELS[l].slice(1), el('small', { textContent: `${l} ${l === 1 ? 'Punkt' : 'Punkte'} je Begriff` }))))];
   }
 
-  function stagePeek() {
-    const [icon, label] = MODES[S.mode];
-    $('stageTitle').textContent = `Nur ${S.actor} schaut`;
-    return [el('div', { className: 'word' }, el('small', { textContent: `${icon} ${label} · ${LEVELS[S.level]} · ${S.word.k}` }), el('b', { textContent: S.word.w })),
-      el('button', { className: 'btn', textContent: `Los – ${S.cfg.time} Sekunden`, onclick: () => { S.deadline = Date.now() + S.cfg.time * 1000; S.timeUp = false; S.phase = 'play'; save(); render(); } }),
-      el('button', { className: 'btn ghost', textContent: 'Anderen Begriff', onclick: () => { S.word = pickWord(S.level); save(); render(); } })];
+  function stageReady() {
+    const [icon, label, rule] = MODES[S.mode];
+    $('stageTitle').textContent = `Bereit, ${S.actor}?`;
+    return [el('div', { className: 'list' }, el('div', { className: 'mode-info', style: 'padding-top:14px', textContent: `${icon} ${label} · ${LEVELS[S.level]}. ${rule} Nur du schaust aufs Handy. „Erraten“ oder „Überspringen“ – sofort kommt der nächste Begriff.` })),
+      el('button', { className: 'btn', textContent: `Los – ${S.cfg.time} Sekunden`, onclick: () => { S.deadline = Date.now() + S.cfg.time * 1000; S.log = []; S.word = pickWord(S.level); S.phase = 'play'; save(); render(); } })];
   }
 
   function stagePlay() {
     const [icon, label] = MODES[S.mode];
-    $('stageTitle').textContent = `${icon} ${label}`;
+    const got = S.log.filter((x) => x.by !== null).length;
+    $('stageTitle').textContent = `${icon} ${label} · ${got} geschafft`;
     const parts = [el('div', { className: 'timer', id: 'timer', textContent: Math.ceil(Math.max(0, S.deadline - Date.now()) / 1000) }), el('div', { className: 'tbar' }, el('i', { id: 'tbar' }))];
-    if (S.mode === 'draw' && S.cfg.pad) {
+    const drawing = S.mode === 'draw' && S.cfg.pad;
+    if (drawing) {
       parts.push(...drawPad());
-      // Begriff nur beim Gedrückthalten zeigen, damit die anderen ihn beim Herzeigen nicht sehen
+      // Begriff nur beim Gedrückthalten, damit die anderen ihn beim Herzeigen nicht sehen
       const peek = el('button', { className: 'peek', textContent: 'Gedrückt halten: Begriff zeigen' });
       const on = () => { peek.textContent = S.word.w; }, off = () => { peek.textContent = 'Gedrückt halten: Begriff zeigen'; };
       peek.addEventListener('pointerdown', on); ['pointerup', 'pointerleave', 'pointercancel'].forEach((e) => peek.addEventListener(e, off));
       parts.push(peek);
+    } else {
+      parts.push(el('div', { className: 'word' }, el('small', { textContent: `${S.word.k} · ${LEVELS[S.level]}` }), el('b', { textContent: S.word.w })));
     }
-    parts.push(el('div', { className: 'judge' },
-      el('button', { className: 'yes', textContent: 'Erraten!', onclick: () => { S.timeUp = false; if (S.everyone) { S.phase = 'judge'; save(); render(); } else award(S.team); } }),
-      el('button', { className: 'no', textContent: 'Aufgeben', onclick: () => { S.phase = 'judge'; S.timeUp = true; S.gaveUp = true; save(); render(); } })));
+    if (S.everyone) {
+      parts.push(el('div', { className: 'mode-info', style: 'padding:12px 4px 0', textContent: 'Alle raten mit – wer hat zuerst gerufen?' }),
+        el('div', { className: 'whowon' }, ...S.teams.map((t, i) => el('button', { style: `--c: ${t.color}`, textContent: t.name, onclick: () => { mark(i); nextWord(); } })),
+          el('button', { className: 'none', textContent: 'Überspringen', onclick: () => { mark(null); nextWord(); } })));
+    } else {
+      parts.push(el('div', { className: 'judge' },
+        el('button', { className: 'yes', textContent: 'Erraten', onclick: () => { mark(S.team); nextWord(); } }),
+        el('button', { className: 'no', textContent: 'Überspringen', onclick: () => { mark(null); nextWord(); } })));
+    }
     return parts;
   }
 
@@ -354,33 +371,30 @@
     return [wrap, tools];
   }
 
-  function stageJudge() {
-    $('stageTitle').textContent = S.timeUp ? (S.gaveUp ? 'Aufgegeben' : 'Zeit ist um!') : 'Erraten!';
-    const parts = [el('div', { className: 'word' }, el('small', { textContent: 'Der Begriff war' }), el('b', { textContent: S.word.w }))];
-    if (S.everyone) {
-      parts.push(el('div', { className: 'list' }, el('div', { className: 'mode-info', style: 'padding-top:14px', textContent: 'Welches Team hat zuerst richtig gerufen?' })),
-        el('div', { className: 'whowon' }, ...S.teams.map((t, i) => el('button', { style: `--c: ${t.color}`, textContent: t.name, onclick: () => award(i) })),
-          el('button', { className: 'none', textContent: 'Niemand', onclick: () => award(null) })));
-    } else if (S.timeUp) {
-      parts.push(el('div', { className: 'judge' },
-        el('button', { className: 'yes', textContent: 'Doch noch erraten', onclick: () => award(S.team) }),
-        el('button', { className: 'no', textContent: 'Nicht erraten', onclick: () => award(null) })));
-    } else {
-      // (nur nach Neuladen möglich) – Punkte nach dem Aufbau vergeben, nicht mittendrin
-      setTimeout(() => award(S.team));
-    }
+  function stageLast() {
+    $('stageTitle').textContent = 'Zeit ist um!';
+    const parts = [el('div', { className: 'word' }, el('small', { textContent: 'Letzter Begriff' }), el('b', { textContent: S.word.w }))];
+    if (S.everyone) parts.push(el('div', { className: 'whowon' }, ...S.teams.map((t, i) => el('button', { style: `--c: ${t.color}`, textContent: `${t.name} hatte ihn`, onclick: () => { mark(i); endTurn(); } })),
+      el('button', { className: 'none', textContent: 'Nicht erraten', onclick: () => { mark(null); endTurn(); } })));
+    else parts.push(el('div', { className: 'judge' },
+      el('button', { className: 'yes', textContent: 'Noch erraten', onclick: () => { mark(S.team); endTurn(); } }),
+      el('button', { className: 'no', textContent: 'Nicht geschafft', onclick: () => { mark(null); endTurn(); } })));
     return parts;
   }
 
   function stageAfter() {
     const L = S.last;
-    $('stageTitle').textContent = L.by ? 'Punkte!' : 'Leider nicht';
-    const v = el('div', { className: 'verdict', style: `--c: ${L.by ? (S.teams.find((t) => t.name === L.by)?.color || L.color) : '#3a3a3c'}` },
-      el('b', { textContent: L.by ? `+${L.pts} für ${L.by}` : 'Nicht erraten' }),
-      el('p', { textContent: `„${L.word}“` }),
+    const got = L.log.filter((x) => x.by !== null);
+    $('stageTitle').textContent = got.length ? `${got.length} ${got.length === 1 ? 'Begriff' : 'Begriffe'} geschafft` : 'Leider keiner';
+    const own = got.filter((x) => S.teams[x.by]?.name === L.team).length * L.pts;
+    const v = el('div', { className: 'verdict', style: `--c: ${L.color}` },
+      el('b', { textContent: `+${own} für ${L.team}` }),
+      el('p', { textContent: L.skipped ? `${L.skipped} übersprungen.` : 'Nichts übersprungen!' }),
       L.drink ? el('p', { textContent: `🍺 ${L.drink}.` }) : null);
+    const list = el('div', { className: 'list', style: 'margin-top:12px' }, ...L.log.map((x) => el('div', { className: 'score' },
+      el('span', { textContent: x.w }), el('b', { textContent: x.by === null ? '–' : (S.teams[x.by].name === L.team ? `+${L.pts}` : `+${L.pts} ${S.teams[x.by].name}`) }))));
     const nt = S.teams[(S.team + 1) % S.teams.length];
-    return [v, el('button', { className: 'btn', textContent: `Weiter – ${nt.name} ist dran`, onclick: () => nextTurn() })];
+    return [v, L.log.length ? list : null, el('button', { className: 'btn', textContent: `Weiter – ${nt.name} ist dran`, onclick: () => nextTurn() })].filter(Boolean);
   }
 
   function stageEnd() {
