@@ -1,14 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs>
-  <linearGradient id="mbg" x1="0.1" y1="0" x2="0.9" y2="1"><stop offset="0" stop-color="#2a2540"/><stop offset="0.5" stop-color="#14121f"/><stop offset="1" stop-color="#0a0a10"/></linearGradient>
-  <linearGradient id="mgl" x1="0.15" y1="0" x2="0.85" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0.5"/><stop offset="1" stop-color="#fff" stop-opacity="0.14"/></linearGradient>
-  <filter id="msh" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="14" stdDeviation="22" flood-color="#000" flood-opacity="0.35"/></filter>
-  <filter id="mglow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="30"/></filter>
-  <clipPath id="mcl"><circle cx="450" cy="585" r="260"/></clipPath></defs>
-  <rect width="1024" height="1024" fill="url(#mbg)"/>
-  <circle cx="623.2411613907042" cy="411.7588386092958" r="161" fill="#ff7a1a" opacity=".55" clip-path="url(#mcl)" filter="url(#mglow)"/>
-  <g filter="url(#msh)">
-  <circle cx="450" cy="585" r="260" fill="url(#mgl)" stroke="#fff" stroke-opacity=".45" stroke-width="6"/>
-  <circle cx="623.2411613907042" cy="411.7588386092958" r="161" fill="url(#mgl)" stroke="#fff" stroke-opacity=".45" stroke-width="6"/>
-  <circle cx="623.2411613907042" cy="411.7588386092958" r="161" fill="#ffb340" clip-path="url(#mcl)"/>
-  <circle cx="789.4112549695428" cy="245.58874503045715" r="44" fill="#ffb340"/>
-  <circle cx="861.5361466505707" cy="173.4638533494293" r="22" fill="#ffb340" fill-opacity="0.75"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- Klirr: zwei flache Glaslinsen auf Mitternacht, nur die Schnittmenge ist orange -->
+  <defs>
+    <linearGradient id="bg" x1="0.1" y1="0" x2="0.9" y2="1"><stop offset="0" stop-color="#2a2540"/><stop offset="0.5" stop-color="#14121f"/><stop offset="1" stop-color="#0a0a10"/></linearGradient>
+    <clipPath id="a"><circle cx="450" cy="585" r="260"/></clipPath>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="30"/></filter>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <g clip-path="url(#a)"><circle cx="623" cy="412" r="161" fill="#ff7a1a" opacity=".55" filter="url(#glow)"/></g>
+  <circle cx="450" cy="585" r="260" fill="#fff" fill-opacity=".24"/>
+  <circle cx="623" cy="412" r="161" fill="#fff" fill-opacity=".24"/>
+  <g clip-path="url(#a)"><circle cx="623" cy="412" r="161" fill="#ffb340"/></g>
+  <circle cx="789" cy="246" r="44" fill="#ffb340"/>
+  <circle cx="878" cy="157" r="22" fill="#ffb340" fill-opacity=".75"/>
+</svg>
