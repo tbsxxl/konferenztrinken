@@ -202,15 +202,15 @@
       <svg viewBox="0 0 1024 1024" aria-hidden="true">
         <defs>
           <linearGradient id="bmBg" x1="0.1" y1="0" x2="0.9" y2="1"><stop offset="0" stop-color="#2a2540"/><stop offset=".5" stop-color="#14121f"/><stop offset="1" stop-color="#0a0a10"/></linearGradient>
-          <radialGradient id="bmGl" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".6" stop-color="#fff" stop-opacity=".18"/><stop offset="1" stop-color="#fff" stop-opacity=".08"/></radialGradient>
+          <radialGradient id="bmGl" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".08"/><stop offset=".72" stop-color="#fff" stop-opacity=".12"/><stop offset="1" stop-color="#fff" stop-opacity=".34"/></radialGradient><radialGradient id="bmSh" cx=".32" cy=".26" r=".55"><stop offset="0" stop-color="#fff" stop-opacity=".42"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
           <clipPath id="bmClip"><circle cx="450" cy="585" r="260"/></clipPath>
           <filter id="bmGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="30"/></filter>
         </defs>
         <rect width="1024" height="1024" fill="url(#bmBg)"/>
         <g class="bm-glow" clip-path="url(#bmClip)"><circle class="bm-move" cx="623" cy="412" r="161" fill="#ff7a1a" filter="url(#bmGlow)" opacity=".55"/></g>
         <g class="bm-lens" clip-path="url(#bmClip)"><circle class="bm-move" cx="623" cy="412" r="161" fill="#ffb340"/></g>
-        <circle cx="450" cy="585" r="260" fill="url(#bmGl)" stroke="#fff" stroke-opacity=".5" stroke-width="7"/><path d="M 289 533 A 187 187 0 0 1 403 419" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="22" stroke-linecap="round"/>
-        <g class="bm-move"><circle cx="623" cy="412" r="161" fill="url(#bmGl)" stroke="#fff" stroke-opacity=".5" stroke-width="7"/><path d="M 523 380 A 116 116 0 0 1 594 309" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="14" stroke-linecap="round"/></g>
+        <circle cx="450" cy="585" r="260" fill="url(#bmGl)"/><circle cx="450" cy="585" r="260" fill="url(#bmSh)"/>
+        <g class="bm-move"><circle cx="623" cy="412" r="161" fill="url(#bmGl)"/><circle cx="623" cy="412" r="161" fill="url(#bmSh)"/></g>
         <g class="bm-move bm-perls"><circle cx="789" cy="246" r="44"/><circle cx="878" cy="157" r="22" opacity=".75"/></g>
       </svg>
     </button>
