@@ -35,7 +35,7 @@ const WOERTER = [
   { k: 'Essen & Trinken', w: 'Sushi', t: 'Reis' },
   { k: 'Essen & Trinken', w: 'Spaghetti', t: 'Gabel' },
   { k: 'Essen & Trinken', w: 'Currywurst', t: 'Pommesbude' },
-  { k: 'Essen & Trinken', w: 'Pfannkuchen', t: 'Pfanne' },
+  { k: 'Essen & Trinken', w: 'Pfannkuchen', t: 'Teig' },
   { k: 'Essen & Trinken', w: 'Popcorn', t: 'Salz' },
   { k: 'Essen & Trinken', w: 'Schokolade', t: 'Schmelzen' },
   { k: 'Essen & Trinken', w: 'Kaffee', t: 'Morgens' },
