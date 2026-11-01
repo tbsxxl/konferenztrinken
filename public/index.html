@@ -12,8 +12,8 @@
   <meta name="apple-mobile-web-app-title" content="Klirr" />
   <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-  <title>Klirr – Trinkspiele</title>
-  <meta name="description" content="Klirr – Trinkspiele: Konferenztrinken zu Bundesliga und Champions League und das Quiz „Der Dümmste fliegt“." />
+  <title>Klirr</title>
+  <meta name="description" content="Klirr – Spiele für deine Runde: Quiz, Imposter, Zeig’s!, Tic Tac Toe und Punktezähler." />
   <link rel="icon" type="image/svg+xml" href="/icon.svg" />
   <link rel="stylesheet" href="/app.css" />
   <style>
@@ -198,7 +198,7 @@
 <body>
 <main>
   <div class="brand">
-    <button type="button" class="brand-mark" id="drinkMark" aria-pressed="false" aria-label="Trinkmodus einschalten">
+    <button type="button" class="brand-mark" id="drinkMark" aria-pressed="false" aria-label="Klirr">
       <svg viewBox="0 0 1024 1024" aria-hidden="true">
         <defs>
           <linearGradient id="bmBg" x1="0.1" y1="0" x2="0.9" y2="1"><stop offset="0" stop-color="#2a2540"/><stop offset=".5" stop-color="#14121f"/><stop offset="1" stop-color="#0a0a10"/></linearGradient>
@@ -219,10 +219,10 @@
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6M12 7.5v.01"/></svg>
     </a>
   </div>
-  <p class="hero-sub" id="heroSub">Trinkspiele für deine Runde.</p>
+  <p class="hero-sub" id="heroSub">Spiele für deine Runde.</p>
 
   <div class="covers" aria-label="Spiele">
-    <a class="cover-card" href="/konferenz.html">
+    <a class="cover-card drink-only" href="/konferenz.html">
       <div class="cover art-konf">
         <span class="badge-live" id="liveKonferenz" hidden>Läuft</span>
         <svg class="ball" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="none" stroke="#fff" stroke-width="5"/><path d="M50 30 L66 42 L60 61 L40 61 L34 42 Z" fill="#fff"/></svg>
@@ -291,7 +291,7 @@
     <div class="prow" id="installRow"><span class="ico" style="--t:#0a84ff" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.5v11M8 7.5l4-4 4 4"/><path d="M7 11H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-1"/></svg></span><span>Zum Home-Bildschirm<small>In Safari über „Teilen“</small></span><span></span></div>
   </div>
 
-  <footer>Trinkt verantwortungsvoll · Wasser zwischendurch · Alkoholfrei zählt auch.</footer>
+  <footer class="drink-only">Trinkt verantwortungsvoll · Wasser zwischendurch · Alkoholfrei zählt auch.</footer>
 </main>
 
 <a class="nowplaying glass" id="nowPlaying" hidden></a>
@@ -308,7 +308,7 @@
   const kt = read('kt-players');
   // Läuft = Runde mit Spielern, zuletzt in den letzten 18 Stunden benutzt (sonst gilt sie als vorbei)
   const ktLast = read('kt-last', 0);
-  const ktRunning = Array.isArray(kt) && kt.length > 0 && Date.now() - ktLast < 18 * 3600e3;
+  const ktRunning = localStorage.getItem('klirr-drink:all') === '1' && Array.isArray(kt) && kt.length > 0 && Date.now() - ktLast < 18 * 3600e3;
   const dumm = read('dumm-state');
   const dummRunning = !!(dumm && !dumm.finished && dumm.phase && dumm.phase !== 'lobby');
   const ttt = read('bttt_state_v1');
@@ -391,9 +391,10 @@
   function showDrink(on) {
     const m = $('drinkMark');
     m.setAttribute('aria-pressed', String(on));
-    m.setAttribute('aria-label', on ? 'Trinkmodus an – zum Ausschalten tippen' : 'Trinkmodus aus – zum Einschalten tippen');
+    m.setAttribute('aria-label', 'Klirr');
     document.documentElement.dataset.drinkAll = on ? 'on' : 'off';
-    $('heroSub').textContent = on ? 'Trinkmodus an · Prost!' : 'Tipp aufs Logo, um anzustoßen.';
+    document.documentElement.dataset.drink = on ? 'on' : 'off';
+    $('heroSub').textContent = on ? 'Prost! Trinkmodus an.' : 'Spiele für deine Runde.';
   }
   showDrink(drinkAll());
   $('drinkMark').addEventListener('click', () => {

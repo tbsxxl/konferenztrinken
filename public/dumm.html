@@ -12,7 +12,7 @@
   <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <title>Der Dümmste fliegt</title>
-  <meta name="description" content="Quiz-Trinkspiel: klassisch mit Leben oder mit Abstimmung – auf einem Handy oder jeder auf seinem eigenen." />
+  <meta name="description" content="Quiz: klassisch mit Leben oder mit Abstimmung – auf einem Handy oder jeder auf seinem eigenen." />
   <link rel="icon" type="image/svg+xml" href="/icon.svg" />
   <link rel="preload" href="/fonts/barlow-condensed-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="/app.css" />
@@ -142,7 +142,7 @@
 
   <!-- EINRICHTEN -->
   <section id="setup" hidden>
-    <header class="lt"><div><div class="eyebrow">Quiz-Trinkspiel</div><h1>Der Dümmste fliegt</h1></div></header>
+    <header class="lt"><div><div class="eyebrow">Quiz</div><h1>Der Dümmste fliegt</h1></div></header>
 
     <h2 class="sec">Spielart</h2>
     <div class="list">
@@ -187,7 +187,7 @@
 
     <h2 class="sec">Regeln</h2>
     <div class="list">
-      <label class="cell"><span>Trinkmodus<small class="sub">Gilt für alle Spiele, wie das Logo im Hub. Aus: reines Quiz.</small></span><input type="checkbox" class="switch" data-klirr-drink="dumm" /></label>
+      <label class="cell drink-only"><span>Trinkmodus<small class="sub">Ausschalten geht auch über das Logo im Hub.</small></span><input type="checkbox" class="switch" data-klirr-drink="dumm" /></label>
       <div class="cell stepper-cell" id="rowLives"><span>Leben pro Person</span><div class="ctl"><button data-step="lives:-1" aria-label="Weniger Leben">−</button><output id="v-lives"></output><button data-step="lives:1" aria-label="Mehr Leben">+</button></div></div>
       <div class="cell stepper-cell" id="rowVoteLives"><span>Leben pro Person<small class="sub">Zum Dümmsten gewählt = 1 Leben weg</small></span><div class="ctl"><button data-step="voteLives:-1" aria-label="Weniger Leben">−</button><output id="v-voteLives"></output><button data-step="voteLives:1" aria-label="Mehr Leben">+</button></div></div>
       <div class="cell stepper-cell drink-only" id="rowLifeLoss"><span>Leben verloren: trinken</span><div class="ctl"><button data-step="lifeLoss:-1" aria-label="Weniger trinken">−</button><output id="v-lifeLoss"></output><button data-step="lifeLoss:1" aria-label="Mehr trinken">+</button></div></div>
@@ -242,7 +242,7 @@
     <button class="btn ghost" id="toSetup">Einstellungen</button>
   </section>
 
-  <footer>Trinkt verantwortungsvoll · Wasser zwischendurch · Alkoholfrei zählt auch.<br /><a class="legal" href="/datenschutz.html">Datenschutz</a></footer>
+  <footer><span class="drink-only">Trinkt verantwortungsvoll · Wasser zwischendurch · Alkoholfrei zählt auch.<br /></span><a class="legal" href="/datenschutz.html">Datenschutz</a></footer>
 </main>
 
 <script src="/dumm-fragen.js"></script>

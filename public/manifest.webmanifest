@@ -1,7 +1,7 @@
 {
-  "name": "Klirr – Trinkspiele",
+  "name": "Klirr",
   "short_name": "Klirr",
-  "description": "Klirr – Trinkspiele: Konferenztrinken und Der Dümmste fliegt",
+  "description": "Klirr – Spiele für deine Runde",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

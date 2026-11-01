@@ -1,3 +1,5 @@
+/* Trinkmodus ist ein verstecktes Feature: alles Trink-Bezogene nur bei data-drink="on" */
+:root:not([data-drink="on"]) .drink-only { display: none !important; }
 /* Gemeinsame Klirr-Schicht für übernommene Spiele (Wizard, Flip 7): Mitternacht-Look und Zurück-Link. */
 [hidden] { display: none !important; }
 :root[data-theme="dark"] {

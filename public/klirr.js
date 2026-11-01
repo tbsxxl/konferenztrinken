@@ -100,6 +100,7 @@
       input.addEventListener('change', () => { setDrink(game, input.checked); document.dispatchEvent(new CustomEvent('klirr-drink', { detail: { game, on: input.checked } })); });
     });
   }
+  document.documentElement.dataset.drink = drink() ? 'on' : 'off';
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bindDrink); else bindDrink();
 
   window.Klirr = { undoToast, moment, note, drink };

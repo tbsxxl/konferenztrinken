@@ -1,3 +1,5 @@
+/* Trinkmodus ist ein verstecktes Feature: alles Trink-Bezogene nur bei data-drink="on" */
+:root:not([data-drink="on"]) .drink-only { display: none !important; }
 /* Apple-Look, angelehnt an Apple Sports: schwarzer Grund, ruhige graue Karten, SF Pro,
    Satzschreibung, iOS-Bedienelemente. Wird als letztes Stylesheet geladen. */
 
