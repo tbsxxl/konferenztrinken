@@ -12,18 +12,11 @@
 .kl-moment svg { position: relative; }
 @keyframes kl-dim { 0% { opacity: 0; } 20%, 80% { opacity: 1; } 100% { opacity: 0; } }
 .kl-moment svg { width: min(56vw, 260px); overflow: visible; filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.5)); }
-.kl-moment .a, .kl-moment .b { transform-box: fill-box; transform-origin: center; }
-.kl-moment circle.a { animation: kl-a 1.05s cubic-bezier(0.3, 1.4, 0.5, 1) both; }
-.kl-moment .b { animation: kl-b 1.05s cubic-bezier(0.3, 1.4, 0.5, 1) both; }
-.kl-moment .lens { animation: kl-lens 1.05s ease-out both; filter: drop-shadow(0 0 14px #ff7a1a); }
-.kl-moment .p1 { animation: kl-p 1.05s 0.25s ease-out both; }
-.kl-moment .p2 { animation: kl-p 1.05s 0.35s ease-out both; }
-@keyframes kl-a { 0% { translate: -60px 40px; opacity: 0; } 35% { translate: 0 0; opacity: 1; } 45% { translate: 4px -3px; } 85% { opacity: 1; } 100% { opacity: 0; } }
-@keyframes kl-b { 0% { translate: 60px -40px; opacity: 0; } 35% { translate: 0 0; opacity: 1; } 45% { translate: -4px 3px; } 85% { opacity: 1; } 100% { opacity: 0; } }
-@keyframes kl-lens { 0%, 30% { opacity: 0; } 40% { opacity: 1; scale: 1.06; } 85% { opacity: 1; scale: 1; } 100% { opacity: 0; } }
+.kl-moment .lens { filter: drop-shadow(0 0 12px #ff7a1a); }
+.kl-moment .p1 { animation: kl-p 1.15s 0.4s ease-out both; }
+.kl-moment .p2 { animation: kl-p 1.15s 0.5s ease-out both; }
 @keyframes kl-p { 0% { opacity: 0; translate: -10px 10px; } 30% { opacity: 1; } 100% { opacity: 0; translate: 14px -26px; } }
-.kl-moment.is-still circle.a, .kl-moment.is-still .b, .kl-moment.is-still .p1, .kl-moment.is-still .p2 { animation: kl-fade 0.7s ease both; }
-.kl-moment.is-still .lens { animation: kl-fade 0.7s ease both; }
+.kl-moment.is-still .p1, .kl-moment.is-still .p2 { animation: none; }
 @keyframes kl-fade { 0%, 100% { opacity: 0; } 25%, 75% { opacity: 1; } }
 
 @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {

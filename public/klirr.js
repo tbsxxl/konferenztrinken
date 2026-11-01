@@ -32,23 +32,48 @@
     function hide() { t.classList.remove('is-open'); clearTimeout(undoTimer); setTimeout(() => { if (!t.classList.contains('is-open')) t.hidden = true; }, 300); }
   }
 
-  // Klirr-Moment: die zwei Kreise aus dem Logo stoßen zusammen, die Schnittmenge leuchtet, Perlen steigen.
-  // Ohne Bewegung (Bewegung reduzieren) leuchtet nur kurz die Schnittmenge auf.
+  // Klirr-Moment: zwei Glaslinsen gleiten aufeinander zu. Gefärbt ist genau ihre Schnittmenge –
+  // sie entsteht in dem Moment, in dem sich die Linsen berühren, und wächst mit der Überlappung.
+  // Ohne Bewegung (Bewegung reduzieren) erscheint nur kurz das fertige Logo.
   let busy = false;
+  const lensSvg = (id, r) => `<circle r="${r}" fill="url(#${id}g)" stroke="#fff" stroke-opacity=".55" stroke-width="1.5"/>
+      <path d="M ${-r * 0.62} ${-r * 0.2} A ${r * 0.72} ${r * 0.72} 0 0 1 ${-r * 0.18} ${-r * 0.64}" fill="none" stroke="#fff" stroke-opacity=".85" stroke-width="${r * 0.09}" stroke-linecap="round"/>`;
   function moment() {
     if (busy) return;
     busy = true;
+    const still = reduced();
+    const A = [80, 92, 46], B = [120, 66, 30];     // Endlage wie im Logo
     const o = document.createElement('div');
-    o.className = 'kl-moment' + (reduced() ? ' is-still' : '');
+    o.className = 'kl-moment' + (still ? ' is-still' : '');
     o.setAttribute('aria-hidden', 'true');
-    o.innerHTML = `<svg viewBox="0 0 200 160"><defs><clipPath id="klc"><circle class="a" cx="80" cy="92" r="46"/></clipPath>
-      <linearGradient id="klg" x1=".15" y1="0" x2=".85" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity=".14"/></linearGradient></defs>
-      <circle class="a" cx="80" cy="92" r="46" fill="url(#klg)" stroke="#fff" stroke-opacity=".5" stroke-width="1.5"/>
-      <g class="b"><circle cx="120" cy="66" r="30" fill="url(#klg)" stroke="#fff" stroke-opacity=".5" stroke-width="1.5"/></g>
-      <g class="lens"><circle cx="120" cy="66" r="30" fill="#ffb340" clip-path="url(#klc)"/></g>
+    o.innerHTML = `<svg viewBox="0 0 200 160"><defs>
+      <radialGradient id="klmg" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".6" stop-color="#fff" stop-opacity=".18"/><stop offset="1" stop-color="#fff" stop-opacity=".08"/></radialGradient>
+      <clipPath id="klc"><circle id="klcA" r="${A[2]}"/></clipPath></defs>
+      <g class="lens" clip-path="url(#klc)"><circle id="klL" r="${B[2]}" fill="#ffb340"/></g>
+      <g id="klA">${lensSvg('klm', A[2])}</g>
+      <g id="klB">${lensSvg('klm', B[2])}</g>
       <circle class="p1" cx="146" cy="40" r="7" fill="#ffb340"/><circle class="p2" cx="160" cy="26" r="3.5" fill="#ffb340"/></svg>`;
     document.body.append(o);
-    setTimeout(() => { o.remove(); busy = false; }, reduced() ? 700 : 1100);
+    const $q = (id) => o.querySelector('#' + id);
+    const place = (k) => {   // k = 0: weit auseinander, 1: Endlage
+      const ax = A[0] - 70 * (1 - k), ay = A[1] + 45 * (1 - k), bx = B[0] + 70 * (1 - k), by = B[1] - 45 * (1 - k);
+      $q('klA').setAttribute('transform', `translate(${ax} ${ay})`);
+      $q('klB').setAttribute('transform', `translate(${bx} ${by})`);
+      $q('klcA').setAttribute('cx', ax); $q('klcA').setAttribute('cy', ay);
+      $q('klL').setAttribute('cx', bx); $q('klL').setAttribute('cy', by);
+    };
+    const dur = still ? 700 : 1150;
+    const backOut = (t) => { const c = 1.9; return 1 + (c + 1) * (t - 1) ** 3 + c * (t - 1) ** 2; };
+    const t0 = performance.now();
+    const svg = o.querySelector('svg');
+    const frame = (now) => {
+      const t = Math.min(1, (now - t0) / dur);
+      place(still ? 1 : backOut(Math.min(1, t / 0.42)));
+      svg.style.opacity = still ? (t < 0.25 ? t / 0.25 : t > 0.75 ? (1 - t) / 0.25 : 1) : (t < 0.12 ? t / 0.12 : t > 0.8 ? (1 - t) / 0.2 : 1);
+      if (t < 1) requestAnimationFrame(frame); else { o.remove(); busy = false; }
+    };
+    place(still ? 1 : 0);
+    requestAnimationFrame(frame);
   }
 
   // Kurzer Hinweis ohne Knopf (z. B. „Tobi trinkt 2“), oben, damit er die Spiel-Hinweise unten nicht verdeckt.
