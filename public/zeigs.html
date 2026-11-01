@@ -95,7 +95,7 @@
   <!-- EINRICHTEN -->
   <section id="setup" hidden>
     <header class="lt"><div><div class="eyebrow">Erklären · Zeichnen · Vormachen</div><h1>Zeig’s!</h1></div></header>
-    <div class="list"><div class="mode-info" style="padding-top:14px">Ihr spielt in Teams. Wer dran ist, bekommt per Zufall eine Art – erklären, zeichnen oder vormachen – und wählt die Schwierigkeit. Dann läuft die Uhr: So viele Begriffe wie möglich, jeder erratene bringt Punkte, schwer zählt mehr. Überspringen geht jederzeit. Manchmal dürfen alle mitraten.</div></div>
+    <div class="list"><div class="mode-info" style="padding-top:14px">Ihr spielt in Teams. Die Teams sind abwechselnd dran, im Team wechselt die Person. Erklären, Zeichnen und Vormachen kommen der Reihe nach. Wer dran ist, wählt die Schwierigkeit. Dann läuft die Uhr: So viele Begriffe wie möglich, jeder erratene bringt Punkte, schwer zählt mehr. Überspringen geht jederzeit. Manchmal dürfen alle mitraten.</div></div>
 
     <h2 class="sec">Teams <small id="teamInfo"></small></h2>
     <div class="list">
@@ -110,7 +110,7 @@
       <div class="cell wrap"><span>Zeit pro Zug</span><div class="seg" id="timeSeg" role="group" aria-label="Zeit pro Zug"></div></div>
       <div class="cell wrap"><span>Spielziel</span><div class="seg" id="goalSeg" role="group" aria-label="Spielziel"></div></div>
       <label class="cell"><span>Zeichnen auf dem Handy<small class="sub">Aus: auf Papier zeichnen.</small></span><input type="checkbox" class="switch" id="optPad" /></label>
-      <label class="cell"><span>Alle-raten-mit-Runden<small class="sub">Ab und zu darf jedes Team mitraten – wer zuerst ruft, bekommt den Punkt.</small></span><input type="checkbox" class="switch" id="optAll" /></label>
+      <label class="cell"><span>Alle-raten-mit-Runden<small class="sub">Jede dritte Runde: Alle Teams raten mit – wer zuerst ruft, bekommt den Punkt.</small></span><input type="checkbox" class="switch" id="optAll" /></label>
       <label class="cell drink-only"><span>Trinkmodus<small class="sub">Ausschalten geht auch über das Logo im Hub.</small></span><input type="checkbox" class="switch" data-klirr-drink /></label>
       <div class="mode-info drink-only" style="padding-top:10px">Trinken: Pro übersprungenem Begriff trinkt das Team je 1 Schluck. Am Ende exen alle aus den Verliererteams.</div>
     </div>
@@ -207,7 +207,7 @@
     S = {
       phase: 'intro', teams: split.map((names, i) => ({ name: TEAMS[i][0], color: TEAMS[i][1], players: names, score: 0, next: 0 })),
       cfg: { time: settings.time, goal: settings.goal, pad: settings.pad, all: settings.all, drink: !!window.Klirr?.drink() },
-      team: Math.floor(Math.random() * split.length), turn: 0, last: null,
+      team: 0, turn: 0, last: null,
     };
     nextTurn(true);
   }
@@ -221,9 +221,13 @@
     S.turn++;
     S.actor = t.players[t.next % t.players.length];
     t.next++;
+    // Abwechselnd statt gelost: jedes Team geht Erklären → Zeichnen → Vormachen der Reihe nach durch
     const modes = Object.keys(MODES);
-    S.mode = modes[Math.floor(Math.random() * modes.length)];
-    S.everyone = S.cfg.all && S.teams.length > 1 && Math.random() < 0.18;
+    t.modeIdx = t.modeIdx || 0;
+    S.mode = modes[t.modeIdx % modes.length];
+    t.modeIdx++;
+    // jede dritte Runde (alle Teams einmal dran): alle raten mit – so trifft es jedes Team gleich oft
+    S.everyone = S.cfg.all && S.teams.length > 1 && Math.ceil(S.turn / S.teams.length) % 3 === 0;
     S.level = null; S.word = null; S.deadline = null; S.log = [];
     S.phase = 'intro';
     save(); render();
