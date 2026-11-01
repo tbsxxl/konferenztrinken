@@ -72,6 +72,22 @@
     .score { display: grid; grid-template-columns: 1fr auto; padding: 12px 18px; position: relative; }
     .score + .score::before { content: ""; position: absolute; top: 0; left: 18px; right: 0; border-top: 0.5px solid var(--sep); }
     .score b { font-variant-numeric: tabular-nums; }
+    /* Mehrere Handys: Raum */
+    .room { padding: 18px; border-radius: var(--r); text-align: center; }
+    .room .code { font: 800 3.4rem/1 var(--display); letter-spacing: 0.18em; margin: 6px 0 4px; }
+    .room .hint { color: var(--secondary); font-size: 0.9rem; overflow-wrap: anywhere; }
+    .room .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+    .room .btns button { min-height: 48px; border: 0; border-radius: 999px; background: var(--fill); color: var(--label); font: inherit; font-weight: 700; }
+    .code-input { width: 100%; min-height: 64px; margin-top: 6px; border: 0; border-radius: 16px; background: var(--fill); color: var(--label); text-align: center; font: 800 2.6rem/1 var(--display); letter-spacing: 0.22em; text-transform: uppercase; }
+    .netpill { display: inline-flex; align-items: center; gap: 6px; }
+    .netpill::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #8e8e93; }
+    .netpill.on::before { background: #30d158; }
+    .netpill.off::before { background: #ff453a; }
+    .you { margin: 0 0 10px; padding: 10px 14px; border-radius: 14px; background: var(--fill); font-weight: 600; text-align: center; }
+    .wait { margin-top: 14px; padding: 18px; border-radius: var(--r); text-align: center; color: var(--secondary); font-weight: 600; }
+    .vote-grid button[aria-pressed="true"] { outline: 3px solid var(--label); outline-offset: 2px; }
+    .vote-grid button:disabled { opacity: 0.45; }
+    .votes { padding: 6px 18px 14px; color: var(--secondary); font-size: 0.9rem; }
   </style>
 </head>
 <body>
@@ -79,9 +95,9 @@
   <a class="back-link" href="/">‹ Alle Spiele</a>
 
   <!-- EINRICHTEN -->
-  <section id="setup">
+  <section id="setup" hidden>
     <header class="lt"><div><div class="eyebrow">Wer gehört nicht dazu?</div><h1>Imposter</h1></div></header>
-    <div class="list"><div class="mode-info" style="padding-top:14px">Alle bekommen dasselbe geheime Wort – nur der Imposter nicht, er bekommt höchstens einen vagen Tipp. Reihum sagt jede Person einen Begriff zum Wort. Danach zeigt ihr auf den Verdächtigen. Wird der Imposter erwischt, darf er noch das Wort raten.</div></div>
+    <div class="list"><div class="mode-info" style="padding-top:14px">Alle bekommen dasselbe geheime Wort – nur der Imposter nicht, er bekommt höchstens einen vagen Tipp. Reihum sagt jede Person einen Begriff zum Wort. Danach wird abgestimmt. Wird der Imposter erwischt, darf er noch das Wort raten.</div></div>
 
     <h2 class="sec">Spielart</h2>
     <div class="list">
@@ -89,15 +105,37 @@
       <div class="mode-info" id="tipInfo"></div>
     </div>
 
-    <h2 class="sec">Mitspieler <small id="rosterCount"></small></h2>
+    <h2 class="sec">Gespielt wird</h2>
     <div class="list">
-      <div class="add-row">
-        <input type="text" id="rosterInput" placeholder="Name eingeben …" aria-label="Mitspieler hinzufügen" autocomplete="off" enterkeyhint="done" />
-        <button class="btn small" id="rosterAdd">Hinzufügen</button>
-      </div>
-      <div class="roster" id="roster"></div>
+      <div class="cell wrap"><div class="seg big" id="playSeg" role="group" aria-label="Gespielt wird"></div></div>
+      <div class="mode-info" id="playInfo"></div>
     </div>
-    <p class="foot">Die Liste gilt für alle Spiele.</p>
+
+    <!-- Ein Handy -->
+    <div id="localPlayers">
+      <h2 class="sec">Mitspieler <small id="rosterCount"></small></h2>
+      <div class="list">
+        <div class="add-row">
+          <input type="text" id="rosterInput" placeholder="Name eingeben …" aria-label="Mitspieler hinzufügen" autocomplete="off" enterkeyhint="done" />
+          <button class="btn small" id="rosterAdd">Hinzufügen</button>
+        </div>
+        <div class="roster" id="roster"></div>
+      </div>
+      <p class="foot">Die Liste gilt für alle Spiele.</p>
+    </div>
+
+    <!-- Mehrere Handys -->
+    <div id="onlinePlayers" hidden>
+      <h2 class="sec">Raum <small class="netpill" id="hostNet"></small></h2>
+      <div class="list room" id="roomBox">
+        <button class="btn" id="createRoom" style="margin:0">Raum erstellen</button>
+        <p class="hint" style="margin:10px 0 0">Alle anderen öffnen den Link auf ihrem Handy und tragen ihren Namen ein.</p>
+      </div>
+      <h2 class="sec">Du</h2>
+      <div class="list"><div class="add-row"><input type="text" id="hostName" placeholder="Dein Name" aria-label="Dein Name" autocomplete="off" /></div></div>
+      <h2 class="sec">Im Raum <small id="lobbyCount"></small></h2>
+      <div class="list"><div class="roster" id="lobby"></div></div>
+    </div>
 
     <h2 class="sec">Regeln</h2>
     <div class="list">
@@ -114,14 +152,30 @@
       <button class="btn" id="start">Spiel starten</button>
       <button class="btn ghost" id="resume" hidden>Laufende Runde fortsetzen</button>
     </div>
+    <button class="btn ghost" id="joinOther">Einem Raum beitreten</button>
     <div class="error" id="setupError" role="alert"></div>
+  </section>
+
+  <!-- BEITRETEN (Gast) -->
+  <section id="join" hidden>
+    <header class="lt"><div><div class="eyebrow">Mehrere Handys</div><h1>Raum beitreten</h1></div></header>
+    <div class="list room">
+      <div class="hint">Raumcode</div>
+      <input type="text" id="joinCode" class="code-input" maxlength="4" autocapitalize="characters" autocomplete="off" aria-label="Raumcode" />
+    </div>
+    <h2 class="sec">Dein Name</h2>
+    <div class="list"><div class="add-row"><input type="text" id="joinName" placeholder="Name" aria-label="Dein Name" autocomplete="off" enterkeyhint="go" /></div></div>
+    <button class="btn" id="joinBtn">Beitreten</button>
+    <button class="btn ghost" id="joinBack">Selbst ein Spiel starten</button>
+    <div class="error" id="joinError" role="alert"></div>
   </section>
 
   <!-- SPIEL -->
   <section id="game" hidden>
-    <header class="lt"><div><div class="eyebrow" id="roundLabel"></div><h1 id="stageTitle">Imposter</h1></div></header>
+    <header class="lt"><div><div class="eyebrow" id="roundLabel"></div><h1 id="stageTitle">Imposter</h1></div><span class="pill netpill" id="gameNet" hidden></span></header>
+    <div class="you" id="youBox" hidden></div>
     <div id="stage"></div>
-    <div class="mini"><button id="quit">Runde abbrechen</button></div>
+    <div class="mini" id="hostMini"><button id="quit">Runde abbrechen</button></div>
   </section>
 
   <footer>Trinkt verantwortungsvoll · Wasser zwischendurch · Alkoholfrei zählt auch.<br /><a class="legal" href="/datenschutz.html">Datenschutz</a></footer>
@@ -135,25 +189,47 @@
     get(key, fallback) { try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch { return fallback; } },
     set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch {} },
   };
-  const norm = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+  const norm = (s) => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
   const shuffle = (arr) => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   const PALETTE = ['#0a6ed1', '#8e44c9', '#b85400', '#0b7285', '#4c4cdb', '#946800', '#c2185b', '#7a5a35'];
   const lines = (text) => String(text || '').split('\n').map((s) => s.trim()).filter(Boolean);
   const initial = (name) => [...name][0] || '?';
   const PERSON = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.2" r="4.3"/><path d="M3.8 21.5c0-4.6 3.7-7.6 8.2-7.6s8.2 3 8.2 7.6z"/></svg>';
-  const drinkOn = () => !!window.Klirr?.drink();
+  const RUNNING = ['reveal', 'talk', 'vote', 'guess'];
 
   // ---------- Einstellungen ----------
   const CATS = [...new Set(WOERTER.map((w) => w.k))];
-  const DEFAULTS = { imps: 1, tip: true, cat: false, cats: CATS };
+  const DEFAULTS = { imps: 1, tip: true, cat: false, cats: CATS, play: 'local' };
   const settings = { ...DEFAULTS, ...store.get('imp-settings', {}) };
   settings.cats = (settings.cats || []).filter((c) => CATS.includes(c));
   if (!settings.cats.length) settings.cats = CATS;
-  const saveSettings = () => { store.set('imp-settings', settings); renderSetup(); };
+  const saveSettings = () => { store.set('imp-settings', settings); renderSetup(); pushLobby(); };
 
-  // ---------- Mitspieler (gemeinsam mit dem Hub) ----------
+  // ---------- Rollen ----------
+  // role: 'local' (ein Handy), 'host' (Gastgeber mit Raum), 'guest' (Mitspieler im Raum)
+  // Der Gastgeber rechnet das Spiel. An alle geht nur der öffentliche Stand; Wort, Tipp und
+  // Imposter bekommt jede Person einzeln als private Nachricht – erst die Auflösung ist öffentlich.
+  let role = 'local';
+  let S = null;            // vollständiger Stand (ein Handy / Gastgeber)
+  let P = null;            // öffentlicher Stand (Gast)
+  let myCard = null;       // eigene Karte (Gast)
+  let cardOpen = false;    // eigene Karte gerade aufgedeckt (mehrere Handys)
+  let myVote = null;
+  let net = null;
+  let momentRound = 0;
+  const host = store.get('imp-host', null);            // { code, hostKey }
+  let guest = store.get('imp-guest', null);           // { code, name, id }
+  let lobby = store.get('imp-lobby', []);             // Gäste im Raum (nur Gastgeber)
+  let ids = store.get('imp-ids', {});                 // Name → Geräte-ID (nur Gastgeber)
+  const view = () => (role === 'guest' ? P : S);
+  const myName = () => (role === 'guest' ? guest?.name : role === 'host' ? $('hostName').value.trim() : null);
+
+  // ---------- Mitspieler ----------
   let roster = lines(store.get('kt-names', ''));
-  const colorOf = (name) => PALETTE[Math.max(0, roster.indexOf(name)) % PALETTE.length];
+  const colorOf = (name) => {
+    const list = view()?.players || (role === 'local' ? roster : lobbyNames());
+    return PALETTE[Math.max(0, list.indexOf(name)) % PALETTE.length];
+  };
   function saveRoster() { store.set('kt-names', roster.join('\n')); renderSetup(); }
   function addRoster() {
     const name = $('rosterInput').value.trim().slice(0, 24);
@@ -163,27 +239,38 @@
   }
   $('rosterAdd').addEventListener('click', addRoster);
   $('rosterInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') addRoster(); });
+  const chip = (name, color, onRemove) => {
+    const node = el('span', { className: 'rchip', style: `--c: ${color}` }, el('span', { className: 'ini', textContent: initial(name) }), name);
+    if (onRemove) { const x = el('button', { textContent: '✕', onclick: onRemove }); x.setAttribute('aria-label', `${name} entfernen`); node.append(x); }
+    return node;
+  };
+  const segButtons = (box, options, current, onPick) => box.replaceChildren(...options.map(([v, label, sub]) => {
+    const b = el('button', { onclick: () => onPick(v) }, label, sub ? el('small', { textContent: sub }) : null);
+    b.setAttribute('aria-pressed', String(current === v));
+    return b;
+  }));
 
   function renderSetup() {
-    $('roster').replaceChildren(...roster.map((name, i) => {
-      const x = el('button', { textContent: '✕', onclick: () => { roster.splice(i, 1); saveRoster(); window.Klirr?.undoToast(`${name} entfernt`, () => { roster.splice(Math.min(i, roster.length), 0, name); saveRoster(); }); } });
-      x.setAttribute('aria-label', `${name} entfernen`);
-      return el('span', { className: 'rchip', style: `--c: ${PALETTE[i % PALETTE.length]}` }, el('span', { className: 'ini', textContent: initial(name) }), name, x);
-    }));
-    $('rosterCount').textContent = roster.length ? `${roster.length} dabei` : '';
-    $('impSeg').replaceChildren(...[1, 2].map((n) => {
-      const b = el('button', { textContent: n === 1 ? '1 Imposter' : '2 Imposter', onclick: () => { settings.imps = n; saveSettings(); } });
-      b.setAttribute('aria-pressed', String(settings.imps === n));
-      return b;
-    }));
-    $('tipSeg').replaceChildren(...[[true, 'Mit Tipp', 'leichter'], [false, 'Ohne Tipp', 'schwerer']].map(([v, label, sub]) => {
-      const b = el('button', { onclick: () => { settings.tip = v; saveSettings(); } }, label, el('small', { textContent: sub }));
-      b.setAttribute('aria-pressed', String(settings.tip === v));
-      return b;
-    }));
+    segButtons($('tipSeg'), [[true, 'Mit Tipp', 'leichter'], [false, 'Ohne Tipp', 'schwerer']], settings.tip, (v) => { settings.tip = v; saveSettings(); });
     $('tipInfo').textContent = settings.tip
       ? 'Der Imposter bekommt einen vagen Tipp, der zu mehreren Wörtern passt – eine Spur, aber keine Lösung.'
       : 'Der Imposter bekommt nur „Du bist der Imposter“. Er muss allein aus den Begriffen der anderen herausfinden, worum es geht.';
+    segButtons($('playSeg'), [['local', 'Ein Handy', 'wird herumgereicht'], ['online', 'Mehrere Handys', 'jeder sieht seine Karte']], settings.play, (v) => {
+      settings.play = v; saveSettings();
+      if (v === 'local' && role === 'host') location.reload();
+      if (v === 'online' && host && role !== 'host') location.reload();
+    });
+    $('playInfo').textContent = settings.play === 'online'
+      ? 'Jede Person sieht ihre Karte geheim auf dem eigenen Handy und stimmt dort ab. Du startest die Runden.'
+      : 'Das Handy geht reihum: Karte aufdecken, merken, verdecken, weitergeben. Abgestimmt wird per Fingerzeig.';
+    $('localPlayers').hidden = settings.play !== 'local';
+    $('onlinePlayers').hidden = settings.play !== 'online';
+    $('roster').replaceChildren(...roster.map((name, i) => chip(name, PALETTE[i % PALETTE.length], () => {
+      roster.splice(i, 1); saveRoster();
+      window.Klirr?.undoToast(`${name} entfernt`, () => { roster.splice(Math.min(i, roster.length), 0, name); saveRoster(); });
+    })));
+    $('rosterCount').textContent = roster.length ? `${roster.length} dabei` : '';
+    segButtons($('impSeg'), [[1, '1 Imposter'], [2, '2 Imposter']], settings.imps, (v) => { settings.imps = v; saveSettings(); });
     $('optCat').checked = settings.cat;
     $('cats').replaceChildren(...CATS.map((c) => {
       const b = el('button', { textContent: c, onclick: () => {
@@ -195,15 +282,120 @@
       return b;
     }));
     $('wCount').textContent = `${WOERTER.filter((w) => settings.cats.includes(w.k)).length} Wörter`;
-    $('resume').hidden = !(state && ['reveal', 'talk', 'vote', 'guess'].includes(state.phase));
+    $('resume').hidden = !(S && RUNNING.includes(S.phase));
+    $('joinOther').hidden = role === 'host';
+    if (settings.play === 'online') renderLobby();
   }
   $('optCat').addEventListener('change', (e) => { settings.cat = e.target.checked; saveSettings(); });
 
-  // ---------- Spielzustand ----------
-  // phase: reveal (Handy geht reihum) → talk (Begriffe sagen) → vote (auf wen gezeigt?) → guess (Imposter rät) → result
-  let state = store.get('imp-state', null);
-  const save = () => store.set('imp-state', state);
-  const show = (id) => { ['setup', 'game'].forEach((s) => { $(s).hidden = s !== id; }); window.scrollTo(0, 0); };
+  // ---------- Verbindung ----------
+  function connect(code, onMessage, onStatus) {
+    let ws, tries = 0, closed = false;
+    const conn = { send: (msg) => { if (ws?.readyState === 1) ws.send(JSON.stringify(msg)); }, close: () => { closed = true; ws?.close(); }, onopen: null };
+    const open = () => {
+      ws = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/api/room/${code}/ws`);
+      ws.onopen = () => { tries = 0; onStatus(true); conn.onopen?.(); };
+      ws.onmessage = (e) => { try { onMessage(JSON.parse(e.data)); } catch {} };
+      ws.onclose = () => { onStatus(false); if (!closed) setTimeout(open, Math.min(8000, 500 * 2 ** tries++)); };
+    };
+    open();
+    return conn;
+  }
+  function setNet(on) {
+    for (const id of ['hostNet', 'gameNet']) {
+      const pill = $(id);
+      pill.classList.toggle('on', on); pill.classList.toggle('off', !on);
+      pill.textContent = on ? 'verbunden' : 'getrennt';
+    }
+    $('gameNet').hidden = role === 'local';
+  }
+
+  // --- Gastgeber ---
+  function lobbyNames() {
+    const names = [...lobby];
+    const me = $('hostName').value.trim();
+    if (me && !names.some((n) => norm(n) === norm(me))) names.unshift(me);
+    return names;
+  }
+  function renderLobby() {
+    if (host && role === 'host') {
+      const link = `${location.origin}/imposter.html?raum=${host.code}`;
+      $('roomBox').replaceChildren(
+        el('div', { className: 'hint', textContent: 'Raumcode' }),
+        el('div', { className: 'code', textContent: host.code }),
+        el('div', { className: 'hint', textContent: link.replace(/^https?:\/\//, '') }),
+        el('div', { className: 'btns' },
+          el('button', { textContent: 'Link teilen', onclick: async () => {
+            try { if (navigator.share) await navigator.share({ title: 'Imposter', text: `Komm in meinen Raum ${host.code}`, url: link }); else { await navigator.clipboard.writeText(link); window.Klirr?.note('Link kopiert'); } } catch {}
+          } }),
+          el('button', { textContent: 'Neuer Raum', onclick: () => createRoom(true) })));
+    }
+    const names = lobbyNames();
+    $('lobby').replaceChildren(...names.map((n, i) => chip(n, PALETTE[i % PALETTE.length], lobby.includes(n) ? () => { lobby = lobby.filter((x) => x !== n); store.set('imp-lobby', lobby); pushLobby(); renderLobby(); } : null)));
+    $('lobbyCount').textContent = names.length ? `${names.length} dabei` : '';
+  }
+  async function createRoom(force = false) {
+    if (host && role === 'host' && !force) return;
+    $('setupError').textContent = '';
+    const res = await fetch('/api/room/new', { method: 'POST' }).catch(() => null);
+    const data = res?.ok ? await res.json() : null;
+    if (!data?.code) { $('setupError').textContent = 'Raum konnte nicht erstellt werden. Ist Mehrspieler auf dem Server eingerichtet?'; return; }
+    store.set('imp-host', data); store.set('imp-lobby', []); store.set('imp-ids', {}); store.set('imp-state', null);
+    location.reload();
+  }
+  $('createRoom').addEventListener('click', () => createRoom());
+  $('hostName').value = store.get('imp-hostname', store.get('dumm-hostname', ''));
+  $('hostName').addEventListener('input', () => { store.set('imp-hostname', $('hostName').value.trim()); renderLobby(); pushLobby(); });
+  function pushLobby() {
+    if (role !== 'host' || (S && RUNNING.includes(S.phase))) return;
+    net?.send({ t: 'state', state: S && S.phase === 'result' ? publicState() : { phase: 'lobby', code: host.code, lobby: lobbyNames() } });
+  }
+  function hostMessage(msg) {
+    if (msg.t === 'host-ok') { if (S && S.phase !== 'setup') { broadcast(); sendCards(); } else pushLobby(); return; }
+    if (msg.t === 'join') {
+      const name = msg.name;
+      if (msg.id) { ids[name] = msg.id; store.set('imp-ids', ids); }
+      if (!lobby.some((n) => norm(n) === norm(name))) { lobby.push(name); store.set('imp-lobby', lobby); renderLobby(); }
+      if (S && S.phase !== 'setup' && S.players.includes(name)) { sendCard(name); broadcast(); } else pushLobby();
+      return;
+    }
+    if (msg.t === 'vote') castVote(msg.name, msg.target);
+  }
+  // Geheime Karte nur an die betreffende Person
+  const cardFor = (name) => ({ round: S.round, imp: S.impostors.includes(name), word: S.impostors.includes(name) ? null : S.word, tip: S.impostors.includes(name) && S.cfg.tip ? S.tip : null, cat: S.cfg.cat ? S.cat : null, two: S.impostors.length > 1 });
+  function sendCard(name) { if (ids[name]) net?.send({ t: 'to', id: ids[name], data: cardFor(name) }); }
+  function sendCards() { if (role === 'host' && S && RUNNING.includes(S.phase)) S.players.forEach(sendCard); }
+  function publicState() {
+    const done = S.phase === 'result';
+    return {
+      phase: S.phase, code: host.code, round: S.round, players: S.players, order: S.order, starter: S.starter,
+      cfg: S.cfg, cat: S.cfg.cat ? S.cat : null, voted: Object.keys(S.votes || {}), accused: S.accused, guessed: S.guessed,
+      crewWins: S.crewWins, tie: S.tie, scores: S.scores, impCount: S.impostors.length,
+      reveal: done ? { word: S.word, tip: S.tip, impostors: S.impostors, votes: S.votes } : null,
+    };
+  }
+  function broadcast() { if (role === 'host' && S) net?.send({ t: 'state', state: publicState() }); }
+
+  // --- Gast ---
+  function guestMessage(msg) {
+    if (msg.t === 'private') { myCard = msg.data; render(); return; }
+    if (msg.t !== 'state') return;
+    const prev = P;
+    P = msg.state;
+    if (!prev || prev.round !== P.round) { cardOpen = false; myVote = null; }
+    if (P.phase === 'result' && P.cfg?.drink && momentRound !== P.round) { momentRound = P.round; setTimeout(() => window.Klirr?.moment(), 200); }
+    render();
+  }
+  function startGuest() {
+    role = 'guest';
+    net = connect(guest.code, guestMessage, setNet);
+    net.onopen = () => net.send({ t: 'join', name: guest.name, id: guest.id });
+    render();
+  }
+
+  // ---------- Spiel (ein Handy / Gastgeber) ----------
+  const save = () => { store.set('imp-state', S); broadcast(); };
+  const show = (id) => { ['setup', 'join', 'game'].forEach((s) => { $(s).hidden = s !== id; }); };
 
   function pickWord() {
     const pool = WOERTER.filter((w) => settings.cats.includes(w.k));
@@ -214,145 +406,261 @@
     store.set('imp-used', [...used, w.w]);
     return w;
   }
-
   function startRound() {
-    const names = roster.slice();
     $('setupError').textContent = '';
-    if (names.length < 3) { $('setupError').textContent = 'Es braucht mindestens drei Mitspieler.'; return; }
+    if (role === 'host' && !$('hostName').value.trim()) { $('setupError').textContent = 'Trag oben deinen Namen ein – du spielst mit.'; window.scrollTo(0, 0); return; }
+    if (settings.play === 'online' && role !== 'host') { $('setupError').textContent = 'Erst oben einen Raum erstellen.'; return; }
+    const names = role === 'host' ? lobbyNames() : roster.slice();
+    if (names.length < 3) { $('setupError').textContent = role === 'host' ? 'Es braucht mindestens drei Personen im Raum.' : 'Es braucht mindestens drei Mitspieler.'; return; }
     const imps = settings.imps === 2 && names.length >= 5 ? 2 : 1;
-    if (settings.imps === 2 && names.length < 5) $('setupError').textContent = 'Zwei Imposter erst ab fünf Personen – diese Runde mit einem.';
     const w = pickWord();
     const order = shuffle(names);
-    const impostors = shuffle(names).slice(0, imps);
-    const scores = state?.scores || {};
+    const scores = S?.scores || {};
     names.forEach((n) => { scores[n] = scores[n] || 0; });
-    state = {
-      phase: 'reveal', round: (state?.round || 0) + 1, word: w.w, tip: w.t, cat: w.k,
-      cfg: { tip: settings.tip, cat: settings.cat, drink: drinkOn() },
-      players: names, order, impostors, idx: 0, open: false,
-      starter: order[Math.floor(Math.random() * order.length)], accused: null, guessed: null, scores,
+    S = {
+      phase: 'reveal', round: (S?.round || 0) + 1, word: w.w, tip: w.t, cat: w.k, code: host?.code,
+      cfg: { tip: settings.tip, cat: settings.cat, drink: !!window.Klirr?.drink() },
+      players: names, order, impostors: shuffle(names).slice(0, imps), idx: 0, open: false,
+      starter: order[Math.floor(Math.random() * order.length)], accused: null, guessed: null, tie: false, votes: {}, scores,
     };
-    save(); render();
+    cardOpen = false; myVote = null;
+    save(); sendCards(); render();
   }
   $('start').addEventListener('click', startRound);
   $('resume').addEventListener('click', () => render());
-  $('quit').addEventListener('click', () => { if (state) { state.phase = 'setup'; save(); } show('setup'); renderSetup(); });
+  $('quit').addEventListener('click', () => {
+    if (role === 'guest') return;
+    if (S) { S.phase = 'setup'; store.set('imp-state', S); }
+    if (role === 'host') pushLobby();
+    show('setup'); renderSetup();
+  });
+
+  function castVote(name, target) {
+    if (!S || S.phase !== 'vote' || !S.players.includes(name) || !S.players.includes(target) || name === target) return;
+    S.votes[name] = target;
+    if (Object.keys(S.votes).length >= S.players.length) tally(); else save();
+    render();
+  }
+  function tally() {
+    const counts = {};
+    Object.values(S.votes).forEach((t) => { counts[t] = (counts[t] || 0) + 1; });
+    const max = Math.max(0, ...Object.values(counts));
+    const top = Object.keys(counts).filter((n) => counts[n] === max);
+    if (top.length !== 1) { S.tie = true; S.accused = null; finish(false); save(); return; }
+    accuse(top[0]);
+  }
+  function accuse(name) {
+    S.accused = name;
+    if (S.impostors.includes(name)) S.phase = 'guess'; else finish(false);
+    save(); render();
+  }
+  // Runde gewonnen: je 1 Punkt; Imposter gewinnt: je 2 Punkte
+  function finish(caught) {
+    const crewWins = caught && S.guessed === false;
+    S.crewWins = crewWins;
+    S.players.forEach((n) => {
+      const imp = S.impostors.includes(n);
+      if (crewWins && !imp) S.scores[n] = (S.scores[n] || 0) + 1;
+      if (!crewWins && imp) S.scores[n] = (S.scores[n] || 0) + 2;
+    });
+    S.phase = 'result';
+    if (S.cfg.drink && momentRound !== S.round) { momentRound = S.round; setTimeout(() => window.Klirr?.moment(), 200); }
+  }
 
   // ---------- Anzeige ----------
   function render() {
-    if (!state || state.phase === 'setup') { show('setup'); renderSetup(); return; }
+    const V = view();
+    if (role === 'guest') {
+      if (!V || V.phase === 'lobby' || V.phase === 'setup') {
+        show('game');
+        $('roundLabel').textContent = `Raum ${guest.code}`;
+        $('stageTitle').textContent = 'Warten auf den Start';
+        $('youBox').hidden = false; $('youBox').textContent = `Du spielst als ${guest.name}`;
+        $('hostMini').hidden = true;
+        const names = V?.lobby || [];
+        $('stage').replaceChildren(el('div', { className: 'list' }, el('div', { className: 'roster', style: 'padding:14px' }, ...names.map((n, i) => chip(n, PALETTE[i % PALETTE.length])))),
+          el('div', { className: 'wait', textContent: names.length ? `${names.length} im Raum – gleich geht's los.` : 'Verbinde …' }));
+        return;
+      }
+    } else if (!V || V.phase === 'setup') { show('setup'); renderSetup(); return; }
     show('game');
-    $('quit').parentElement.hidden = state.phase === 'result';
-    $('roundLabel').textContent = `Runde ${state.round}${state.cfg.cat ? ` · ${state.cat}` : ''}`;
-    const stage = { reveal: stageReveal, talk: stageTalk, vote: stageVote, guess: stageGuess, result: stageResult }[state.phase]();
+    $('youBox').hidden = role !== 'guest';
+    if (role === 'guest') $('youBox').textContent = V.players.includes(guest.name) ? `Du spielst als ${guest.name}` : `Du schaust zu (${guest.name})`;
+    $('hostMini').hidden = role === 'guest' || V.phase === 'result';
+    $('roundLabel').textContent = `Runde ${V.round}${V.cfg.cat && (V.cat || V.reveal) ? ` · ${V.cat}` : ''}`;
+    const stage = { reveal: stageReveal, talk: stageTalk, vote: stageVote, guess: stageGuess, result: stageResult }[V.phase]();
     $('stage').replaceChildren(...stage);
   }
 
-  function stageReveal() {
-    $('stageTitle').textContent = 'Karten verteilen';
-    const name = state.order[state.idx];
-    const isImp = state.impostors.includes(name);
-    const next = state.order[state.idx + 1];
-    if (!state.open) {
-      const card = el('div', { className: 'card' });
-      card.innerHTML = `<div><div class="figure">${PERSON}</div><span class="big"></span><div class="hint"></div></div>`;
-      card.querySelector('.big').textContent = name;
-      card.querySelector('.hint').textContent = `Handy an ${name} geben. Nur ${name} schaut hin.`;
-      return [card, el('button', { className: 'btn', textContent: 'Karte aufdecken', onclick: () => { state.open = true; save(); render(); } })];
+  // Eigene Karte (mehrere Handys) bzw. Karte der Person, die das Handy gerade hat (ein Handy)
+  function cardView(name, card, open, onToggle, toggleLabel) {
+    if (!open) {
+      const c = el('div', { className: 'card' });
+      c.innerHTML = `<div><div class="figure">${PERSON}</div><span class="big"></span><div class="hint"></div></div>`;
+      c.querySelector('.big').textContent = name;
+      c.querySelector('.hint').textContent = role === 'local' ? `Handy an ${name} geben. Nur ${name} schaut hin.` : 'Nur du schaust hin.';
+      return [c, el('button', { className: 'btn', textContent: 'Karte aufdecken', onclick: onToggle })];
     }
-    const card = el('div', { className: 'card flip' });
+    const c = el('div', { className: 'card flip' });
     const inner = el('div');
-    if (isImp) {
+    if (!card) inner.append(el('span', { className: 'big', textContent: 'Karte kommt …' }));
+    else if (card.imp) {
       inner.append(el('div', { className: 'who', textContent: name }), el('span', { className: 'big', textContent: 'Du bist der Imposter' }));
-      if (state.impostors.length > 1) inner.append(el('div', { className: 'small', textContent: 'Es gibt noch einen zweiten Imposter.' }));
-      inner.append(el('div', { className: 'tip', textContent: state.cfg.tip ? `Tipp: ${state.tip}` : 'Ohne Tipp – hör gut zu.' }));
-      if (state.cfg.cat) inner.append(el('div', { className: 'hint', textContent: `Kategorie: ${state.cat}` }));
+      if (card.two) inner.append(el('div', { className: 'small', textContent: 'Es gibt noch einen zweiten Imposter.' }));
+      inner.append(el('div', { className: 'tip', textContent: card.tip ? `Tipp: ${card.tip}` : 'Ohne Tipp – hör gut zu.' }));
+      if (card.cat) inner.append(el('div', { className: 'hint', textContent: `Kategorie: ${card.cat}` }));
     } else {
-      inner.append(el('div', { className: 'who', textContent: `${name}, dein Wort` }), el('span', { className: 'big', textContent: state.word }));
-      if (state.cfg.cat) inner.append(el('div', { className: 'small', textContent: `Kategorie: ${state.cat}` }));
+      inner.append(el('div', { className: 'who', textContent: `${name}, dein Wort` }), el('span', { className: 'big', textContent: card.word }));
+      if (card.cat) inner.append(el('div', { className: 'small', textContent: `Kategorie: ${card.cat}` }));
     }
-    card.append(inner);
-    return [card, el('button', { className: 'btn', textContent: next ? `Verdecken – weiter an ${next}` : 'Verdecken – alle haben ihre Karte', onclick: () => {
-      state.open = false;
-      if (next) state.idx++; else state.phase = 'talk';
-      save(); render();
-    } })];
+    c.append(inner);
+    return [c, el('button', { className: 'btn', textContent: toggleLabel, onclick: onToggle })];
+  }
+
+  function stageReveal() {
+    $('stageTitle').textContent = role === 'local' ? 'Karten verteilen' : 'Deine Karte';
+    if (role === 'local') {
+      const name = S.order[S.idx];
+      const next = S.order[S.idx + 1];
+      return cardView(name, cardFor(name), S.open, () => {
+        if (!S.open) S.open = true;
+        else { S.open = false; if (next) S.idx++; else S.phase = 'talk'; }
+        save(); render();
+      }, next ? `Verdecken – weiter an ${next}` : 'Verdecken – alle haben ihre Karte');
+    }
+    const me = myName();
+    const V = view();
+    const playing = V.players.includes(me);
+    const card = role === 'host' ? (playing ? cardFor(me) : null) : (myCard && myCard.round === V.round ? myCard : null);
+    const parts = playing ? cardView(me, card, cardOpen, () => { cardOpen = !cardOpen; render(); }, 'Karte verdecken') : [el('div', { className: 'wait', textContent: 'Du schaust diese Runde zu.' })];
+    if (role === 'host') parts.push(el('button', { className: 'btn ghost', textContent: 'Alle haben ihre Karte – weiter', onclick: () => { S.phase = 'talk'; cardOpen = false; save(); render(); } }));
+    else parts.push(el('div', { className: 'wait', textContent: 'Schau dir deine Karte an. Es geht weiter, sobald alle bereit sind.' }));
+    return parts;
   }
 
   function stageTalk() {
     $('stageTitle').textContent = 'Begriffe sagen';
-    const start = state.order.indexOf(state.starter);
-    const seq = state.order.slice(start).concat(state.order.slice(0, start));
-    return [
-      el('div', { className: 'list' },
-        el('div', { className: 'mode-info', style: 'padding-top:14px', textContent: `${state.starter} fängt an. Reihum sagt jede Person einen Begriff zum Wort – nicht zu offensichtlich, aber auch nicht zu vage. Spielt ein, zwei Runden, dann diskutiert und zeigt auf den Verdächtigen.` }),
-        el('div', { className: 'order' }, ...seq.map((n, i) => el('span', { className: 'rchip', style: `--c: ${colorOf(n)}` }, el('span', { className: 'ini', textContent: initial(n) }), el('span', { className: 'n', textContent: `${i + 1}.` }), n)))),
-      el('button', { className: 'btn', textContent: 'Zur Abstimmung', onclick: () => { state.phase = 'vote'; save(); render(); } }),
-    ];
+    const V = view();
+    const start = V.order.indexOf(V.starter);
+    const seq = V.order.slice(start).concat(V.order.slice(0, start));
+    const parts = [el('div', { className: 'list' },
+      el('div', { className: 'mode-info', style: 'padding-top:14px', textContent: `${V.starter} fängt an. Reihum sagt jede Person einen Begriff zum Wort – nicht zu offensichtlich, aber auch nicht zu vage. Spielt ein, zwei Runden, dann diskutiert ihr.` }),
+      el('div', { className: 'order' }, ...seq.map((n, i) => el('span', { className: 'rchip', style: `--c: ${colorOf(n)}` }, el('span', { className: 'ini', textContent: initial(n) }), el('span', { className: 'n', textContent: `${i + 1}.` }), n))))];
+    if (role !== 'local' && V.players.includes(myName())) {
+      const card = role === 'host' ? cardFor(myName()) : myCard;
+      parts.push(el('button', { className: 'btn ghost', textContent: cardOpen ? 'Karte verdecken' : 'Meine Karte nochmal ansehen', onclick: () => { cardOpen = !cardOpen; render(); } }));
+      if (cardOpen && card) parts.push(...cardView(myName(), card, true, () => { cardOpen = false; render(); }, 'Karte verdecken').slice(0, 1));
+    }
+    if (role !== 'guest') parts.push(el('button', { className: 'btn', textContent: 'Zur Abstimmung', onclick: () => { S.phase = 'vote'; cardOpen = false; save(); render(); } }));
+    else parts.push(el('div', { className: 'wait', textContent: 'Die Abstimmung startet gleich.' }));
+    return parts;
   }
 
   function stageVote() {
     $('stageTitle').textContent = 'Abstimmen';
-    return [
-      el('div', { className: 'list' }, el('div', { className: 'mode-info', style: 'padding-top:14px', textContent: 'Auf drei zeigen alle gleichzeitig auf eine Person. Wen hat die Mehrheit gewählt?' })),
-      el('div', { className: 'vote-grid' }, ...state.players.map((n) => el('button', { style: `--c: ${colorOf(n)}`, textContent: n, onclick: () => accuse(n) }))),
-    ];
-  }
-
-  function accuse(name) {
-    state.accused = name;
-    if (state.impostors.includes(name)) state.phase = 'guess';
-    else finish(false);
-    save(); render();
+    const V = view();
+    if (role === 'local') {
+      return [
+        el('div', { className: 'list' }, el('div', { className: 'mode-info', style: 'padding-top:14px', textContent: 'Auf drei zeigen alle gleichzeitig auf eine Person. Wen hat die Mehrheit gewählt?' })),
+        el('div', { className: 'vote-grid' }, ...S.players.map((n) => el('button', { style: `--c: ${colorOf(n)}`, textContent: n, onclick: () => accuse(n) })))];
+    }
+    const me = myName();
+    const voted = V.voted || [];
+    const playing = V.players.includes(me);
+    const mine = role === 'host' ? S.votes[me] : myVote;
+    const parts = [el('div', { className: 'list' }, el('div', { className: 'mode-info', style: 'padding-top:14px', textContent: playing ? 'Wer ist der Imposter? Tipp geheim auf eine Person. Bei Gleichstand entkommt der Imposter.' : 'Die anderen stimmen gerade ab.' }),
+      el('div', { className: 'votes', textContent: `${voted.length} von ${V.players.length} haben abgestimmt` }))];
+    if (playing) parts.push(el('div', { className: 'vote-grid' }, ...V.players.filter((n) => n !== me).map((n) => {
+      const b = el('button', { style: `--c: ${colorOf(n)}`, textContent: n, onclick: () => {
+        if (role === 'host') castVote(me, n);
+        else { myVote = n; net?.send({ t: 'vote', name: guest.name, id: guest.id, target: n }); render(); }
+      } });
+      b.setAttribute('aria-pressed', String(mine === n));
+      return b;
+    })));
+    if (role === 'host') parts.push(el('button', { className: 'btn ghost', textContent: 'Jetzt auswerten', disabled: !voted.length, onclick: () => { tally(); render(); } }));
+    return parts;
   }
 
   function stageGuess() {
     $('stageTitle').textContent = 'Erwischt?';
-    const v = el('div', { className: 'verdict', style: `--c: ${colorOf(state.accused)}` },
-      el('b', { textContent: `${state.accused} ist ein Imposter!` }),
-      el('p', { textContent: `${state.accused}, du hast eine Chance: Wie heißt das geheime Wort? Sag es laut – die anderen tippen, ob es stimmt.` }));
-    return [v,
-      el('div', { className: 'guess' },
-        el('button', { className: 'yes', textContent: 'Richtig geraten', onclick: () => { state.guessed = true; finish(true); save(); render(); } }),
-        el('button', { className: 'no', textContent: 'Falsch geraten', onclick: () => { state.guessed = false; finish(true); save(); render(); } }))];
-  }
-
-  // Ergebnis und Punkte: Crew gewinnt (Imposter erwischt und Wort falsch) → je 1 Punkt; sonst Imposter je 2 Punkte.
-  function finish(caught) {
-    const crewWins = caught && state.guessed === false;
-    state.crewWins = crewWins;
-    state.players.forEach((n) => {
-      const imp = state.impostors.includes(n);
-      if (crewWins && !imp) state.scores[n] = (state.scores[n] || 0) + 1;
-      if (!crewWins && imp) state.scores[n] = (state.scores[n] || 0) + 2;
-    });
-    state.phase = 'result';
-    if (state.cfg.drink) setTimeout(() => window.Klirr?.moment(), 200);
+    const V = view();
+    const parts = [el('div', { className: 'verdict', style: `--c: ${colorOf(V.accused)}` },
+      el('b', { textContent: `${V.accused} ist ein Imposter!` }),
+      el('p', { textContent: `${V.accused}, du hast eine Chance: Wie heißt das geheime Wort? Sag es laut – die anderen entscheiden, ob es stimmt.` }))];
+    if (role === 'guest') parts.push(el('div', { className: 'wait', textContent: `${V.accused} rät …` }));
+    else parts.push(el('div', { className: 'guess' },
+      el('button', { className: 'yes', textContent: 'Richtig geraten', onclick: () => { S.guessed = true; finish(true); save(); render(); } }),
+      el('button', { className: 'no', textContent: 'Falsch geraten', onclick: () => { S.guessed = false; finish(true); save(); render(); } })));
+    return parts;
   }
 
   function stageResult() {
-    $('stageTitle').textContent = state.crewWins ? 'Imposter erwischt' : 'Imposter gewinnt';
-    const imps = state.impostors.join(' & ');
-    const others = state.players.filter((n) => !state.impostors.includes(n));
+    const V = view();
+    const R = role === 'guest' ? V.reveal : { word: S.word, tip: S.tip, impostors: S.impostors, votes: S.votes };
+    $('stageTitle').textContent = V.crewWins ? 'Imposter erwischt' : 'Imposter gewinnt';
+    const imps = R.impostors.join(' & ');
+    const others = V.players.filter((n) => !R.impostors.includes(n));
     let text;
-    if (state.crewWins) text = `${imps} wurde erwischt und kannte das Wort nicht.`;
-    else if (state.guessed) text = `${state.accused} wurde erwischt – hat das Wort aber erraten!`;
-    else text = `${state.accused} war unschuldig. Der Imposter war ${imps}.`;
-    const v = el('div', { className: 'verdict', style: `--c: ${state.crewWins ? '#1f6feb' : '#c2185b'}` },
-      el('b', { textContent: state.crewWins ? 'Die Runde gewinnt!' : `${imps} gewinnt!` }),
+    if (V.crewWins) text = `${imps} wurde erwischt und kannte das Wort nicht.`;
+    else if (V.guessed) text = `${V.accused} wurde erwischt – hat das Wort aber erraten!`;
+    else if (V.tie) text = `Gleichstand bei der Abstimmung – ${imps} entkommt.`;
+    else text = `${V.accused} war unschuldig. Der Imposter war ${imps}.`;
+    const v = el('div', { className: 'verdict', style: `--c: ${V.crewWins ? '#1f6feb' : '#c2185b'}` },
+      el('b', { textContent: V.crewWins ? 'Die Runde gewinnt!' : `${imps} gewinnt!` }),
       el('p', { textContent: text }),
-      el('p', { textContent: `Das Wort war „${state.word}“${state.cfg.tip ? ` · Tipp: ${state.tip}` : ''}.` }));
-    if (state.cfg.drink) v.append(el('p', { className: 'drinks', textContent: state.crewWins ? `🍺 ${imps} trinkt 3.` : `🍺 ${others.join(', ')} trinken je 2.` }));
-    const ranked = Object.entries(state.scores).filter(([n]) => state.players.includes(n)).sort((a, b) => b[1] - a[1]);
-    return [v,
-      el('h2', { className: 'sec', textContent: 'Punkte' }),
+      el('p', { textContent: `Das Wort war „${R.word}“${V.cfg.tip ? ` · Tipp: ${R.tip}` : ''}.` }));
+    if (V.cfg.drink) v.append(el('p', { className: 'drinks', textContent: V.crewWins ? `🍺 ${imps} trinkt 3.` : `🍺 ${others.join(', ')} trinken je 2.` }));
+    const parts = [v];
+    if (R.votes && Object.keys(R.votes).length) {
+      const counts = {};
+      Object.values(R.votes).forEach((t) => { counts[t] = (counts[t] || 0) + 1; });
+      parts.push(el('div', { className: 'list', style: 'margin-top:12px' }, el('div', { className: 'votes', style: 'padding-top:14px', textContent: 'Stimmen: ' + Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([n, c]) => `${n} ${c}`).join(' · ') })));
+    }
+    const ranked = Object.entries(V.scores).filter(([n]) => V.players.includes(n)).sort((a, b) => b[1] - a[1]);
+    parts.push(el('h2', { className: 'sec', textContent: 'Punkte' }),
       el('div', { className: 'list' }, ...ranked.map(([n, p]) => el('div', { className: 'score' }, el('span', { textContent: n }), el('b', { textContent: `${p}` })))),
-      el('p', { className: 'foot', textContent: 'Runde gewonnen: je 1 Punkt. Imposter gewinnt: 2 Punkte.' }),
-      el('button', { className: 'btn', textContent: 'Nächste Runde', onclick: startRound }),
-      el('button', { className: 'btn ghost', textContent: 'Einstellungen', onclick: () => { state.phase = 'setup'; save(); render(); } })];
+      el('p', { className: 'foot', textContent: 'Runde gewonnen: je 1 Punkt. Imposter gewinnt: 2 Punkte.' }));
+    if (role === 'guest') parts.push(el('div', { className: 'wait', textContent: 'Gleich kommt die nächste Runde.' }));
+    else parts.push(el('button', { className: 'btn', textContent: 'Nächste Runde', onclick: startRound }),
+      el('button', { className: 'btn ghost', textContent: 'Einstellungen', onclick: () => { S.phase = 'setup'; store.set('imp-state', S); pushLobby(); render(); } }));
+    return parts;
   }
 
-  render();
+  // ---------- Beitreten ----------
+  $('joinOther').addEventListener('click', () => { show('join'); $('joinName').value = store.get('imp-myname', store.get('dumm-myname', '')); });
+  $('joinBack').addEventListener('click', () => { history.replaceState(null, '', '/imposter.html'); show('setup'); renderSetup(); });
+  $('joinBtn').addEventListener('click', () => {
+    const code = $('joinCode').value.trim().toUpperCase();
+    const name = $('joinName').value.trim().slice(0, 24);
+    $('joinError').textContent = '';
+    if (!/^[A-Z0-9]{4}$/.test(code)) { $('joinError').textContent = 'Der Raumcode hat 4 Zeichen.'; return; }
+    if (!name) { $('joinError').textContent = 'Bitte deinen Namen eintragen.'; return; }
+    store.set('imp-myname', name);
+    guest = { code, name, id: guest?.code === code && guest?.name === name ? guest.id : (crypto.randomUUID?.() || String(Math.random())) };
+    store.set('imp-guest', guest);
+    history.replaceState(null, '', `/imposter.html?raum=${code}`);
+    startGuest();
+  });
+  $('joinName').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('joinBtn').click(); });
+
+  // ---------- Start ----------
+  const roomParam = (new URLSearchParams(location.search).get('raum') || '').toUpperCase();
+  if (roomParam && !(host && host.code === roomParam && settings.play === 'online')) {
+    if (guest && guest.code === roomParam) startGuest();
+    else { show('join'); $('joinCode').value = roomParam; $('joinName').value = store.get('imp-myname', store.get('dumm-myname', '')); }
+  } else if (settings.play === 'online' && host) {
+    role = 'host';
+    const saved = store.get('imp-state', null);
+    S = saved && saved.code === host.code ? saved : null;
+    net = connect(host.code, hostMessage, setNet);
+    net.onopen = () => net.send({ t: 'host', hostKey: host.hostKey });
+    render();
+  } else {
+    const saved = store.get('imp-state', null);
+    S = saved && !saved.code ? saved : null;
+    render();
+  }
 </script>
 </body>
 </html>

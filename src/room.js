@@ -1,4 +1,4 @@
-// Mehrspieler-Raum für „Der Dümmste fliegt“ (Cloudflare Durable Object).
+// Mehrspieler-Raum für „Der Dümmste fliegt“ und „Imposter“ (Cloudflare Durable Object).
 // Das Handy des Quizmasters rechnet das Spiel und schickt den Spielstand; der Raum
 // verteilt ihn an alle und leitet Beitritte und Stimmen der Mitspieler an den Quizmaster.
 import { DurableObject } from 'cloudflare:workers';
@@ -16,6 +16,8 @@ export class Room extends DurableObject {
       const hostKey = crypto.randomUUID();
       await this.ctx.storage.put('hostKey', hostKey);
       await this.ctx.storage.delete('state');
+      const old = await this.ctx.storage.list({ prefix: 'priv:' });
+      if (old.size) await this.ctx.storage.delete([...old.keys()]);
       await this.touch();
       return Response.json({ hostKey });
     }
@@ -55,10 +57,28 @@ export class Room extends DurableObject {
       return;
     }
 
+    // Private Nachricht vom Gastgeber an genau einen Mitspieler (z. B. die geheime Karte bei „Imposter“).
+    // Wird gespeichert, damit sie nach einem Verbindungsabbruch erneut zugestellt werden kann.
+    if (msg.t === 'to' && isHost) {
+      const id = String(msg.id || '').slice(0, 40);
+      if (!id) return;
+      await this.ctx.storage.put(`priv:${id}`, msg.data ?? null);
+      const out = JSON.stringify({ t: 'private', data: msg.data ?? null });
+      for (const s of this.ctx.getWebSockets()) if (s.deserializeAttachment()?.id === id) try { s.send(out); } catch {}
+      return;
+    }
+
     // Beitritt oder Stimme eines Mitspielers: an den Quizmaster weiterreichen.
     if (msg.t === 'join' || msg.t === 'vote') {
       const name = String(msg.name || '').trim().slice(0, 24);
       if (!name) return;
+      // Beitritt: Verbindung dieser Mitspieler-ID zuordnen und eine gespeicherte private Nachricht nachreichen.
+      if (msg.t === 'join' && !isHost && msg.id) {
+        const id = String(msg.id).slice(0, 40);
+        ws.serializeAttachment({ id });
+        const priv = await this.ctx.storage.get(`priv:${id}`);
+        if (priv !== undefined) try { ws.send(JSON.stringify({ t: 'private', data: priv })); } catch {}
+      }
       const fwd = JSON.stringify({ t: msg.t, name, id: String(msg.id || '').slice(0, 40), target: msg.target ? String(msg.target).slice(0, 24) : undefined });
       for (const s of this.ctx.getWebSockets()) if (s.deserializeAttachment()?.host) try { s.send(fwd); } catch {}
     }
