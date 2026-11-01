@@ -36,8 +36,8 @@
   // sie entsteht in dem Moment, in dem sich die Linsen berühren, und wächst mit der Überlappung.
   // Ohne Bewegung (Bewegung reduzieren) erscheint nur kurz das fertige Logo.
   let busy = false;
-  // Glaslinse ohne Rand und ohne Lichtstrich: weicher Glanz innen, zum Rand hin etwas heller (Liquid Glass)
-  const lensSvg = (id, r) => `<circle r="${r}" fill="url(#${id}r)"/><circle r="${r}" fill="url(#${id}s)"/>`;
+  // Flache Glaslinse: gleichmäßig durchscheinend, ohne Rand, ohne Glanz
+  const lensSvg = (id, r) => `<circle r="${r}" fill="#fff" fill-opacity=".24"/>`;
   function moment() {
     if (busy) return;
     busy = true;
@@ -47,12 +47,10 @@
     o.className = 'kl-moment' + (still ? ' is-still' : '');
     o.setAttribute('aria-hidden', 'true');
     o.innerHTML = `<svg viewBox="0 0 200 160"><defs>
-      <radialGradient id="klmr" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff" stop-opacity=".08"/><stop offset=".72" stop-color="#fff" stop-opacity=".12"/><stop offset="1" stop-color="#fff" stop-opacity=".34"/></radialGradient>
-      <radialGradient id="klms" cx=".32" cy=".26" r=".55"><stop offset="0" stop-color="#fff" stop-opacity=".42"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
       <clipPath id="klc"><circle id="klcA" r="${A[2]}"/></clipPath></defs>
-      <g class="lens" clip-path="url(#klc)"><circle id="klL" r="${B[2]}" fill="#ffb340"/></g>
       <g id="klA">${lensSvg('klm', A[2])}</g>
       <g id="klB">${lensSvg('klm', B[2])}</g>
+      <g class="lens" clip-path="url(#klc)"><circle id="klL" r="${B[2]}" fill="#ffb340"/></g>
       <circle class="p1" cx="146" cy="40" r="7" fill="#ffb340"/><circle class="p2" cx="160" cy="26" r="3.5" fill="#ffb340"/></svg>`;
     document.body.append(o);
     const $q = (id) => o.querySelector('#' + id);
