@@ -6,7 +6,6 @@
     <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="30"/></filter>
   </defs>
   <rect width="1024" height="1024" fill="url(#bg)"/>
-  <g clip-path="url(#a)"><circle cx="623" cy="412" r="161" fill="#ff7a1a" opacity=".55" filter="url(#glow)"/></g>
   <circle cx="450" cy="585" r="260" fill="#fff" fill-opacity=".24"/>
   <circle cx="623" cy="412" r="161" fill="#fff" fill-opacity=".24"/>
   <g clip-path="url(#a)"><circle cx="623" cy="412" r="161" fill="#ffb340"/></g>

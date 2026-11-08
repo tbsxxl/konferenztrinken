@@ -62,7 +62,7 @@
       $q('klL').setAttribute('cx', bx); $q('klL').setAttribute('cy', by);
     };
     const dur = still ? 700 : 1150;
-    const backOut = (t) => { const c = 1.9; return 1 + (c + 1) * (t - 1) ** 3 + c * (t - 1) ** 2; };
+    const backOut = (t) => 1 - (1 - t) ** 4; // ruhiges Abbremsen, ohne Überschwingen
     const t0 = performance.now();
     const svg = o.querySelector('svg');
     const frame = (now) => {

@@ -2,10 +2,10 @@
 :root:not([data-drink="on"]) .drink-only { display: none !important; }
 /* Gemeinsame Effekte aller Klirr-Seiten (wird von klirr.js geladen) */
 /* ---------- Rückgängig-Hinweis ---------- */
-.kl-undo { position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom)); z-index: 60; display: flex; align-items: center; gap: 14px; max-width: calc(100% - 32px); padding: 6px 6px 6px 18px; border-radius: 999px; background: rgba(40, 37, 58, 0.82); -webkit-backdrop-filter: blur(20px) saturate(170%); backdrop-filter: blur(20px) saturate(170%); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 0 0 0.5px rgba(255, 255, 255, 0.16); color: #fff; font-weight: 600; translate: -50% 20px; opacity: 0; transition: translate 0.35s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.2s; }
+.kl-undo { position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom)); z-index: 60; display: flex; align-items: center; gap: 16px; max-width: calc(100% - 32px); padding: 8px 8px 8px 16px; border-radius: 999px; background: rgba(40, 37, 58, 0.82); -webkit-backdrop-filter: blur(20px) saturate(170%); backdrop-filter: blur(20px) saturate(170%); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 0 0 0.5px rgba(255, 255, 255, 0.16); color: #fff; font-weight: 600; translate: -50% 20px; opacity: 0; transition: translate 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s; }
 .kl-undo.is-open { translate: -50% 0; opacity: 1; }
 .kl-undo span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.kl-undo button { flex: none; min-height: 44px; padding: 0 16px; border: 0; border-radius: 999px; background: rgba(255, 255, 255, 0.14); color: #ffb340; font: inherit; font-weight: 700; }
+.kl-undo button { flex: none; min-height: 44px; padding: 0 16px; border: 0; border-radius: 999px; background: rgba(255, 255, 255, 0.14); color: #ffb340; font: inherit; font-weight: 600; }
 
 /* ---------- Klirr-Moment ---------- */
 .kl-moment { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; pointer-events: none; }
@@ -14,7 +14,7 @@
 .kl-moment svg { position: relative; }
 @keyframes kl-dim { 0% { opacity: 0; } 20%, 80% { opacity: 1; } 100% { opacity: 0; } }
 .kl-moment svg { width: min(56vw, 260px); overflow: visible; filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.5)); }
-.kl-moment .lens { filter: drop-shadow(0 0 12px #ff7a1a); }
+.kl-moment .lens { }
 .kl-moment .p1 { animation: kl-p 1.15s 0.4s ease-out both; }
 .kl-moment .p2 { animation: kl-p 1.15s 0.5s ease-out both; }
 @keyframes kl-p { 0% { opacity: 0; translate: -10px 10px; } 30% { opacity: 1; } 100% { opacity: 0; translate: 14px -26px; } }
@@ -26,7 +26,7 @@
 }
 
 /* Trink-Hinweis oben */
-.kl-note { position: fixed; left: 50%; top: calc(12px + env(safe-area-inset-top)); z-index: 70; width: max-content; max-width: calc(100vw - 32px); padding: 12px 18px; border-radius: 18px; background: rgba(40, 37, 58, 0.9); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 0 0 0.5px rgba(255, 255, 255, 0.16); color: #fff; font: 600 1rem/1.35 -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, system-ui, sans-serif; text-align: center; translate: -50% -20px; opacity: 0; pointer-events: none; transition: translate 0.35s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.2s; }
+.kl-note { position: fixed; left: 50%; top: calc(12px + env(safe-area-inset-top)); z-index: 70; width: max-content; max-width: calc(100vw - 32px); padding: 12px 16px; border-radius: 18px; background: rgba(40, 37, 58, 0.9); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 0 0 0.5px rgba(255, 255, 255, 0.16); color: #fff; font: 600 1rem/1.35 -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, system-ui, sans-serif; text-align: center; translate: -50% -20px; opacity: 0; pointer-events: none; transition: translate 0.35s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.2s; }
 .kl-note.is-open { translate: -50% 0; opacity: 1; }
 @media (prefers-reduced-motion: reduce) { .kl-note, .kl-undo { transition: opacity 0.2s; } }
 @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) { .kl-note { -webkit-backdrop-filter: none; backdrop-filter: none; background: #1b1926; } }
@@ -38,12 +38,12 @@
 /* ---------- •••-Knopf und Aktionsblatt ---------- */
 .kl-hidden-bar { display: none !important; }
 .kl-more { flex: none; align-self: center; width: 44px; height: 44px; margin-left: auto; border: 0; border-radius: 50%; display: grid; place-items: center; background: var(--fill, rgba(120, 120, 128, 0.2)); color: var(--label, #fff); font-size: 1.35rem; }
-.kl-sheet-bg { position: fixed; inset: 0; z-index: 90; display: flex; align-items: flex-end; justify-content: center; padding: 10px 10px calc(10px + env(safe-area-inset-bottom)); background: rgba(0, 0, 0, 0); transition: background 0.25s; }
+.kl-sheet-bg { position: fixed; inset: 0; z-index: 90; display: flex; align-items: flex-end; justify-content: center; padding: 8px 8px calc(8px + env(safe-area-inset-bottom)); background: rgba(0, 0, 0, 0); transition: background 0.25s; }
 .kl-sheet-bg.is-open { background: rgba(0, 0, 0, 0.4); }
-.kl-sheet { width: min(520px, 100%); display: grid; gap: 8px; translate: 0 110%; transition: translate 0.3s cubic-bezier(0.32, 0.72, 0, 1); }
+.kl-sheet { width: min(520px, 100%); display: grid; gap: 8px; translate: 0 110%; transition: translate 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
 .kl-sheet-bg.is-open .kl-sheet { translate: 0 0; }
 .kl-sheet-group { border-radius: 14px; overflow: hidden; background: rgba(44, 42, 58, 0.92); -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px); }
-.kl-sheet-title { padding: 13px 16px; text-align: center; color: rgba(235, 235, 245, 0.6); font: 600 0.82rem/1.3 -apple-system, system-ui, sans-serif; }
+.kl-sheet-title { padding: 12px 16px; text-align: center; color: rgba(235, 235, 245, 0.6); font: 600 0.82rem/1.3 -apple-system, system-ui, sans-serif; }
 .kl-sheet-btn { display: block; width: 100%; min-height: 56px; border: 0; background: none; color: #8aa9ff; font: 400 1.18rem/56px -apple-system, system-ui, sans-serif; text-align: center; text-decoration: none; }
 .kl-sheet-group > * + * { border-top: 0.5px solid rgba(84, 84, 88, 0.65); }
 .kl-sheet-btn.danger { color: #ff453a; }

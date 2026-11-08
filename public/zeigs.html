@@ -23,71 +23,72 @@
     @media (prefers-color-scheme: light) { :root { --tint: #7a5f00; } }
     :root[data-drink="off"] .drink-only { display: none !important; }
     .cell .sub { display: block; color: var(--secondary); font-size: 0.8rem; margin-top: 2px; }
-    .mode-info { padding: 0 18px 14px; color: var(--secondary); font-size: 0.9rem; line-height: 1.4; }
+    .mode-info { padding: 0 16px 16px; color: var(--secondary); font-size: 0.9rem; line-height: 1.4; }
     .cell.wrap .seg { flex: 1 1 100%; }
     .seg { display: flex; gap: 4px; background: var(--fill); border-radius: 14px; padding: 3px; }
     .seg button { flex: 1; min-width: 44px; min-height: 44px; border: 0; border-radius: 11px; background: transparent; color: var(--label); font: inherit; font-weight: 600; font-size: 0.9rem; }
     .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
-    .cta-bar { position: sticky; bottom: 0; z-index: 5; margin: 18px -16px 0; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: linear-gradient(transparent, rgba(10, 10, 16, 0.85) 30%); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+    .cta-bar { position: sticky; bottom: 0; z-index: 5; margin: 16px -16px 0; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: linear-gradient(transparent, rgba(10, 10, 16, 0.85) 30%); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
     @media (prefers-color-scheme: light) { .cta-bar { background: linear-gradient(rgba(242, 242, 247, 0), rgba(242, 242, 247, 0.9) 30%); } }
     .cta-bar .btn { margin-top: 0; }
     .mini { display: flex; gap: 8px; margin-top: 12px; }
     .mini button { flex: 1; min-height: 44px; border: 0; border-radius: 999px; background: var(--fill); color: var(--label); font: inherit; font-weight: 600; }
 
     /* Teams */
-    .teams { display: grid; gap: 10px; padding: 14px; }
-    .team { border-radius: 18px; padding: 12px 14px; background: color-mix(in srgb, var(--c) 18%, transparent); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--c) 55%, transparent); }
+    .teams { display: grid; gap: 8px; padding: 16px; }
+    .team { border-radius: 18px; padding: 12px 16px; background: color-mix(in srgb, var(--c) 18%, transparent); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--c) 55%, transparent); }
     .team b { display: block; color: var(--label); font-size: 1rem; margin-bottom: 8px; }
-    .team .who { display: flex; flex-wrap: wrap; gap: 6px; }
-    .team .who span { padding: 5px 11px; border-radius: 999px; background: var(--c); color: #fff; font-weight: 600; font-size: 0.9rem; }
+    .team .who { display: flex; flex-wrap: wrap; gap: 8px; }
+    .team .who span { padding: 4px 12px; border-radius: 999px; background: var(--c); color: #fff; font-weight: 600; font-size: 0.9rem; }
 
     /* Punktetafel */
     .board { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
-    .board .t { border-radius: 16px; padding: 10px 12px; background: var(--cell); color: var(--label); }
-    .board .t.on { box-shadow: inset 0 0 0 2px var(--c); }
-    .board .t small { display: flex; align-items: center; gap: 6px; font-weight: 600; color: var(--secondary); }
+    .board .t { border-radius: 16px; padding: 8px 12px; background: var(--cell); color: var(--label); }
+    .board .t { position: relative; }
+    .board .t.on::after { content: ""; position: absolute; right: 10px; top: 10px; width: 18px; height: 18px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3CclipPath id='a'%3E%3Ccircle cx='9.5' cy='13.5' r='7'/%3E%3C/clipPath%3E%3C/defs%3E%3Ccircle cx='9.5' cy='13.5' r='7' fill='%23ffffff' fill-opacity='.35'/%3E%3Ccircle cx='14.5' cy='9.5' r='6' fill='%23ffffff' fill-opacity='.35'/%3E%3Ccircle cx='14.5' cy='9.5' r='6' fill='%23ffb340' clip-path='url(%23a)'/%3E%3C/svg%3E") center / contain no-repeat; }
+    .board .t small { display: flex; align-items: center; gap: 8px; font-weight: 600; color: var(--secondary); }
     .board .t small::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--c); }
-    .board .t b { font: 800 1.8rem/1.1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; }
-    .board .bar { height: 5px; border-radius: 3px; background: var(--fill); margin-top: 6px; overflow: hidden; }
+    .board .t b { font: 600 1.8rem/1.1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; }
+    .board .bar { height: 5px; border-radius: 3px; background: var(--fill); margin-top: 8px; overflow: hidden; }
     .board .bar i { display: block; height: 100%; background: var(--c); }
 
     /* Zug */
-    .turnbox { margin-top: 14px; border-radius: 26px; padding: 22px 18px; text-align: center; color: #fff; background: var(--c); box-shadow: 0 14px 34px rgba(0, 0, 0, 0.3); }
+    .turnbox { margin-top: 16px; border-radius: 26px; padding: 24px 16px; text-align: center; color: #fff; background: var(--c); box-shadow: 0 14px 34px rgba(0, 0, 0, 0.3); }
     .turnbox .mode { font-size: 3.2rem; line-height: 1; }
     .turnbox .mode .kl-ico { width: 3.4rem; height: 3.4rem; }
-    .turnbox b { display: block; margin-top: 8px; font: 800 1.9rem/1.1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; }
-    .turnbox p { margin: 6px 0 0; font-weight: 600; opacity: 0.92; }
-    .turnbox .all { display: inline-block; margin-top: 10px; padding: 6px 14px; border-radius: 999px; background: rgba(0, 0, 0, 0.3); font-weight: 700; }
-    .levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
-    .levels button { min-height: 72px; border: 0; border-radius: 18px; background: var(--fill); color: var(--label); font: 700 1rem/1.2 inherit; }
+    .turnbox b { display: block; margin-top: 8px; font: 600 1.9rem/1.1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; }
+    .turnbox p { margin: 8px 0 0; font-weight: 600; opacity: 0.92; }
+    .turnbox .all { display: inline-block; margin-top: 8px; padding: 8px 16px; border-radius: 999px; background: rgba(0, 0, 0, 0.3); font-weight: 600; }
+    .levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 16px; }
+    .levels button { min-height: 72px; border: 0; border-radius: 18px; background: var(--fill); color: var(--label); font: 600 1rem/1.2 inherit; }
     .levels button small { display: block; font-weight: 500; color: var(--secondary); margin-top: 2px; }
-    .word { margin-top: 14px; border-radius: 26px; padding: 26px 18px; text-align: center; background: var(--cell); }
+    .word { margin-top: 16px; border-radius: 26px; padding: 24px 16px; text-align: center; background: var(--cell); }
     .word small { display: block; color: var(--secondary); font-weight: 600; }
-    .word b { display: block; margin: 8px 0 4px; font: 800 2.4rem/1.1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; overflow-wrap: anywhere; }
-    .timer { margin-top: 14px; text-align: center; font: 800 4.4rem/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; font-variant-numeric: tabular-nums; }
+    .word b { display: block; margin: 8px 0 4px; font: 600 2.4rem/1.1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; overflow-wrap: anywhere; }
+    .timer { margin-top: 16px; text-align: center; font: 600 4.4rem/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; font-variant-numeric: tabular-nums; }
     .timer.low { color: #ff453a; }
     @media (prefers-color-scheme: light) { .timer.low { color: #c4001a; } }
-    .tbar { height: 8px; border-radius: 4px; background: var(--fill); overflow: hidden; margin-top: 10px; }
+    .tbar { height: 8px; border-radius: 4px; background: var(--fill); overflow: hidden; margin-top: 8px; }
     .tbar i { display: block; height: 100%; background: var(--accent); transition: width 0.25s linear; }
-    .judge { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
-    .judge button { min-height: 60px; border: 0; border-radius: 18px; color: #fff; font: 700 1.05rem/1 inherit; }
+    .judge { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+    .judge button { min-height: 60px; border: 0; border-radius: 18px; color: #fff; font: 600 1.05rem/1 inherit; }
     .judge .yes { background: #1f8a4c; }
     .judge .no { background: #c4001a; }
-    .whowon { display: grid; gap: 8px; margin-top: 14px; }
-    .whowon button { min-height: 56px; border: 0; border-radius: 18px; background: var(--c, var(--fill)); color: #fff; font: 700 1.05rem/1 inherit; }
+    .whowon { display: grid; gap: 8px; margin-top: 16px; }
+    .whowon button { min-height: 56px; border: 0; border-radius: 18px; background: var(--c, var(--fill)); color: #fff; font: 600 1.05rem/1 inherit; }
     .whowon button.none { background: var(--fill); color: var(--label); }
     .peek.open { background: var(--accent); color: var(--accent-ink); font-size: 1.3rem; }
-    .peek { margin-top: 10px; width: 100%; min-height: 48px; border: 0; border-radius: 999px; background: var(--fill); color: var(--label); font: inherit; font-weight: 700; -webkit-user-select: none; user-select: none; touch-action: none; }
+    .peek { margin-top: 8px; width: 100%; min-height: 48px; border: 0; border-radius: 999px; background: var(--fill); color: var(--label); font: inherit; font-weight: 600; -webkit-user-select: none; user-select: none; touch-action: none; }
 
     /* Zeichenfläche */
     .pad { position: relative; margin-top: 12px; border-radius: 20px; overflow: hidden; background: #fff; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08); touch-action: none; }
     .pad canvas { display: block; width: 100%; height: min(58vh, 520px); touch-action: none; }
     .padtools { display: flex; gap: 8px; margin-top: 8px; }
     .padtools button { flex: 1; min-height: 44px; border: 0; border-radius: 999px; background: var(--fill); color: var(--label); font: inherit; font-weight: 600; }
-    .verdict { margin-top: 14px; border-radius: var(--r); padding: 20px; color: #fff; background: var(--c); box-shadow: 0 10px 26px rgba(0, 0, 0, 0.28); animation: pop 0.4s cubic-bezier(0.3, 1.4, 0.6, 1); }
-    .verdict b { display: block; font: 800 1.9rem/1.1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; }
+    .verdict { margin-top: 16px; border-radius: var(--r); padding: 20px; color: #fff; background: var(--c); box-shadow: 0 10px 26px rgba(0, 0, 0, 0.28); animation: pop 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+    .verdict b { display: block; font: 600 1.9rem/1.1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; }
     .verdict p { margin: 8px 0 0; font-weight: 600; }
-    .score { display: grid; grid-template-columns: 1fr auto; padding: 12px 18px; position: relative; }
+    .score { display: grid; grid-template-columns: 1fr auto; padding: 12px 16px; position: relative; }
     .score + .score::before { content: ""; position: absolute; top: 0; left: 18px; right: 0; border-top: 0.5px solid var(--sep); }
   </style>
 </head>
@@ -178,7 +179,7 @@
     segButtons($('goalSeg'), [[20, '20 P'], [30, '30 P'], [40, '40 P'], [50, '50 P']], settings.goal, (v) => { settings.goal = v; saveSettings(); });
     segButtons($('padSeg'), [[false, 'Auf Papier'], [true, 'Auf dem Handy']], settings.pad, (v) => { settings.pad = v; saveSettings(); });
     $('padInfo').textContent = settings.pad
-      ? 'Begriff erst verdeckt – antippen zeigt ihn 3 Sekunden. Kurz wegschauen!'
+      ? 'Begriff erst verdeckt – antippen zeigt ihn 3 Sekunden. Kurz wegschauen'
       : 'Das Handy bleibt bei der zeichnenden Person, gezeichnet wird auf Papier.';
     $('optAll').checked = settings.all;
     $('teams').replaceChildren(...split.map((names, i) => el('div', { className: 'team', style: `--c: ${TEAMS[i][1]}` },
@@ -306,7 +307,7 @@
       el('div', { className: 'mode' }, window.Klirr ? Klirr.icon(icon) : null),
       el('b', { textContent: `${S.actor} – ${label}` }),
       el('p', { textContent: rule }),
-      S.everyone ? el('span', { className: 'all', textContent: 'Alle raten mit!' }) : null),
+      S.everyone ? el('span', { className: 'all', textContent: 'Alle raten mit' }) : null),
       el('button', { className: 'btn', textContent: `${S.actor}: Schwierigkeit wählen`, onclick: () => { S.phase = 'level'; save(); render(); } })];
   }
 
@@ -387,7 +388,7 @@
   }
 
   function stageLast() {
-    $('stageTitle').textContent = 'Zeit ist um!';
+    $('stageTitle').textContent = 'Zeit ist um';
     const parts = [el('div', { className: 'word' }, el('small', { textContent: 'Letzter Begriff' }), el('b', { textContent: S.word.w }))];
     if (S.everyone) parts.push(el('div', { className: 'whowon' }, ...S.teams.map((t, i) => el('button', { style: `--c: ${t.color}`, textContent: `${t.name} hatte ihn`, onclick: () => { mark(i); endTurn(); } })),
       el('button', { className: 'none', textContent: 'Nicht erraten', onclick: () => { mark(null); endTurn(); } })));
@@ -404,7 +405,7 @@
     const own = got.filter((x) => S.teams[x.by]?.name === L.team).length * L.pts;
     const v = el('div', { className: 'verdict', style: `--c: ${L.color}` },
       el('b', { textContent: `+${own} für ${L.team}` }),
-      el('p', { textContent: L.skipped ? `${L.skipped} übersprungen.` : 'Nichts übersprungen!' }),
+      el('p', { textContent: L.skipped ? `${L.skipped} übersprungen.` : 'Nichts übersprungen' }),
       L.drink ? el('p', { textContent: `${L.drink}.` }) : null);
     const list = el('div', { className: 'list', style: 'margin-top:12px' }, ...L.log.map((x) => el('div', { className: 'score' },
       el('span', { textContent: x.w }), el('b', { textContent: x.by === null ? '–' : (S.teams[x.by].name === L.team ? `+${L.pts}` : `+${L.pts} ${S.teams[x.by].name}`) }))));
@@ -417,7 +418,7 @@
     $('stageTitle').textContent = 'Spielende';
     const losers = S.teams.filter((_, i) => i !== S.winner).flatMap((t) => t.players);
     const v = el('div', { className: 'verdict', style: `--c: ${w.color}` },
-      el('b', { textContent: `${w.name} gewinnt!` }),
+      el('b', { textContent: `${w.name} gewinnt` }),
       el('p', { textContent: `${w.players.join(', ')} – mit ${w.score} Punkten.` }),
       S.cfg.drink ? el('p', { textContent: `Exen: ${losers.join(', ')}.` }) : null);
     return [v,

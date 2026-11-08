@@ -27,7 +27,7 @@
     @media (prefers-color-scheme: light) { :root { --accent: #1c1c1e; --accent-fill: #1c1c1e; --accent-ink: #ffffff; --tint: #000000; } }
     /* Ohne Farbakzent bleiben Aktionen über Gewicht und Pfeil erkennbar */
     .edit-teams summary, .game summary, .cell.action, .chip { font-weight: 600; }
-    .edit-teams summary { list-style: none; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding-bottom: 4px; }
+    .edit-teams summary { list-style: none; display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding-bottom: 4px; }
     .edit-teams summary::-webkit-details-marker { display: none; }
     .edit-teams summary::after { content: "›"; color: var(--secondary); font-size: 1.2em; transition: rotate 0.2s; }
     .edit-teams[open] summary::after { rotate: 90deg; }
@@ -789,7 +789,7 @@
   function renderGames() {
     const box = $('games');
     box.innerHTML = '';
-    if (!games.length) { box.append(el('div', { className: 'empty', textContent: 'Keine Spiele für diese Auswahl.' })); return; }
+    if (!games.length) { box.append(el('div', { className: 'empty', textContent: 'Keine Spiele für diese Auswahl' })); return; }
     for (const g of games) {
       const card = el('div', { className: 'game' });
       card.append(scoreRow(g));
@@ -1159,7 +1159,7 @@
         disc,
         el('div', { className: 'info' }, el('div', { className: 'who-line' }, nameBtn), el('div', { className: 'sub' }, crests, ...pickButtons)),
         el('div', { className: 'cells' },
-          el('span', { textContent: 'SCHL.' }), el('span', { textContent: 'EX' }),
+          el('span', { textContent: 'SCHL' }), el('span', { textContent: 'EX' }),
           el('b', { className: p.count ? '' : 'dim', textContent: p.count }), el('b', { className: p.ex ? 'hot' : 'dim', textContent: p.ex || 0 })));
 
       // Aufklappbereich: Zähler von Hand, Picks verwalten.
@@ -1358,7 +1358,7 @@
     turn.innerHTML = '';
     if (done) {
       turn.style.setProperty('--c', 'var(--accent)');
-      turn.append(el('div', {}, el('b', { textContent: 'Alles verlost!' }), el('span', { textContent: 'Viel Spaß bei der Konferenz' })));
+      turn.append(el('div', {}, el('b', { textContent: 'Alles verlost' }), el('span', { textContent: 'Viel Spaß bei der Konferenz' })));
     } else {
       const who = plan.steps[step].person;
       turn.style.setProperty('--c', personColor(who));

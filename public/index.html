@@ -19,19 +19,19 @@
   <style>
     /* Hub im Stil von Apple Music: große Titel, Cover-Kacheln, schlichte Listen, Glas-Kapsel für „Läuft gerade“ */
     main { padding-bottom: calc(140px + env(safe-area-inset-bottom)); }
-    .topbar { display: flex; justify-content: flex-end; gap: 10px; margin: 2px 0 6px; }
+    .topbar { display: flex; justify-content: flex-end; gap: 8px; margin: 2px 0 8px; }
     .glass-btn { display: inline-grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; color: var(--label); text-decoration: none; font-size: 1.25rem; }
     .glass { background: rgba(120, 120, 128, 0.28); border: 0.5px solid rgba(255, 255, 255, 0.16); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12); -webkit-backdrop-filter: blur(22px) saturate(180%); backdrop-filter: blur(22px) saturate(180%); }
     .glass-btn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-    .hero-title { font: 700 2.4rem/1.1 -apple-system, BlinkMacSystemFont, "SF Pro Display", Inter, system-ui, sans-serif; letter-spacing: -0.01em; margin: 0 4px 2px; }
-    .hero-sub { margin: 0 4px 22px; color: var(--secondary); font-size: 1rem; }
+    .hero-title { font: 600 2.4rem/1.1 -apple-system, BlinkMacSystemFont, "SF Pro Display", Inter, system-ui, sans-serif; letter-spacing: -0.01em; margin: 0 4px 2px; }
+    .hero-sub { margin: 0 4px 24px; color: var(--secondary); font-size: 1rem; }
 
-    .shelf-title { display: flex; align-items: center; gap: 6px; margin: 26px 4px 12px; font: 700 1.35rem/1.2 -apple-system, "SF Pro Display", Inter, system-ui, sans-serif; letter-spacing: -0.01em; }
+    .shelf-title { display: flex; align-items: center; gap: 8px; margin: 24px 4px 12px; font: 600 1.35rem/1.2 -apple-system, "SF Pro Display", Inter, system-ui, sans-serif; letter-spacing: -0.01em; }
     .shelf-title span { color: var(--secondary); font-weight: 600; }
 
     /* Cover-Kacheln wie Alben */
     /* Zwei Spalten bei normaler Schrift, eine bei großer (Dynamic Type) */
-    .covers { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.6em), 1fr)); gap: 18px 14px; }
+    .covers { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 9.6em), 1fr)); gap: 16px 16px; }
     .cover { container-type: inline-size; }
     .covers .cover-card b, .covers .cover-card small { white-space: normal; }
     .cover-card { color: var(--label); text-decoration: none; min-width: 0; }
@@ -41,70 +41,64 @@
     .cover::after { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.18); pointer-events: none; }
     .cover-card b { display: block; margin-top: 8px; font-size: 0.95rem; font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .cover-card small { display: block; color: var(--secondary); font-size: 0.85rem; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .badge-live { position: absolute; left: 10px; top: 10px; z-index: 2; padding: 4px 9px; border-radius: 999px; background: rgba(0, 0, 0, 0.55); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); font-size: max(11px, 6.5cqw); font-weight: 700; letter-spacing: 0.02em; }
-    .badge-live::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 8px var(--amber-2); margin-right: 5px; vertical-align: 1px; }
+    .badge-live { position: absolute; left: 10px; top: 10px; z-index: 2; padding: 4px 8px; border-radius: 999px; background: rgba(0, 0, 0, 0.55); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); font-size: max(11px, 6.5cqw); font-weight: 600; letter-spacing: 0.02em; }
+    .badge-live::before { content: ""; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--amber); margin-right: 4px; vertical-align: 1px; }
 
     /* Cover-Motive */
-    .art-konf { background: radial-gradient(120% 80% at 20% 0%, #ff8a4c, transparent 60%), linear-gradient(160deg, #ff3b30, #a5001f); }
-    .art-konf::before { content: ""; position: absolute; inset: -20%; background: repeating-radial-gradient(circle at 50% 120%, transparent 0 22px, rgba(255, 255, 255, 0.07) 22px 24px); }
-    .scoreboard { position: relative; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 6px; width: 74%; padding: 10px 10px 12px; border-radius: 14px; background: rgba(0, 0, 0, 0.55); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35); text-align: center; }
-    .scoreboard .team { font-size: 6.5cqw; font-weight: 700; letter-spacing: 0.05em; color: rgba(255, 255, 255, 0.75); }
+    .art-konf { background: #c3352b; }
+    .scoreboard { position: relative; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; width: 74%; padding: 8px 8px 12px; border-radius: 14px; background: rgba(0, 0, 0, 0.55); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35); text-align: center; }
+    .scoreboard .team { font-size: 6.5cqw; font-weight: 600;  color: rgba(255, 255, 255, 0.75); }
     /* Neutrale Wappen statt echter Vereine */
     .scoreboard .shield { width: 20px; height: 23px; display: block; margin: 0 auto; fill: #fff; }
     .scoreboard .shield.alt { fill: none; stroke: rgba(255, 255, 255, 0.85); stroke-width: 2.2; }
-    .scoreboard .score { font: 800 17cqw/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; font-variant-numeric: tabular-nums; }
-    .scoreboard .min { grid-column: 1 / -1; justify-self: center; margin-top: 4px; padding: 2px 8px; border-radius: 999px; background: #ff453a; font-size: 6.5cqw; font-weight: 700; }
+    .scoreboard .score { font: 600 17cqw/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; font-variant-numeric: tabular-nums; }
+    .scoreboard .min { grid-column: 1 / -1; justify-self: center; margin-top: 4px; padding: 2px 8px; border-radius: 999px; background: #ff453a; font-size: 6.5cqw; font-weight: 600; }
     .art-konf .ball { position: absolute; right: -14%; bottom: -14%; width: 52%; aspect-ratio: 1; opacity: 0.22; }
 
-    .art-dumm { background: radial-gradient(110% 80% at 80% 0%, #b69cff, transparent 60%), linear-gradient(160deg, #7c3aed, #2e1065); }
-    .art-dumm .q { font: 800 64cqw/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; color: #fff; text-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); transform: rotate(-8deg); }
-    .art-dumm .hearts { position: absolute; bottom: 10%; left: 0; right: 0; text-align: center; font-size: 10cqw; letter-spacing: 4px; color: #ff6b8a; text-shadow: 0 2px 6px rgba(0, 0, 0, 0.35); }
+    .art-dumm { background: #6a3fd1; }
+    .art-dumm .q { font: 600 64cqw/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; color: #fff; transform: rotate(-8deg); }
+    .art-dumm .hearts { position: absolute; bottom: 10%; left: 0; right: 0; text-align: center; font-size: 10cqw; letter-spacing: 4px; color: #ff6b8a; }
     .art-dumm .spark { position: absolute; font-size: 12cqw; opacity: 0.85; }
 
     /* Wizard: aufgefächerte Karten, vorne Weiß mit Stern (gleiche Formensprache wie Tic Tac Toe) */
-    .art-wiz { background: radial-gradient(110% 80% at 80% 0%, #8ea2ff, transparent 60%), linear-gradient(160deg, #3a5bef, #16207a); }
+    .art-wiz { background: #3448d6; }
     .art-wiz .spark { position: absolute; font-size: 11cqw; color: #fff; opacity: 0.85; }
     .art-wiz .fan { position: relative; width: 36cqw; aspect-ratio: 5 / 7; }
     .art-wiz .fan > * { position: absolute; inset: 0; border-radius: 4.5cqw; transform-origin: 50% 120%; }
     .art-wiz .fan i { background: rgba(0, 0, 0, 0.28); box-shadow: inset 0 0 0 0.6cqw rgba(255, 255, 255, 0.12); }
     .art-wiz .fan i:nth-child(1) { rotate: -24deg; }
     .art-wiz .fan i:nth-child(2) { rotate: 24deg; }
-    .art-wiz .fan b { display: grid; place-items: center; background: rgba(255, 255, 255, 0.95); color: #2a3fd0; font: 800 28cqw/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3); }
+    .art-wiz .fan b { display: grid; place-items: center; background: rgba(255, 255, 255, 0.95); color: #2a3fd0; font: 600 28cqw/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3); }
     /* Flip 7: eine Karte wird umgedreht, vorne die 7 */
-    .art-flip { background: radial-gradient(110% 80% at 20% 0%, #6ff0d8, transparent 60%), linear-gradient(160deg, #10a99c, #08474f); }
-    .art-flip::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0 8%, transparent 8% 16%); }
+    .art-flip { background: #0e8a80; }
     .art-flip .flip { position: relative; width: 38cqw; aspect-ratio: 5 / 7; }
     .art-flip .flip > * { position: absolute; inset: 0; border-radius: 4.5cqw; }
     .art-flip .flip i { background: rgba(0, 0, 0, 0.28); box-shadow: inset 0 0 0 0.6cqw rgba(255, 255, 255, 0.12); rotate: -14deg; translate: -14% 2%; }
-    .art-flip .flip b { display: grid; place-items: center; background: rgba(255, 255, 255, 0.95); color: #0a7d74; font: 800 30cqw/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; rotate: 8deg; translate: 10% -2%; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3); }
+    .art-flip .flip b { display: grid; place-items: center; background: rgba(255, 255, 255, 0.95); color: #0a7d74; font: 600 30cqw/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; rotate: 8deg; translate: 10% -2%; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3); }
     /* Imposter: drei Figuren, eine gehört nicht dazu */
-    .art-imp { background: radial-gradient(110% 80% at 80% 0%, #ff7aa8, transparent 60%), linear-gradient(160deg, #c2185b, #4d0a27); }
-    .art-imp::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0 12%, transparent 12% 24%); }
+    .art-imp { background: #ad1a54; }
     .imp { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 3.5cqw; width: 86%; }
     .imp span { aspect-ratio: 3 / 4; border-radius: 5cqw; display: grid; place-items: center; overflow: hidden; }
     .imp .pa { background: rgba(255, 255, 255, 0.92); fill: #a3154f; }
     .imp .pa svg { display: block; width: 100%; height: auto; margin-top: 38%; }
-    .imp .pq { background: rgba(0, 0, 0, 0.32); color: #fff; font: 800 18cqw/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; translate: 0 -8%; box-shadow: 0 2cqw 6cqw rgba(0, 0, 0, 0.3); }
+    .imp .pq { background: rgba(0, 0, 0, 0.32); color: #fff; font: 600 18cqw/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; translate: 0 -8%; box-shadow: 0 2cqw 6cqw rgba(0, 0, 0, 0.3); }
     /* Zeig’s!: Sprechblase und Stift (erklären, zeichnen) */
-    .art-zeigs { background: radial-gradient(110% 80% at 20% 0%, #fff07a, transparent 60%), linear-gradient(160deg, #ffc400, #c27a00); }
-    .art-zeigs::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0 8%, transparent 8% 16%); }
+    .art-zeigs { background: #f0b400; }
     .art-zeigs .zg { position: relative; width: 72%; filter: drop-shadow(0 2cqw 4cqw rgba(0, 0, 0, 0.25)); }
     .art-zeigs .zg .bubble { fill: #fff; }
     .art-zeigs .zg circle { fill: #c27a00; }
     .art-zeigs .zg .pen { fill: #3a2600; }
-    .art-ttt { background: radial-gradient(110% 80% at 20% 0%, #5ee08a, transparent 60%), linear-gradient(160deg, #1fa855, #0b4d2a); }
-    .art-ttt::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.06) 0 14%, transparent 14% 28%); }
-    .ttt { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 66%; aspect-ratio: 1; }
-    .ttt span { display: grid; place-items: center; border-radius: 10px; background: rgba(0, 0, 0, 0.28); font: 800 15cqw/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; color: #fff; }
+    .art-ttt { background: #1f8a4c; }
+    .ttt { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 66%; aspect-ratio: 1; }
+    .ttt span { display: grid; place-items: center; border-radius: 10px; background: rgba(0, 0, 0, 0.28); font: 600 15cqw/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; color: #fff; }
     .ttt span:nth-child(4n+1) { background: rgba(255, 255, 255, 0.92); color: #0b4d2a; }
     /* Cover = Spiel-Icon im Klirr-Stil (quadratisch, die Kachel rundet die Ecken) */
-    .art-soon { background: linear-gradient(160deg, #2c2c2e, #1c1c1e); color: rgba(235, 235, 245, 0.35); font-size: 2.6rem; }
 
     /* Mitspieler-Liste wie in Apple Music */
     .rows { display: grid; }
-    .prow { display: grid; grid-template-columns: 48px minmax(0, 1fr) 44px; gap: 14px; align-items: center; min-height: 64px; position: relative; }
+    .prow { display: grid; grid-template-columns: 48px minmax(0, 1fr) 44px; gap: 16px; align-items: center; min-height: 64px; position: relative; }
     .prow + .prow::before { content: ""; position: absolute; top: 0; left: 62px; right: 0; border-top: 0.5px solid rgba(84, 84, 88, 0.65); }
-    .prow .av { width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center; background: var(--c); color: #fff; font: 700 1.3rem/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.18); text-transform: uppercase; }
+    .prow .av { width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center; background: var(--c); color: #fff; font: 600 1.3rem/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.18);  }
     .prow b { font-size: 1.05rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .prow small { display: block; color: var(--secondary); font-size: 0.85rem; }
     .prow button { width: 44px; height: 44px; border: 0; border-radius: 50%; background: transparent; color: var(--secondary); font-size: 1.4rem; line-height: 1; }
@@ -119,13 +113,13 @@
     .links .ico svg { width: 19px; height: 19px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     .links .prow small { display: block; }
     /* Einblenden der Kacheln, leicht gestaffelt */
-    .covers .cover-card { animation: kl-rise 0.5s cubic-bezier(0.32, 0.72, 0, 1) both; animation-delay: calc(var(--i, 0) * 45ms); }
-    .nowplaying:not([hidden]) { animation: kl-rise 0.45s 0.15s cubic-bezier(0.32, 0.72, 0, 1) both; }
+    .covers .cover-card { animation: kl-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: calc(var(--i, 0) * 45ms); }
+    .nowplaying:not([hidden]) { animation: kl-rise 0.45s 0.15s cubic-bezier(0.22, 1, 0.36, 1) both; }
     @media (prefers-reduced-motion: reduce) { .covers .cover-card, .nowplaying { animation: none !important; } }
     .links .chev { color: var(--tertiary); font-size: 1.3rem; }
 
     /* „Läuft gerade“ als Glas-Kapsel wie der Mini-Player */
-    .nowplaying { position: fixed; left: 12px; right: 12px; bottom: calc(14px + env(safe-area-inset-bottom)); z-index: 20; max-width: 560px; margin: 0 auto; display: grid; grid-template-columns: 46px minmax(0, 1fr) 48px; gap: 12px; align-items: center; padding: 8px 8px 8px 10px; border-radius: 999px; color: var(--label); text-decoration: none; }
+    .nowplaying { position: fixed; left: 12px; right: 12px; bottom: calc(14px + env(safe-area-inset-bottom)); z-index: 20; max-width: 560px; margin: 0 auto; display: grid; grid-template-columns: 46px minmax(0, 1fr) 48px; gap: 12px; align-items: center; padding: 8px 8px 8px 8px; border-radius: 999px; color: var(--label); text-decoration: none; }
     .nowplaying .mini-art { position: relative; width: 46px; height: 46px; border-radius: 50%; overflow: hidden; display: grid; place-items: center; }
     .nowplaying .mini-art .scoreboard { width: 100%; height: 100%; border-radius: 0; padding: 0; background: none; box-shadow: none; display: grid; place-items: center; }
     .nowplaying small { display: block; color: var(--secondary); font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -143,32 +137,32 @@
     /* Logo = Trinkmodus-Schalter. Aus: Kreise getrennt, nichts leuchtet. An: Kreise stoßen an, Schnittmenge leuchtet. */
     .brand-mark { flex: none; width: 56px; height: 56px; padding: 0; border: 0; border-radius: 13px; overflow: hidden; background: none; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45), inset 0 0 0 0.5px rgba(255, 255, 255, 0.18); }
     .brand-mark svg { display: block; width: 100%; height: 100%; }
-    .brand-mark .bm-move { transform: translate(150px, -150px); transition: transform 0.6s cubic-bezier(0.3, 1.45, 0.5, 1); }
+    .brand-mark .bm-move { transform: translate(150px, -150px); transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
     /* Kein Ein-/Ausblenden: gefärbt ist immer genau die Schnittmenge – sie wächst und schrumpft beim Gleiten */
     .brand-mark .bm-perls { fill: rgba(255, 255, 255, 0.35); }
     .brand-mark[data-on="true"] .bm-move { transform: none; }
     .brand-mark[data-on="true"] .bm-perls { fill: #ffb340; }
     /* Antippen sichtbar machen, ohne etwas zu verraten */
-    .brand-mark { transition: scale 0.18s cubic-bezier(0.3, 1.5, 0.6, 1); }
+    .brand-mark { transition: scale 0.18s cubic-bezier(0.22, 1, 0.36, 1); }
     .brand-mark:active { scale: 0.9; }
     @media (prefers-color-scheme: light) { html:not([data-drink-all="on"]) .wordmark .perl { background: rgba(60, 60, 67, 0.28); } }
-    .brand-mark .bm-perls { transition: fill 0.35s 0.25s, transform 0.6s cubic-bezier(0.3, 1.45, 0.5, 1); }
+    .brand-mark .bm-perls { transition: fill 0.35s 0.25s, transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
     .wordmark .perl { transition: background 0.35s, box-shadow 0.35s; }
     html:not([data-drink-all="on"]) .wordmark .perl { background: rgba(255, 255, 255, 0.3); box-shadow: none; }
     @media (prefers-reduced-motion: reduce) { .brand-mark .bm-move, .brand-mark .bm-perls { transition: none; } }
     .brand .hero-title { margin: 0; }
     /* Wortmarke: gerundete Schrift, Bernstein-Perle als Schlusspunkt */
-    .wordmark { font-family: "SF Pro Rounded", ui-rounded, -apple-system, Inter, system-ui, sans-serif; font-weight: 800; font-size: 2.6rem; letter-spacing: -0.02em; }
-    .wordmark .perl { display: inline-block; width: 0.2em; height: 0.2em; margin-left: 0.06em; border-radius: 50%; background: var(--amber); box-shadow: 0 0 12px var(--amber-2); vertical-align: 0.62em; }
+    .wordmark { font-family: "SF Pro Rounded", ui-rounded, -apple-system, Inter, system-ui, sans-serif; font-weight: 600; font-size: 2.6rem; letter-spacing: -0.02em; }
+    .wordmark .perl { display: inline-block; width: 0.2em; height: 0.2em; margin-left: 0.06em; border-radius: 50%; background: var(--amber);  vertical-align: 0.62em; }
     /* ---------- Apple-Music-Gefühl: ruhiger Kopf, 3er-Raster, freie Listen ---------- */
-    .brand { gap: 12px; margin: 6px 4px 2px; }
+    .brand { gap: 12px; margin: 8px 4px 2px; }
     .brand .glass-btn { margin-left: auto; width: 44px; height: 44px; flex: none; }
     .brand-mark { width: 44px; height: 44px; border-radius: 10px; }
     .wordmark { font-size: 2.125rem; }
-    .hero-sub { margin: 4px 4px 22px; font-size: 0.94rem; }
+    .hero-sub { margin: 4px 4px 24px; font-size: 0.94rem; }
     .covers { grid-template-columns: repeat(auto-fill, minmax(min(6.2em, 45%), 1fr)); gap: 16px 12px; } /* große Schrift: zwei statt drei Spalten */
     .cover { border-radius: 10px; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4); }
-    .covers .cover-card > b { margin-top: 7px; hyphens: auto; -webkit-hyphens: auto; text-align: center; font-size: 0.88rem; font-weight: 400; line-height: 1.25; white-space: normal; }
+    .covers .cover-card > b { margin-top: 8px; hyphens: auto; -webkit-hyphens: auto; text-align: center; font-size: 0.88rem; font-weight: 400; line-height: 1.25; white-space: normal; }
     /* Kachel-Inhalt wächst mit der Kachel (cqw), damit nichts zu groß wird oder überlappt */
     .badge-live { left: 5cqw; top: 5cqw; padding: 1.6cqw 4cqw; font-size: max(11px, 7cqw); line-height: 1.1; }
     .badge-live::before { width: 4.5cqw; height: 4.5cqw; margin-right: 2.5cqw; vertical-align: 0.1em; }
@@ -196,7 +190,7 @@
     .links .ico { width: 28px; height: 28px; background: none; }
     .links .ico svg { width: 25px; height: 25px; stroke: var(--amber-ink); }
     .links .chev { font-size: 1.5rem; }
-    .shelf-title { margin-top: 30px; }
+    .shelf-title { margin-top: 32px; }
   </style>
 </head>
 <body>
@@ -211,7 +205,7 @@
           <filter id="bmGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="30"/></filter>
         </defs>
         <rect width="1024" height="1024" fill="url(#bmBg)"/>
-        <g class="bm-glow" clip-path="url(#bmClip)"><circle class="bm-move" cx="623" cy="412" r="161" fill="#ff7a1a" filter="url(#bmGlow)" opacity=".55"/></g>
+        
         <circle cx="450" cy="585" r="260" fill="#fff" fill-opacity=".24"/>
         <g class="bm-move"><circle cx="623" cy="412" r="161" fill="#fff" fill-opacity=".24"/></g>
         <g class="bm-lens" clip-path="url(#bmClip)"><circle class="bm-move" cx="623" cy="412" r="161" fill="#ffb340"/></g>
@@ -223,7 +217,7 @@
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6M12 7.5v.01"/></svg>
     </a>
   </div>
-  <p class="hero-sub" id="heroSub">Spiele für deine Runde.</p>
+  <p class="hero-sub" id="heroSub">Spiele für deine Runde</p>
 
   <div class="covers" aria-label="Spiele">
     <a class="cover-card drink-only" href="/konferenz.html">
@@ -398,7 +392,7 @@
     m.setAttribute('aria-label', 'Klirr');
     document.documentElement.dataset.drinkAll = on ? 'on' : 'off';
     document.documentElement.dataset.drink = on ? 'on' : 'off';
-    $('heroSub').textContent = on ? 'Prost! Trinkmodus an.' : 'Spiele für deine Runde.';
+    $('heroSub').textContent = on ? 'Prost, Trinkmodus an' : 'Spiele für deine Runde';
   }
   showDrink(drinkAll());
   $('drinkMark').addEventListener('click', () => {

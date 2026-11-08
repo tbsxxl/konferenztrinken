@@ -55,10 +55,10 @@ body::before { display: none; }
 .min, .ticker .min, .todo-head .min { background: var(--fill); }
 
 /* Typografie: SF Pro, große Titel, Satzschreibung */
-.lt h1 { font: 700 2.125rem/1.15 var(--display); text-transform: none; letter-spacing: 0.005em; text-shadow: none; }
+.lt h1 { font: 600 2.125rem/1.15 var(--display); text-transform: none; letter-spacing: 0.005em; text-shadow: none; }
 #game .lt h1, #end .lt h1 { font-size: 1.75rem; }
 .eyebrow { color: var(--secondary); text-transform: none; letter-spacing: 0; font-weight: 600; font-size: 0.95rem; }
-h2.sec { margin: 30px 4px 10px; font: 700 1.3rem/1.2 var(--display); text-transform: none; letter-spacing: 0; color: var(--label); }
+h2.sec { margin: 32px 4px 8px; font: 600 1.3rem/1.2 var(--display); text-transform: none; letter-spacing: 0; color: var(--label); }
 h2.sec::before { display: none; }
 h2.sec small { font: 500 0.9rem/1.2 var(--display); color: var(--secondary); text-transform: none; letter-spacing: 0; }
 .foot, .mode-info { color: var(--secondary); }
@@ -68,19 +68,19 @@ h2.sec small { font: 500 0.9rem/1.2 var(--display); color: var(--secondary); tex
 .room .code, .code-input, .fx b, .sheet-value output, .stepper-cell output, .rules .what {
   text-transform: none; font-family: var(--display); letter-spacing: -0.01em;
 }
-.p .name { font-weight: 700; font-size: 1.25rem; line-height: 24px; min-height: 44px; }
-.dp b { font-weight: 700; font-size: 1rem; }
-.turn b { font-weight: 700; font-size: 1.3rem; }
-.verdict b { font-weight: 800; font-size: 1.75rem; }
-.winner b { font-weight: 800; font-size: 2rem; }
-.vote h3 { font-weight: 700; font-size: 1.45rem; }
-.qanswer { font-weight: 700; font-size: 1.5rem; }
+.p .name { font-weight: 600; font-size: 1.25rem; line-height: 24px; min-height: 44px; }
+.dp b { font-weight: 600; font-size: 1rem; }
+.turn b { font-weight: 600; font-size: 1.3rem; }
+.verdict b { font-weight: 600; font-size: 1.75rem; }
+.winner b { font-weight: 600; font-size: 2rem; }
+.vote h3 { font-weight: 600; font-size: 1.45rem; }
+.qanswer { font-weight: 600; font-size: 1.5rem; }
 .qcat { font-weight: 600; font-size: 0.8rem; letter-spacing: 0; }
-.sheet-title { font-weight: 700; font-size: 1.35rem; }
-.game-tile b { font-weight: 800; font-size: 1.55rem; letter-spacing: -0.02em; }
-.vote .grid button, .judge button { font-weight: 700; font-size: 1.15rem; }
-.room .code, .code-input { font-weight: 800; letter-spacing: 0.2em; }
-.fx b { font-weight: 800; font-size: 1.6rem; }
+.sheet-title { font-weight: 600; font-size: 1.35rem; }
+.game-tile b { font-weight: 600; font-size: 1.55rem; letter-spacing: -0.02em; }
+.vote .grid button, .judge button { font-weight: 600; font-size: 1.15rem; }
+.room .code, .code-input { font-weight: 600; letter-spacing: 0.2em; }
+.fx b { font-weight: 600; font-size: 1.6rem; }
 .rank .nm { font-weight: 600; font-size: 1.05rem; }
 .stepper-cell output { font-weight: 600; font-size: 1.05rem; }
 .cells span, .cells b { font-family: var(--display); }
@@ -124,12 +124,12 @@ footer { color: var(--secondary); } /* tertiary (2.4:1) war zu schwach für Text
 /* ---------- Bewegung & Haptik-Gefühl (Klirr) ----------
    Seitenwechsel wie ein iOS-Push, Federn beim Antippen. Alles aus bei „Bewegung reduzieren“. */
 @view-transition { navigation: auto; }
-::view-transition-old(root) { animation: kl-out 0.28s cubic-bezier(0.32, 0.72, 0, 1) both; }
-::view-transition-new(root) { animation: kl-in 0.38s cubic-bezier(0.32, 0.72, 0, 1) both; }
+::view-transition-old(root) { animation: kl-out 0.28s cubic-bezier(0.22, 1, 0.36, 1) both; }
+::view-transition-new(root) { animation: kl-in 0.38s cubic-bezier(0.22, 1, 0.36, 1) both; }
 @keyframes kl-out { to { opacity: 0; scale: 0.985; } }
 @keyframes kl-in { from { opacity: 0; translate: 0 14px; } }
 /* Federn nur bei Kacheln und Hauptknöpfen – häufige Bedienelemente (Stepper, Wertung) bleiben ruhig */
-:where(.btn, .glass-btn, .cover) { transition: scale 0.22s cubic-bezier(0.3, 1.5, 0.6, 1), background-color 0.2s, opacity 0.2s; }
+:where(.btn, .glass-btn, .cover) { transition: scale 0.22s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.2s, opacity 0.2s; }
 :where(.btn, .glass-btn):not(:disabled):active { scale: 0.96; }
 @keyframes kl-rise { from { opacity: 0; translate: 0 16px; } }
 @media (prefers-reduced-motion: reduce) {
@@ -194,3 +194,9 @@ footer { color: var(--secondary); } /* tertiary (2.4:1) war zu schwach für Text
 @media (prefers-color-scheme: light) and (prefers-reduced-transparency: reduce), (prefers-color-scheme: light) and (prefers-contrast: more) {
   .glass, .nowplaying, .cta-bar, .tabbar, .sheet { background: #ffffff !important; }
 }
+
+
+/* ---------- Unslop: Signatur und ruhige Bewegung ----------
+   Signatur: die orange Schnittmenge zweier Linsen markiert, wer gerade dran ist – nur dort. */
+.kl-turn-mark { display: inline-block; width: 18px; height: 18px; flex: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3CclipPath id='a'%3E%3Ccircle cx='9.5' cy='13.5' r='7'/%3E%3C/clipPath%3E%3C/defs%3E%3Ccircle cx='9.5' cy='13.5' r='7' fill='%23ffffff' fill-opacity='.35'/%3E%3Ccircle cx='14.5' cy='9.5' r='6' fill='%23ffffff' fill-opacity='.35'/%3E%3Ccircle cx='14.5' cy='9.5' r='6' fill='%23ffb340' clip-path='url(%23a)'/%3E%3C/svg%3E") center / contain no-repeat; vertical-align: -3px; }
+@keyframes pop { from { opacity: 0; translate: 0 8px; } }

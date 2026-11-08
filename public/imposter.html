@@ -24,17 +24,17 @@
     :root[data-drink="off"] .drink-only { display: none !important; }
 
     .cell .sub { display: block; color: var(--secondary); font-size: 0.8rem; margin-top: 2px; }
-    .mode-info { padding: 0 18px 14px; color: var(--secondary); font-size: 0.9rem; line-height: 1.4; }
+    .mode-info { padding: 0 16px 16px; color: var(--secondary); font-size: 0.9rem; line-height: 1.4; }
     .cell.wrap .seg { flex: 1 1 100%; }
     .seg { display: flex; gap: 4px; background: var(--fill); border-radius: 14px; padding: 3px; }
     .seg button { flex: 1; min-width: 44px; min-height: 44px; border: 0; border-radius: 11px; background: transparent; color: var(--label); font: inherit; font-weight: 600; font-size: 0.9rem; }
-    .seg.big button { min-height: 58px; font-weight: 700; font-size: 1rem; }
+    .seg.big button { min-height: 58px; font-weight: 600; font-size: 1rem; }
     .seg.big button small { display: block; font-weight: 500; font-size: 0.75rem; opacity: 0.8; margin-top: 2px; }
     .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
-    .cats { display: flex; flex-wrap: wrap; gap: 8px; padding: 14px; }
-    .cats button { min-height: 44px; padding: 0 14px; border: 0; border-radius: 999px; background: var(--fill); color: var(--label); font: inherit; font-weight: 600; font-size: 0.9rem; }
+    .cats { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px; }
+    .cats button { min-height: 44px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--fill); color: var(--label); font: inherit; font-weight: 600; font-size: 0.9rem; }
     .cats button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
-    .cta-bar { position: sticky; bottom: 0; z-index: 5; margin: 18px -16px 0; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: linear-gradient(transparent, rgba(10, 10, 16, 0.85) 30%); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+    .cta-bar { position: sticky; bottom: 0; z-index: 5; margin: 16px -16px 0; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: linear-gradient(transparent, rgba(10, 10, 16, 0.85) 30%); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
     @media (prefers-color-scheme: light) { .cta-bar { background: linear-gradient(rgba(242, 242, 247, 0), rgba(242, 242, 247, 0.9) 30%); } }
     .cta-bar .btn { margin-top: 0; }
     .cta-bar .btn + .btn { margin-top: 8px; }
@@ -42,52 +42,53 @@
     .mini button { flex: 1; min-height: 44px; border: 0; border-radius: 999px; background: var(--fill); color: var(--label); font: inherit; font-weight: 600; }
 
     /* Karte zum Aufdecken */
-    .card { position: relative; margin-top: 14px; min-height: 340px; border-radius: 28px; padding: 26px 22px; display: grid; place-items: center; text-align: center; color: #fff; overflow: hidden;
+    .card { position: relative; margin-top: 16px; min-height: 340px; border-radius: 28px; padding: 24px 24px; display: grid; place-items: center; text-align: center; color: #fff; overflow: hidden;
       background: radial-gradient(110% 80% at 80% 0%, #ff7aa8, transparent 60%), linear-gradient(160deg, #c2185b, #5a0a2c); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35); }
     /* Imposter- und Wort-Karte sehen gleich aus – sonst verrät die Farbe die Rolle */
-    .card .who { font: 700 1rem/1.2 -apple-system, "SF Pro Text", Inter, sans-serif; opacity: 0.85; }
-    .card .big { display: block; margin: 10px 0 6px; font: 800 2.6rem/1.05 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; letter-spacing: -0.01em; overflow-wrap: anywhere; }
+    .card .who { font: 600 1rem/1.2 -apple-system, "SF Pro Text", Inter, sans-serif; opacity: 0.85; }
+    .card .big { display: block; margin: 8px 0 8px; font: 600 2.6rem/1.05 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; letter-spacing: -0.01em; overflow-wrap: anywhere; }
     .card .small { font-weight: 600; opacity: 0.9; }
-    .card .tip { display: inline-block; margin-top: 12px; padding: 8px 16px; border-radius: 999px; background: rgba(0, 0, 0, 0.28); font-weight: 700; }
-    .card .figure { width: 96px; height: 96px; margin: 0 auto 14px; border-radius: 24px; background: rgba(0, 0, 0, 0.25); display: grid; place-items: center; overflow: hidden; }
+    .card .tip { display: inline-block; margin-top: 12px; padding: 8px 16px; border-radius: 999px; background: rgba(0, 0, 0, 0.28); font-weight: 600; }
+    .card .figure { width: 96px; height: 96px; margin: 0 auto 16px; border-radius: 24px; background: rgba(0, 0, 0, 0.25); display: grid; place-items: center; overflow: hidden; }
     .card .figure svg { width: 92%; margin-top: 30%; fill: #fff; }
     .card .hint { margin-top: 8px; opacity: 0.85; font-size: 0.9rem; }
     @keyframes flip { from { transform: rotateY(90deg); opacity: 0.4; } }
-    .card.flip { animation: flip 0.35s cubic-bezier(0.3, 1.3, 0.5, 1); }
+    .card.flip { animation: flip 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
     @media (prefers-reduced-motion: reduce) { .card.flip { animation: none; } }
 
     /* Reihenfolge und Abstimmung */
-    .order { display: flex; flex-wrap: wrap; gap: 8px; padding: 14px; }
+    .order { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px; }
     .order .rchip .n { opacity: 0.8; margin-right: 2px; }
     .vote-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin-top: 12px; }
-    .vote-grid button { min-height: 60px; border: 0; border-radius: 18px; background: var(--c); color: #fff; font: 700 1.1rem/1.1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2); }
-    .verdict { margin-top: 14px; border-radius: var(--r); padding: 20px; color: #fff; background: var(--c, #c2185b); box-shadow: 0 10px 26px rgba(0, 0, 0, 0.28); animation: pop 0.4s cubic-bezier(0.3, 1.4, 0.6, 1); }
-    .verdict b { display: block; font: 800 1.9rem/1.1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; }
+    .vote-grid button { min-height: 60px; border: 0; border-radius: 18px; background: var(--c); color: #fff; font: 600 1.1rem/1.1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2); }
+    .verdict { margin-top: 16px; border-radius: var(--r); padding: 20px; color: #fff; background: var(--c, #c2185b); box-shadow: 0 10px 26px rgba(0, 0, 0, 0.28); animation: pop 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+    .verdict b { display: block; font: 600 1.9rem/1.1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; }
     .verdict p { margin: 8px 0 0; font-weight: 600; }
     .verdict .drinks { margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.25); }
-    .guess { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
-    .guess button { min-height: 52px; border: 0; border-radius: 16px; font: 700 1rem/1 inherit; color: #fff; }
+    .guess { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+    .guess button { min-height: 52px; border: 0; border-radius: 16px; font: 600 1rem/1 inherit; color: #fff; }
     .guess .yes { background: #1f8a4c; }
     .guess .no { background: #c4001a; }
-    .score { display: grid; grid-template-columns: 1fr auto; padding: 12px 18px; position: relative; }
+    .score { display: grid; grid-template-columns: 1fr auto; padding: 12px 16px; position: relative; }
     .score + .score::before { content: ""; position: absolute; top: 0; left: 18px; right: 0; border-top: 0.5px solid var(--sep); }
     .score b { font-variant-numeric: tabular-nums; }
     /* Mehrere Handys: Raum */
-    .room { padding: 18px; border-radius: var(--r); text-align: center; }
-    .room .code { font: 800 3.4rem/1 var(--display); letter-spacing: 0.18em; margin: 6px 0 4px; }
+    .room { padding: 16px; border-radius: var(--r); text-align: center; }
+    .room .code { font: 600 3.4rem/1 var(--display);  margin: 8px 0 4px; }
     .room .hint { color: var(--secondary); font-size: 0.9rem; overflow-wrap: anywhere; }
-    .room .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
-    .room .btns button { min-height: 48px; border: 0; border-radius: 999px; background: var(--fill); color: var(--label); font: inherit; font-weight: 700; }
-    .code-input { width: 100%; min-height: 64px; margin-top: 6px; border: 0; border-radius: 16px; background: var(--fill); color: var(--label); text-align: center; font: 800 2.6rem/1 var(--display); letter-spacing: 0.22em; text-transform: uppercase; }
-    .netpill { display: inline-flex; align-items: center; gap: 6px; }
+    .room .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+    .room .btns button { min-height: 48px; border: 0; border-radius: 999px; background: var(--fill); color: var(--label); font: inherit; font-weight: 600; }
+    .code-input { width: 100%; min-height: 64px; margin-top: 8px; border: 0; border-radius: 16px; background: var(--fill); color: var(--label); text-align: center; font: 600 2.6rem/1 var(--display);   }
+    .netpill { display: inline-flex; align-items: center; gap: 8px; }
     .netpill::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #8e8e93; }
     .netpill.on::before { background: #30d158; }
     .netpill.off::before { background: #ff453a; }
-    .you { margin: 0 0 10px; padding: 10px 14px; border-radius: 14px; background: var(--fill); font-weight: 600; text-align: center; }
-    .wait { margin-top: 14px; padding: 18px; border-radius: var(--r); text-align: center; color: var(--secondary); font-weight: 600; }
+    .you { margin: 0 0 8px; padding: 8px 16px; border-radius: 14px; background: var(--fill); font-weight: 600; text-align: center; }
+    .wait { margin-top: 16px; padding: 16px; border-radius: var(--r); text-align: center; color: var(--secondary); font-weight: 600; }
     .vote-grid button[aria-pressed="true"] { outline: 3px solid var(--label); outline-offset: 2px; }
     .vote-grid button:disabled { opacity: 0.45; }
-    .votes { padding: 6px 18px 14px; color: var(--secondary); font-size: 0.9rem; }
+    .votes { padding: 8px 16px 16px; color: var(--secondary); font-size: 0.9rem; }
+    .room .code, .code-input { text-transform: uppercase; letter-spacing: 0.18em; }
   </style>
 </head>
 <body>
@@ -407,8 +408,8 @@
   }
   function startRound() {
     $('setupError').textContent = '';
-    if (role === 'host' && !$('hostName').value.trim()) { $('setupError').textContent = 'Trag oben deinen Namen ein – du spielst mit.'; window.scrollTo(0, 0); return; }
-    if (settings.play === 'online' && role !== 'host') { $('setupError').textContent = 'Erst oben einen Raum erstellen.'; return; }
+    if (role === 'host' && !$('hostName').value.trim()) { $('setupError').textContent = 'Trag oben deinen Namen ein – du spielst mit'; window.scrollTo(0, 0); return; }
+    if (settings.play === 'online' && role !== 'host') { $('setupError').textContent = 'Erst oben einen Raum erstellen'; return; }
     const names = role === 'host' ? lobbyNames() : roster.slice();
     if (names.length < 3) { $('setupError').textContent = role === 'host' ? 'Es braucht mindestens drei Personen im Raum.' : 'Es braucht mindestens drei Mitspieler.'; return; }
     const imps = settings.imps === 2 && names.length >= 5 ? 2 : 1;
@@ -505,7 +506,7 @@
     if (!card) inner.append(el('span', { className: 'big', textContent: 'Karte kommt …' }));
     else if (card.imp) {
       inner.append(el('div', { className: 'who', textContent: name }), el('span', { className: 'big', textContent: 'Du bist der Imposter' }));
-      if (card.two) inner.append(el('div', { className: 'small', textContent: 'Es gibt noch einen zweiten Imposter.' }));
+      if (card.two) inner.append(el('div', { className: 'small', textContent: 'Es gibt noch einen zweiten Imposter' }));
       inner.append(el('div', { className: 'tip', textContent: card.tip ? `Tipp: ${card.tip}` : 'Ohne Tipp – hör gut zu.' }));
       if (card.cat) inner.append(el('div', { className: 'hint', textContent: `Kategorie: ${card.cat}` }));
     } else {
@@ -531,7 +532,7 @@
     const V = view();
     const playing = V.players.includes(me);
     const card = role === 'host' ? (playing ? cardFor(me) : null) : (myCard && myCard.round === V.round ? myCard : null);
-    const parts = playing ? cardView(me, card, cardOpen, () => { cardOpen = !cardOpen; render(); }, 'Karte verdecken') : [el('div', { className: 'wait', textContent: 'Du schaust diese Runde zu.' })];
+    const parts = playing ? cardView(me, card, cardOpen, () => { cardOpen = !cardOpen; render(); }, 'Karte verdecken') : [el('div', { className: 'wait', textContent: 'Du schaust diese Runde zu' })];
     if (role === 'host') parts.push(el('button', { className: 'btn ghost', textContent: 'Alle haben ihre Karte – weiter', onclick: () => { S.phase = 'talk'; cardOpen = false; save(); render(); } }));
     else parts.push(el('div', { className: 'wait', textContent: 'Schau dir deine Karte an. Es geht weiter, sobald alle bereit sind.' }));
     return parts;
@@ -544,14 +545,14 @@
     const seq = V.order.slice(start).concat(V.order.slice(0, start));
     const parts = [el('div', { className: 'list' },
       el('div', { className: 'mode-info', style: 'padding-top:14px', textContent: `${V.starter} fängt an. Reihum sagt jede Person einen Begriff zum Wort – nicht zu offensichtlich, aber auch nicht zu vage. Spielt ein, zwei Runden, dann diskutiert ihr.` }),
-      el('div', { className: 'order' }, ...seq.map((n, i) => el('span', { className: 'rchip', style: `--c: ${colorOf(n)}` }, el('span', { className: 'ini', textContent: initial(n) }), el('span', { className: 'n', textContent: `${i + 1}.` }), n))))];
+      el('div', { className: 'order' }, ...seq.map((n, i) => el('span', { className: 'rchip', style: `--c: ${colorOf(n)}` }, el('span', { className: 'ini', textContent: initial(n) }), el('span', { className: 'n', textContent: `${i + 1}.` }), n, i === 0 ? el('span', { className: 'kl-turn-mark', title: 'fängt an' }) : null))))];
     if (role !== 'local' && V.players.includes(myName())) {
       const card = role === 'host' ? cardFor(myName()) : myCard;
       parts.push(el('button', { className: 'btn ghost', textContent: cardOpen ? 'Karte verdecken' : 'Meine Karte nochmal ansehen', onclick: () => { cardOpen = !cardOpen; render(); } }));
       if (cardOpen && card) parts.push(...cardView(myName(), card, true, () => { cardOpen = false; render(); }, 'Karte verdecken').slice(0, 1));
     }
     if (role !== 'guest') parts.push(el('button', { className: 'btn', textContent: 'Zur Abstimmung', onclick: () => { S.phase = 'vote'; cardOpen = false; save(); render(); } }));
-    else parts.push(el('div', { className: 'wait', textContent: 'Die Abstimmung startet gleich.' }));
+    else parts.push(el('div', { className: 'wait', textContent: 'Die Abstimmung startet gleich' }));
     return parts;
   }
 
@@ -585,7 +586,7 @@
     $('stageTitle').textContent = 'Erwischt?';
     const V = view();
     const parts = [el('div', { className: 'verdict', style: `--c: ${colorOf(V.accused)}` },
-      el('b', { textContent: `${V.accused} ist ein Imposter!` }),
+      el('b', { textContent: `${V.accused} ist ein Imposter` }),
       el('p', { textContent: `${V.accused}, du hast eine Chance: Wie heißt das geheime Wort? Sag es laut – die anderen entscheiden, ob es stimmt.` }))];
     if (role === 'guest') parts.push(el('div', { className: 'wait', textContent: `${V.accused} rät …` }));
     else parts.push(el('div', { className: 'guess' },
@@ -602,11 +603,11 @@
     const others = V.players.filter((n) => !R.impostors.includes(n));
     let text;
     if (V.crewWins) text = `${imps} wurde erwischt und kannte das Wort nicht.`;
-    else if (V.guessed) text = `${V.accused} wurde erwischt – hat das Wort aber erraten!`;
+    else if (V.guessed) text = `${V.accused} wurde erwischt – hat das Wort aber erraten`;
     else if (V.tie) text = `Gleichstand bei der Abstimmung – ${imps} entkommt.`;
     else text = `${V.accused} war unschuldig. Der Imposter war ${imps}.`;
     const v = el('div', { className: 'verdict', style: `--c: ${V.crewWins ? '#1f6feb' : '#c2185b'}` },
-      el('b', { textContent: V.crewWins ? 'Die Runde gewinnt!' : `${imps} gewinnt!` }),
+      el('b', { textContent: V.crewWins ? 'Die Runde gewinnt' : `${imps} gewinnt` }),
       el('p', { textContent: text }),
       el('p', { textContent: `Das Wort war „${R.word}“${V.cfg.tip ? ` · Tipp: ${R.tip}` : ''}.` }));
     if (V.cfg.drink) v.append(el('p', { className: 'drinks', textContent: V.crewWins ? `${imps} trinkt 3.` : `${others.join(', ')} trinken je 2.` }));
@@ -620,7 +621,7 @@
     parts.push(el('h2', { className: 'sec', textContent: 'Punkte' }),
       el('div', { className: 'list' }, ...ranked.map(([n, p]) => el('div', { className: 'score' }, el('span', { textContent: n }), el('b', { textContent: `${p}` })))),
       el('p', { className: 'foot', textContent: 'Runde gewonnen: je 1 Punkt. Imposter gewinnt: 2 Punkte.' }));
-    if (role === 'guest') parts.push(el('div', { className: 'wait', textContent: 'Gleich kommt die nächste Runde.' }));
+    if (role === 'guest') parts.push(el('div', { className: 'wait', textContent: 'Gleich kommt die nächste Runde' }));
     else parts.push(el('button', { className: 'btn', textContent: 'Nächste Runde', onclick: startRound }),
       el('button', { className: 'btn ghost', textContent: 'Einstellungen', onclick: () => { S.phase = 'setup'; store.set('imp-state', S); pushLobby(); render(); } }));
     return parts;
@@ -633,8 +634,8 @@
     const code = $('joinCode').value.trim().toUpperCase();
     const name = $('joinName').value.trim().slice(0, 24);
     $('joinError').textContent = '';
-    if (!/^[A-Z0-9]{4}$/.test(code)) { $('joinError').textContent = 'Der Raumcode hat 4 Zeichen.'; return; }
-    if (!name) { $('joinError').textContent = 'Bitte deinen Namen eintragen.'; return; }
+    if (!/^[A-Z0-9]{4}$/.test(code)) { $('joinError').textContent = 'Der Raumcode hat 4 Zeichen'; return; }
+    if (!name) { $('joinError').textContent = 'Bitte deinen Namen eintragen'; return; }
     store.set('imp-myname', name);
     guest = { code, name, id: guest?.code === code && guest?.name === name ? guest.id : (crypto.randomUUID?.() || String(Math.random())) };
     store.set('imp-guest', guest);

@@ -23,111 +23,112 @@
 
     /* Spieler-Leiste: kleine Banner in Personenfarbe */
     .dplayers { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
-    .dp { position: relative; display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 9px; align-items: center; padding: 9px 11px; border-radius: 18px; background: var(--c); color: #fff; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.18); overflow: hidden; }
+    .dp { position: relative; display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 8px; align-items: center; padding: 8px 12px; border-radius: 18px; background: var(--c); color: #fff; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.18); overflow: hidden; }
     .dp::before { content: ""; position: absolute; inset: 0; background: radial-gradient(rgba(0, 0, 0, 0.12) 0.7px, transparent 1.1px) 0 0 / 4px 4px, linear-gradient(135deg, rgba(255, 255, 255, 0.14), transparent 55%); pointer-events: none; }
     .dp > * { position: relative; }
-    .dp .ini { width: 38px; height: 38px; border-radius: 50%; background: #fff; color: var(--c); display: grid; place-items: center; font: 800 21px/1 var(--display); text-transform: uppercase; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25); }
-    .dp b { display: block; font: 800 1.05rem/1.1 var(--display); text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); }
+    .dp .ini { width: 38px; height: 38px; border-radius: 50%; background: #fff; color: var(--c); display: grid; place-items: center; font: 600 21px/1 var(--display);  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25); }
+    .dp b { display: block; font: 600 1.05rem/1.1 var(--display);  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .dp .meta { font-size: 0.78rem; font-weight: 600; opacity: 0.92; white-space: pre-line; overflow: hidden; line-height: 1.35; }
-    .dp.now { box-shadow: 0 0 0 3px #fff, 0 8px 20px rgba(0, 0, 0, 0.3); }
-    .dp.me .ini { box-shadow: 0 0 0 3px #ffd60a; }
+    .dp.now::before { content: ""; position: absolute; inset: 8px 8px auto auto; width: 18px; height: 18px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3CclipPath id='a'%3E%3Ccircle cx='9.5' cy='13.5' r='7'/%3E%3C/clipPath%3E%3C/defs%3E%3Ccircle cx='9.5' cy='13.5' r='7' fill='%23ffffff' fill-opacity='.35'/%3E%3Ccircle cx='14.5' cy='9.5' r='6' fill='%23ffffff' fill-opacity='.35'/%3E%3Ccircle cx='14.5' cy='9.5' r='6' fill='%23ffb340' clip-path='url(%23a)'/%3E%3C/svg%3E") center / contain no-repeat; }
+    .dp.me b::after { content: " · du"; font-weight: 400; opacity: 0.8; }
     .dp.out { background: #26262b; color: rgba(255, 255, 255, 0.5); box-shadow: none; }
     .dp.out .ini { background: #3a3a40; color: #8e8e93; box-shadow: none; }
-    .dp.out::after { content: "RAUS"; position: absolute; right: 10px; top: 9px; font: 800 0.8rem/1 var(--display); letter-spacing: 0.06em; color: #ff6b6b; }
+    .dp.out::after { content: "raus"; position: absolute; right: 10px; top: 9px; font: 600 0.8rem/1 var(--display);  color: #ff6b6b; }
 
     /* Frage auf der Tafel */
-    .qcard { margin-top: 14px; padding: 18px; border-radius: var(--r); }
+    .qcard { margin-top: 16px; padding: 16px; border-radius: var(--r); }
     .qhead { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-    .qcat { font: 700 0.85rem/1 var(--display); letter-spacing: 0.06em; text-transform: uppercase; background: rgba(255, 255, 255, 0.1); padding: 7px 11px; border-radius: 999px; }
-    .qtimer { font: 800 1.7rem/1 var(--display); font-variant-numeric: tabular-nums; min-width: 2.5ch; text-align: right; }
+    .qcat { font: 600 0.85rem/1 var(--display);   background: rgba(255, 255, 255, 0.1); padding: 8px 12px; border-radius: 999px; }
+    .qtimer { font: 600 1.7rem/1 var(--display); font-variant-numeric: tabular-nums; min-width: 2.5ch; text-align: right; }
     .qtimer.low { color: #ff6b6b; }
-    .qtext { font-size: 1.45rem; font-weight: 700; line-height: 1.3; margin: 16px 0 4px; letter-spacing: -0.01em; }
-    .qanswer { margin-top: 14px; padding: 14px 16px; border-radius: 16px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.08); font: 800 1.65rem/1.15 var(--display); text-transform: uppercase; letter-spacing: 0.01em; }
-    .qanswer small { display: block; font: 700 0.75rem/1.2 Inter, system-ui, sans-serif; letter-spacing: 0.06em; color: rgba(255, 255, 255, 0.55); margin-bottom: 4px; text-transform: uppercase; }
+    .qtext { font-size: 1.45rem; font-weight: 600; line-height: 1.3; margin: 16px 0 4px; letter-spacing: -0.01em; }
+    .qanswer { margin-top: 16px; padding: 16px 16px; border-radius: 16px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.08); font: 600 1.65rem/1.15 var(--display);  letter-spacing: 0.01em; }
+    .qanswer small { display: block; font: 600 0.75rem/1.2 Inter, system-ui, sans-serif;  color: rgba(255, 255, 255, 0.55); margin-bottom: 4px;  }
     .qanswer.timeout small { color: #ff6b6b; }
-    .judge { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
-    .judge button { min-height: 62px; border: 0; border-radius: 20px; color: #fff; font: 800 1.4rem/1 var(--display); text-transform: uppercase; letter-spacing: 0.03em; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2); }
+    .judge { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+    .judge button { min-height: 62px; border: 0; border-radius: 20px; color: #fff; font: 600 1.4rem/1 var(--display);   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2); }
     .judge .right { background: linear-gradient(180deg, #23a04c, #157535); }
     .judge .wrong { background: linear-gradient(180deg, #ef2a37, #b3000f); }
     .mini { display: flex; gap: 8px; margin-top: 12px; }
     .mini button { flex: 1; min-height: 44px; border: 0; border-radius: 999px; background: var(--fill); color: var(--label); font: inherit; font-weight: 600; }
-    .waiting { margin-top: 14px; padding: 18px; border-radius: var(--r); text-align: center; font-weight: 600; }
+    .waiting { margin-top: 16px; padding: 16px; border-radius: var(--r); text-align: center; font-weight: 600; }
 
     /* Ergebniskarten */
-    .verdict { margin-top: 14px; border-radius: var(--r); padding: 18px; background: var(--c); color: #fff; box-shadow: 0 10px 26px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.18); animation: pop 0.4s cubic-bezier(0.3, 1.4, 0.6, 1); }
-    .verdict b { display: block; font: 800 2rem/1.05 var(--display); text-transform: uppercase; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); }
-    .verdict p { margin: 6px 0 0; font-weight: 600; }
+    .verdict { margin-top: 16px; border-radius: var(--r); padding: 16px; background: var(--c); color: #fff; box-shadow: 0 10px 26px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.18); animation: pop 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+    .verdict b { display: block; font: 600 2rem/1.05 var(--display);  }
+    .verdict p { margin: 8px 0 0; font-weight: 600; }
     .targets { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-    .targets button { min-height: 44px; border: 0; border-radius: 999px; padding: 0 16px; background: rgba(0, 0, 0, 0.35); color: #fff; font: inherit; font-weight: 700; }
+    .targets button { min-height: 44px; border: 0; border-radius: 999px; padding: 0 16px; background: rgba(0, 0, 0, 0.35); color: #fff; font: inherit; font-weight: 600; }
 
     /* Abstimmung */
-    .vote { margin-top: 14px; padding: 18px; border-radius: var(--r); }
-    .vote h3 { margin: 0; font: 800 1.7rem/1.05 var(--display); text-transform: uppercase; }
-    .vote p { margin: 6px 0 0; color: var(--secondary); }
-    .vote .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; margin-top: 14px; }
-    .vote .grid button { min-height: 64px; border: 0; border-radius: 18px; background: var(--c); color: #fff; font: 800 1.25rem/1 var(--display); text-transform: uppercase; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.18); }
+    .vote { margin-top: 16px; padding: 16px; border-radius: var(--r); }
+    .vote h3 { margin: 0; font: 600 1.7rem/1.05 var(--display);  }
+    .vote p { margin: 8px 0 0; color: var(--secondary); }
+    .vote .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin-top: 16px; }
+    .vote .grid button { min-height: 64px; border: 0; border-radius: 18px; background: var(--c); color: #fff; font: 600 1.25rem/1 var(--display);  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.18); }
     .vote .grid button small { display: block; font: 600 0.75rem/1.2 Inter, system-ui, sans-serif; text-transform: none; opacity: 0.9; margin-top: 4px; }
-    .vote .who { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
-    .vote .who span { padding: 6px 10px; border-radius: 999px; background: var(--fill); font-size: 0.85rem; font-weight: 600; }
+    .vote .who { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .vote .who span { padding: 8px 8px; border-radius: 999px; background: var(--fill); font-size: 0.85rem; font-weight: 600; }
     .vote .who span.done { background: #18803c; color: #fff; }
-    .bars { margin-top: 14px; display: grid; gap: 8px; }
-    .bar { display: grid; grid-template-columns: 90px 1fr 28px; align-items: center; gap: 10px; font-weight: 700; }
+    .bars { margin-top: 16px; display: grid; gap: 8px; }
+    .bar { display: grid; grid-template-columns: 90px 1fr 28px; align-items: center; gap: 8px; font-weight: 600; }
     .bar i { display: block; height: 14px; border-radius: 7px; background: var(--c); min-width: 4px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25); }
-    .bar span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: uppercase; font-family: var(--display); font-size: 1.05rem; }
+    .bar span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap;  font-family: var(--display); font-size: 1.05rem; }
 
     /* Optionen */
     /* Trinkmodus aus: Trink-Regeln ausblenden */
     :root[data-drink="off"] .drink-only { display: none !important; }
     .cell .sub { display: block; color: var(--secondary); font-size: 0.8rem; margin-top: 2px; }
     /* Startknopf bleibt beim Scrollen durch die Einstellungen unten sichtbar (wie eine iOS-Aktionsleiste) */
-    .cta-bar { position: sticky; bottom: 0; z-index: 5; margin: 18px -16px 0; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: linear-gradient(transparent, rgba(10, 10, 16, 0.85) 30%); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
+    .cta-bar { position: sticky; bottom: 0; z-index: 5; margin: 16px -16px 0; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: linear-gradient(transparent, rgba(10, 10, 16, 0.85) 30%); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); }
     @media (prefers-color-scheme: light) { .cta-bar { background: linear-gradient(rgba(242, 242, 247, 0), rgba(242, 242, 247, 0.9) 30%); } }
     .cta-bar .btn { margin-top: 0; }
     .cta-bar .btn + .btn { margin-top: 8px; }
     .stepper-cell > span:first-child { flex: 1; min-width: 0; }
-    .stepper-cell output { width: 3.6rem; flex: none; text-align: center; white-space: nowrap; font: 800 1.15rem/1 var(--display); text-transform: uppercase; }
-    .stepper-cell .ctl { display: flex; flex: none; align-items: center; gap: 6px; }
+    .stepper-cell output { width: 3.6rem; flex: none; text-align: center; white-space: nowrap; font: 600 1.15rem/1 var(--display);  }
+    .stepper-cell .ctl { display: flex; flex: none; align-items: center; gap: 8px; }
     .stepper-cell button { flex: none; width: 44px; height: 44px; border: 0; border-radius: 12px; background: var(--fill); color: var(--label); font-size: 1.3rem; font-weight: 600; }
-    .cell.wrap { flex-wrap: wrap; row-gap: 10px; }
+    .cell.wrap { flex-wrap: wrap; row-gap: 8px; }
     .cell.wrap .seg { flex: 1 1 100%; }
     .seg { display: flex; gap: 4px; background: var(--fill); border-radius: 14px; padding: 3px; }
     .seg button { flex: 1; min-width: 44px; min-height: 44px; border: 0; border-radius: 11px; background: transparent; color: var(--label); font: inherit; font-weight: 600; font-size: 0.9rem; }
     .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); box-shadow: 0 4px 10px rgba(210, 5, 21, 0.35); }
-    .seg.big button { min-height: 58px; font: 800 1.05rem/1.1 var(--display); text-transform: uppercase; letter-spacing: 0.03em; }
+    .seg.big button { min-height: 58px; font: 600 1.05rem/1.1 var(--display);   }
     .seg.big button small { display: block; font: 500 0.72rem/1.2 Inter, system-ui, sans-serif; text-transform: none; letter-spacing: 0; opacity: 0.8; }
-    .cats { display: flex; flex-wrap: wrap; gap: 8px; padding: 14px; }
-    .cats button { min-height: 44px; padding: 0 14px; border: 0; border-radius: 999px; background: var(--fill); color: var(--label); font: inherit; font-weight: 600; font-size: 0.9rem; }
+    .cats { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px; }
+    .cats button { min-height: 44px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--fill); color: var(--label); font: inherit; font-weight: 600; font-size: 0.9rem; }
     .cats button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
-    .mode-info { padding: 0 18px 14px; color: var(--secondary); font-size: 0.9rem; line-height: 1.4; }
+    .mode-info { padding: 0 16px 16px; color: var(--secondary); font-size: 0.9rem; line-height: 1.4; }
 
     /* Raum / Lobby */
-    .room { padding: 18px; border-radius: var(--r); text-align: center; }
-    .room .code { font: 800 3.4rem/1 var(--display); letter-spacing: 0.18em; margin: 6px 0 4px; }
+    .room { padding: 16px; border-radius: var(--r); text-align: center; }
+    .room .code { font: 600 3.4rem/1 var(--display);  margin: 8px 0 4px; }
     .room .hint { color: var(--secondary); font-size: 0.9rem; overflow-wrap: anywhere; }
-    .room .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
-    .room .btns button { min-height: 48px; border: 0; border-radius: 999px; background: var(--fill); color: var(--label); font: inherit; font-weight: 700; }
-    .code-input { width: 100%; min-height: 64px; margin-top: 6px; border: 0; border-radius: 16px; background: var(--fill); color: var(--label); text-align: center; font: 800 2.6rem/1 var(--display); letter-spacing: 0.22em; text-transform: uppercase; }
-    .netpill { display: inline-flex; align-items: center; gap: 6px; }
+    .room .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+    .room .btns button { min-height: 48px; border: 0; border-radius: 999px; background: var(--fill); color: var(--label); font: inherit; font-weight: 600; }
+    .code-input { width: 100%; min-height: 64px; margin-top: 8px; border: 0; border-radius: 16px; background: var(--fill); color: var(--label); text-align: center; font: 600 2.6rem/1 var(--display);   }
+    .netpill { display: inline-flex; align-items: center; gap: 8px; }
     .netpill::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #8e8e93; }
     .netpill.on::before { background: #30d158; }
     .netpill.off::before { background: #ff453a; }
-    .you { margin: 0 0 10px; padding: 10px 14px; border-radius: 14px; background: var(--fill); font-weight: 600; text-align: center; }
+    .you { margin: 0 0 8px; padding: 8px 16px; border-radius: 14px; background: var(--fill); font-weight: 600; text-align: center; }
 
     /* Ende */
-    .winner { margin-top: 6px; border-radius: 26px; padding: 24px 18px; text-align: center; background: var(--c); color: #fff; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2); }
-    .winner .ini { width: 76px; height: 76px; margin: 0 auto 10px; border-radius: 50%; background: #fff; color: var(--c); display: grid; place-items: center; font: 800 42px/1 var(--display); text-transform: uppercase; }
+    .winner { margin-top: 8px; border-radius: 26px; padding: 24px 16px; text-align: center; background: var(--c); color: #fff; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2); }
+    .winner .ini { width: 76px; height: 76px; margin: 0 auto 8px; border-radius: 50%; background: #fff; color: var(--c); display: grid; place-items: center; font: 600 42px/1 var(--display);  }
     .winner .crown { font-size: 2rem; display: block; margin-bottom: 4px; }
     .winner .crown .kl-ico { width: 2.2rem; height: 2.2rem; }
-    .winner b { display: block; font: 800 2.3rem/1 var(--display); text-transform: uppercase; }
-    .winner span { display: block; margin-top: 6px; font-weight: 600; opacity: 0.92; }
-    .rank { display: grid; grid-template-columns: 36px 1fr auto; gap: 10px; align-items: center; padding: 12px 18px; position: relative; }
+    .winner b { display: block; font: 600 2.3rem/1 var(--display);  }
+    .winner span { display: block; margin-top: 8px; font-weight: 600; opacity: 0.92; }
+    .rank { display: grid; grid-template-columns: 36px 1fr auto; gap: 8px; align-items: center; padding: 12px 16px; position: relative; }
     .rank + .rank::before { content: ""; position: absolute; top: 0; left: 18px; right: 0; border-top: 0.5px solid var(--sep); }
-    .rank .pos { font: 800 1.3rem/1 var(--display); color: var(--secondary); }
-    .rank .nm { font: 800 1.15rem/1 var(--display); text-transform: uppercase; }
+    .rank .pos { font: 600 1.3rem/1 var(--display); color: var(--secondary); }
+    .rank .nm { font: 600 1.15rem/1 var(--display);  }
     .rank .st2 { color: var(--secondary); font-size: 0.9rem; }
 
-    .fx { position: fixed; left: 12px; right: 12px; top: calc(12px + env(safe-area-inset-top)); z-index: 40; max-width: 520px; margin: 0 auto; padding: 18px; border-radius: 24px; text-align: center; background: var(--c, #d20515); color: #fff; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45); animation: pop 0.4s cubic-bezier(0.3, 1.4, 0.6, 1); }
-    .fx b { display: block; font: 800 2.1rem/1.05 var(--display); text-transform: uppercase; }
+    .fx { position: fixed; left: 12px; right: 12px; top: calc(12px + env(safe-area-inset-top)); z-index: 40; max-width: 520px; margin: 0 auto; padding: 16px; border-radius: 24px; text-align: center; background: var(--c, #d20515); color: #fff; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45); animation: pop 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+    .fx b { display: block; font: 600 2.1rem/1.05 var(--display);  }
+    .room .code, .code-input { text-transform: uppercase; letter-spacing: 0.18em; }
   </style>
   <link rel="stylesheet" href="/apple.css" />
   <script src="/klirr.js" defer></script>
@@ -498,10 +499,10 @@
 
   function startGame() {
     $('setupError').textContent = '';
-    if (settings.play === 'online' && role !== 'host') { $('setupError').textContent = 'Erst oben einen Raum erstellen.'; return; }
+    if (settings.play === 'online' && role !== 'host') { $('setupError').textContent = 'Erst oben einen Raum erstellen'; return; }
     const names = role === 'host' ? lobbyNames() : roster;
     if (names.length < 2) { $('setupError').textContent = role === 'host' ? 'Es braucht mindestens zwei Personen im Raum.' : 'Mindestens zwei Mitspieler eintragen.'; return; }
-    if (settings.mode === 'vote' && names.length < 3) { $('setupError').textContent = 'Für die Abstimmung braucht es mindestens drei Personen.'; return; }
+    if (settings.mode === 'vote' && names.length < 3) { $('setupError').textContent = 'Für die Abstimmung braucht es mindestens drei Personen'; return; }
     state = {
       phase: 'play', mode: settings.mode, cfg: drinkCfg(), code: role === 'host' ? host.code : undefined,
       players: shuffle(names).map((name) => ({ name, lives: settings.mode === 'vote' ? settings.voteLives : settings.lives, sips: 0, ex: 0, out: false, rc: 0, rq: 0 })),
@@ -538,7 +539,7 @@
       if (state.final) state.final.scores[p.name]++;
       state.verdict = { kind: 'right', name: p.name, left: c.right };
     } else {
-      if (c.wrong === 11) { p.ex++; addFx(p.name, 'Ex!', 'ex'); } else if (c.wrong) { p.sips += c.wrong; addFx(p.name, `${plural(c.wrong, 'Schluck', 'Schlucke')} trinken`); }
+      if (c.wrong === 11) { p.ex++; addFx(p.name, 'Ex', 'ex'); } else if (c.wrong) { p.sips += c.wrong; addFx(p.name, `${plural(c.wrong, 'Schluck', 'Schlucke')} trinken`); }
       let out = false;
       if (state.mode === 'classic') {
         p.lives--;
@@ -555,7 +556,7 @@
   function eliminate(p) {
     p.out = true;
     state.outOrder.push(p.name);
-    if (state.cfg.exOnOut) { p.ex++; addFx(p.name, 'Du fliegst – Ex!', 'ex'); } else addFx(p.name, 'Du fliegst!', 'out');
+    if (state.cfg.exOnOut) { p.ex++; addFx(p.name, 'Du fliegst – Ex', 'ex'); } else addFx(p.name, 'Du fliegst', 'out');
   }
   function give(target) {
     const v = state.verdict;
@@ -649,7 +650,7 @@
     if (out) eliminate(target);
     else {
       const l = state.cfg.lifeLoss ?? 2;
-      if (l === 11) { target.ex++; addFx(target.name, 'Dümmster der Runde – Ex!', 'ex'); }
+      if (l === 11) { target.ex++; addFx(target.name, 'Dümmster der Runde – Ex', 'ex'); }
       else if (l) { target.sips += l; addFx(target.name, `Dümmster der Runde – ${plural(l, 'Schluck', 'Schlucke')}`, 'ex'); }
     }
     state.voteRes = { target: target.name, counts, reason, out, lives: target.lives };
@@ -733,7 +734,7 @@
     const parts = [];
     parts.push(el('div', { className: 'turn', style: `--c: ${colorOf(p.name)}; margin-top: 14px` },
       el('span', { className: 'ini', textContent: initial(p.name) }),
-      el('div', {}, el('b', { textContent: isMe ? 'Du bist dran!' : `${p.name} ist dran` }),
+      el('div', {}, el('b', { textContent: isMe ? 'Du bist dran' : `${p.name} ist dran` }),
         el('span', { textContent: state.mode === 'classic' ? `noch ${plural(p.lives, 'Leben', 'Leben')}` : state.final ? `Finale: ${state.final.scores[p.name]} richtig` : `${p.rc} von ${p.rq} richtig · noch ${plural(p.lives, 'Leben', 'Leben')}` }))));
     const card = el('div', { className: 'qcard surface' },
       el('div', { className: 'qhead' }, el('span', { className: 'qcat', textContent: q.k }), el('span', { className: 'qtimer', id: 'qtimer' })),
@@ -748,7 +749,7 @@
         el('button', { className: 'right', textContent: '✓ Richtig', onclick: () => judge(true) }),
         el('button', { className: 'wrong', textContent: '✗ Falsch', onclick: () => judge(false) })));
     } else if (!v) {
-      parts.push(el('div', { className: 'waiting surface', textContent: state.revealed ? 'Der Quizmaster wertet …' : isMe ? 'Sag deine Antwort laut!' : `${p.name} antwortet …` }));
+      parts.push(el('div', { className: 'waiting surface', textContent: state.revealed ? 'Der Quizmaster wertet …' : isMe ? 'Sag deine Antwort laut' : `${p.name} antwortet …` }));
     }
     if (v) parts.push(verdictCard(v));
     if (v && canControl()) parts.push(el('button', { className: 'btn', textContent: nextLabel(), onclick: next }));
@@ -764,7 +765,7 @@
     const mine = v.name === me();
     const card = el('div', { className: 'verdict', style: `--c: ${v.kind === 'right' ? '#18803c' : v.kind === 'out' ? '#1c1c1f' : '#c8101e'}` });
     if (v.kind === 'right') {
-      card.append(el('b', { textContent: 'Richtig!' }), el('p', { textContent: v.left > 0 ? `${mine ? 'Du darfst' : `${v.name} darf`} noch ${plural(v.left, 'Schluck', 'Schlucke')} verteilen` : `${mine ? 'Du bist' : `${v.name} ist`} sicher.` }));
+      card.append(el('b', { textContent: 'Richtig' }), el('p', { textContent: v.left > 0 ? `${mine ? 'Du darfst' : `${v.name} darf`} noch ${plural(v.left, 'Schluck', 'Schlucke')} verteilen` : `${mine ? 'Du bist' : `${v.name} ist`} sicher.` }));
       if (v.left > 0 && canControl()) {
         card.append(el('div', { className: 'targets' }, ...state.players.filter((x) => x.name !== v.name).map((o) =>
           el('button', { textContent: o.name, style: `background: ${colorOf(o.name)}`, onclick: () => give(o.name) }))));
@@ -772,9 +773,9 @@
     } else if (v.kind === 'wrong') {
       const w = state.cfg.wrong;
       const drink = !drinkOn() ? (mine ? 'liegst daneben' : 'liegt daneben') : w === 11 ? (mine ? 'musst exen' : 'muss exen') : w ? (mine ? `trinkst ${w}` : `trinkt ${w}`) : (mine ? 'kommst davon' : 'kommt davon');
-      card.append(el('b', { textContent: 'Falsch!' }), el('p', { textContent: `${mine ? 'Du' : v.name} ${drink}${state.mode === 'classic' ? ` · noch ${plural(who.lives, 'Leben', 'Leben')}` : ''}` }));
+      card.append(el('b', { textContent: 'Falsch' }), el('p', { textContent: `${mine ? 'Du' : v.name} ${drink}${state.mode === 'classic' ? ` · noch ${plural(who.lives, 'Leben', 'Leben')}` : ''}` }));
     } else {
-      card.append(el('b', { textContent: mine ? 'Du fliegst!' : `${v.name} fliegt!` }), el('p', { textContent: state.cfg.exOnOut ? 'Keine Leben mehr – Ex!' : 'Keine Leben mehr.' }));
+      card.append(el('b', { textContent: mine ? 'Du fliegst' : `${v.name} fliegt` }), el('p', { textContent: state.cfg.exOnOut ? 'Keine Leben mehr – Ex' : 'Keine Leben mehr.' }));
     }
     return card;
   }
@@ -792,7 +793,7 @@
           el('p', { textContent: `Gib das Handy an ${voter.name}. Alle anderen schauen weg. (${state.voter + 1} von ${voters.length})` }),
           el('button', { className: 'btn', textContent: `Ich bin ${voter.name}`, onclick: () => { localVoteOpen = true; renderAny(); } }));
       } else {
-        box.append(el('h3', { textContent: 'Wer war der Dümmste?' }), el('p', { textContent: 'Deine Stimme ist geheim.' }),
+        box.append(el('h3', { textContent: 'Wer war der Dümmste?' }), el('p', { textContent: 'Deine Stimme ist geheim' }),
           voteGrid(voter.name, (t) => { localVoteOpen = false; castVote(voter.name, t); }));
       }
       return [box];
@@ -802,7 +803,7 @@
     const myVote = state.votes[myName];
     box.append(el('h3', { textContent: 'Wer war der Dümmste?' }));
     if (amVoter && !myVote) {
-      box.append(el('p', { textContent: 'Tippe geheim auf eine Person.' }), voteGrid(myName, (t) => {
+      box.append(el('p', { textContent: 'Tippe geheim auf eine Person' }), voteGrid(myName, (t) => {
         if (role === 'host') castVote(myName, t);
         else { net.send({ t: 'vote', name: guest.name, id: guest.id, target: t }); state.votes = { ...state.votes, [myName]: t }; renderAny(); }
       }));
@@ -823,9 +824,9 @@
     const max = Math.max(1, ...Object.values(r.counts));
     const parts = [
       el('div', { className: 'verdict', style: `--c: ${colorOf(r.target)}` },
-        el('b', { textContent: r.out === false ? (mine ? 'Du bist der Dümmste!' : `${r.target} ist der Dümmste!`) : mine ? 'Du fliegst!' : `${r.target} fliegt!` }),
+        el('b', { textContent: r.out === false ? (mine ? 'Du bist der Dümmste' : `${r.target} ist der Dümmste`) : mine ? 'Du fliegst' : `${r.target} fliegt` }),
         el('p', { textContent: r.out === false
-          ? `Ein Leben weg – noch ${plural(r.lives, 'Leben', 'Leben')}. ${state.cfg.lifeLoss === 11 ? 'Ex!' : state.cfg.lifeLoss ? `${plural(state.cfg.lifeLoss, 'Schluck', 'Schlucke')} trinken.` : ''} ${r.reason}`
+          ? `Ein Leben weg – noch ${plural(r.lives, 'Leben', 'Leben')}. ${state.cfg.lifeLoss === 11 ? 'Ex' : state.cfg.lifeLoss ? `${plural(state.cfg.lifeLoss, 'Schluck', 'Schlucke')} trinken.` : ''} ${r.reason}`
           : `${state.cfg.exOnOut ? 'Ex! ' : ''}${r.reason}` })),
       el('div', { className: 'vote surface' }, el('h3', { textContent: 'Stimmen' }),
         el('div', { className: 'bars' }, ...Object.entries(r.counts).sort((a, b) => b[1] - a[1]).map(([n, c]) =>
@@ -846,7 +847,7 @@
     const win = state.players.find((p) => p.name === state.winner) || state.players[0];
     const w = $('winner');
     w.style.setProperty('--c', colorOf(win.name));
-    w.replaceChildren(el('span', { className: 'crown' }, window.Klirr ? Klirr.icon('crown') : null), el('div', { className: 'ini', textContent: initial(win.name) }), el('b', { textContent: win.name === me() ? 'Du gewinnst!' : win.name }),
+    w.replaceChildren(el('span', { className: 'crown' }, window.Klirr ? Klirr.icon('crown') : null), el('div', { className: 'ini', textContent: initial(win.name) }), el('b', { textContent: win.name === me() ? 'Du gewinnst' : win.name }),
       el('span', { textContent: state.mode === 'classic' ? (win.out ? 'hat am längsten durchgehalten' : `gewinnt mit ${plural(win.lives, 'Leben', 'Leben')} übrig`) : 'ist der Klügste der Runde' }));
     $('ranking').replaceChildren(...state.rank.map((name, i) => {
       const p = state.players.find((x) => x.name === name);
@@ -942,8 +943,8 @@
     const code = $('joinCode').value.trim().toUpperCase();
     const name = $('joinName').value.trim().slice(0, 24);
     $('joinError').textContent = '';
-    if (!/^[A-Z0-9]{4}$/.test(code)) { $('joinError').textContent = 'Der Raumcode hat 4 Zeichen.'; return; }
-    if (!name) { $('joinError').textContent = 'Bitte deinen Namen eintragen.'; return; }
+    if (!/^[A-Z0-9]{4}$/.test(code)) { $('joinError').textContent = 'Der Raumcode hat 4 Zeichen'; return; }
+    if (!name) { $('joinError').textContent = 'Bitte deinen Namen eintragen'; return; }
     store.set('dumm-myname', name);
     guest = { code, name, id: guest?.code === code && guest?.name === name ? guest.id : (crypto.randomUUID?.() || String(Math.random())) };
     store.set('dumm-guest', guest);
