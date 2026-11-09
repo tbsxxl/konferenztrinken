@@ -90,6 +90,15 @@
     .verdict p { margin: 8px 0 0; font-weight: 600; }
     .score { display: grid; grid-template-columns: 1fr auto; padding: 12px 16px; position: relative; }
     .score + .score::before { content: ""; position: absolute; top: 0; left: 18px; right: 0; border-top: 0.5px solid var(--sep); }
+    .tvbox { padding: 16px; display: grid; gap: 12px; text-align: center; }
+    .tvbox .code { font: 600 2.6rem/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; letter-spacing: 0.18em; }
+    .tvbox .hint { color: var(--secondary); font-size: 0.9rem; }
+    .tvbox .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .tvbox .row button, .tvbox > button { min-height: 44px; border: 0; border-radius: 12px; background: var(--fill); color: var(--label); font: inherit; font-weight: 600; }
+    .netpill { display: inline-flex; align-items: center; gap: 6px; font-weight: 500; }
+    .netpill::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #8e8e93; }
+    .netpill.on::before { background: #30d158; }
+    .netpill.off::before { background: #ff453a; }
   </style>
 </head>
 <body>
@@ -118,6 +127,10 @@
       <label class="cell drink-only"><span>Trinkmodus<small class="sub">Ausschalten geht auch über das Logo im Hub.</small></span><input type="checkbox" class="switch" data-klirr-drink /></label>
       <div class="mode-info drink-only" style="padding-top:10px">Trinken: Pro übersprungenem Begriff trinkt das Team je 1 Schluck. Am Ende exen alle aus den Verliererteams.</div>
     </div>
+
+    <h2 class="sec">Fernseher <small class="netpill" id="tvNet" hidden></small></h2>
+    <div class="list"><div class="tvbox" id="tvBox"></div></div>
+    <p class="foot">Ein zweites Gerät am Fernseher öffnet <b id="tvHost">klirr/tv</b> und gibt den Code ein – zum Beispiel ein iPad per AirPlay. Der Begriff erscheint dort nie.</p>
 
     <div class="cta-bar">
       <button class="btn" id="start">Spiel starten</button>
@@ -194,7 +207,7 @@
   // ---------- Spielzustand ----------
   // phase: intro (wer, welche Art) → level (Schwierigkeit) → ready → play (Uhr läuft, Begriff für Begriff) → last (Zeit um) → after (Bilanz) → … → end
   let S = store.get('zeigs-state', null);
-  const save = () => store.set('zeigs-state', S);
+  const save = () => { store.set('zeigs-state', S); tvPush(); };
   const show = (id) => { ['setup', 'game'].forEach((s) => { $(s).hidden = s !== id; }); };
 
   function pickWord(level) {
@@ -377,13 +390,25 @@
       for (const s of strokes) { ctx.beginPath(); s.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); if (s.length === 1) ctx.lineTo(s[0][0] + 0.1, s[0][1]); ctx.stroke(); }
     };
     const pos = (e) => { const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
-    cv.addEventListener('pointerdown', (e) => { cv.setPointerCapture(e.pointerId); cur = [pos(e)]; strokes.push(cur); redraw(); });
-    cv.addEventListener('pointermove', (e) => { if (!cur) return; cur.push(pos(e)); redraw(); });
-    ['pointerup', 'pointercancel'].forEach((ev) => cv.addEventListener(ev, () => { cur = null; }));
+    // An den Fernseher: Striche auf 0–1000 normiert, mit Seitenverhältnis
+    const share = () => {
+      const r = cv.getBoundingClientRect(); if (!r.width) return;
+      tvPad = { aspect: r.width / r.height, strokes: strokes.map((st) => st.map(([x, y]) => [Math.round((x / r.width) * 1000), Math.round((y / r.height) * 1000)])) };
+      tvPush();
+    };
+    cv.addEventListener('pointerdown', (e) => { cv.setPointerCapture(e.pointerId); cur = [pos(e)]; strokes.push(cur); redraw(); share(); });
+    cv.addEventListener('pointermove', (e) => {
+      if (!cur) return;
+      const p = pos(e), last = cur[cur.length - 1];
+      if (Math.hypot(p[0] - last[0], p[1] - last[1]) < 3) return;
+      cur.push(p); redraw(); share();
+    });
+    ['pointerup', 'pointercancel'].forEach((ev) => cv.addEventListener(ev, () => { cur = null; share(); }));
+    tvPad = { aspect: 1, strokes: [] }; tvPush();
     requestAnimationFrame(fit);
     const tools = el('div', { className: 'padtools' },
-      el('button', { textContent: 'Rückgängig', onclick: () => { strokes.pop(); redraw(); } }),
-      el('button', { textContent: 'Löschen', onclick: () => { strokes.length = 0; redraw(); } }));
+      el('button', { textContent: 'Rückgängig', onclick: () => { strokes.pop(); redraw(); share(); } }),
+      el('button', { textContent: 'Löschen', onclick: () => { strokes.length = 0; redraw(); share(); } }));
     return [wrap, tools];
   }
 
@@ -425,6 +450,65 @@
       el('button', { className: 'btn', textContent: 'Nochmal mit denselben Teams', onclick: () => { split = S.teams.map((t) => t.players); store.set('zeigs-split', split); startGame(); } }),
       el('button', { className: 'btn ghost', textContent: 'Teams & Regeln', onclick: () => { S.aborted = true; save(); render(); } })];
   }
+
+  // ---------- Fernseher (zweites Gerät, z. B. iPad per AirPlay) ----------
+  // Dieses Handy ist Gastgeber eines Raums und schickt einen öffentlichen Stand – nie den Begriff.
+  let tv = store.get('zeigs-tv', null);   // { code, hostKey }
+  let tvNet = null, tvPad = { aspect: 1, strokes: [] }, tvQueued = false;
+  function connect(code, onMessage, onStatus) {
+    let ws, tries = 0, closed = false;
+    const conn = { send: (msg) => { if (ws?.readyState === 1) ws.send(JSON.stringify(msg)); }, close: () => { closed = true; ws?.close(); }, onopen: null };
+    const open = () => {
+      ws = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/api/room/${code}/ws`);
+      ws.onopen = () => { tries = 0; onStatus(true); conn.onopen?.(); };
+      ws.onmessage = (e) => { try { onMessage(JSON.parse(e.data)); } catch {} };
+      ws.onclose = () => { onStatus(false); if (!closed) setTimeout(open, Math.min(8000, 500 * 2 ** tries++)); };
+    };
+    open();
+    return conn;
+  }
+  function tvState() {
+    if (!S || S.aborted) return { game: 'zeigs', phase: 'lobby' };
+    const playing = S.phase === 'play';
+    return {
+      game: 'zeigs', phase: S.phase, turn: S.turn, goal: S.cfg.goal, time: S.cfg.time,
+      teams: S.teams.map((t) => ({ name: t.name, color: t.color, score: t.score, players: t.players })),
+      team: S.team, actor: S.actor, mode: S.mode, modeLabel: MODES[S.mode]?.[1], everyone: S.everyone, level: S.level,
+      got: (S.log || []).filter((x) => x.by !== null).length,
+      left: playing && S.deadline ? Math.max(0, S.deadline - Date.now()) : null,
+      pad: playing && S.mode === 'draw' && S.cfg.pad ? tvPad : null,
+      last: S.phase === 'after' ? { team: S.last.team, pts: S.last.pts, log: S.last.log.map((x) => ({ w: x.w, by: x.by })) } : null,
+      winner: S.phase === 'end' ? S.winner : null,
+    };
+  }
+  function tvPush() {
+    if (!tvNet || tvQueued) return;
+    tvQueued = true;
+    setTimeout(() => { tvQueued = false; tvNet?.send({ t: 'state', state: tvState() }); }, 80);
+  }
+  function tvStatus(on) { const pl = $('tvNet'); pl.hidden = false; pl.classList.toggle('on', on); pl.classList.toggle('off', !on); pl.textContent = on ? 'verbunden' : 'getrennt'; }
+  function tvStart() {
+    if (!tv) return;
+    tvNet?.close();
+    tvNet = connect(tv.code, (msg) => { if (msg.t === 'host-ok' || msg.t === 'join') tvPush(); }, tvStatus);
+    tvNet.onopen = () => tvNet.send({ t: 'host', hostKey: tv.hostKey });
+  }
+  async function tvCreate() {
+    const res = await fetch('/api/room/new', { method: 'POST' }).catch(() => null);
+    const data = res?.ok ? await res.json() : null;
+    if (!data?.code) { window.Klirr?.note('Fernseher-Code konnte nicht erstellt werden'); return; }
+    tv = data; store.set('zeigs-tv', tv); tvStart(); renderTv();
+  }
+  function renderTv() {
+    $('tvHost').textContent = `${location.host}/tv`;
+    if (!tv) { $('tvBox').replaceChildren(el('button', { textContent: 'Fernseher verbinden', onclick: tvCreate })); return; }
+    $('tvBox').replaceChildren(el('div', { className: 'hint', textContent: 'Code für den Fernseher' }), el('div', { className: 'code', textContent: tv.code }),
+      el('div', { className: 'row' },
+        el('button', { textContent: 'Neuer Code', onclick: tvCreate }),
+        el('button', { textContent: 'Trennen', onclick: () => { tvNet?.close(); tvNet = null; tv = null; store.set('zeigs-tv', null); $('tvNet').hidden = true; renderTv(); } })));
+  }
+  renderTv();
+  tvStart();
 
   // ---------- Start ----------
   window.addEventListener('DOMContentLoaded', () => { window.Klirr?.moreMenu(document.querySelector('#game .lt'), $('gameMini'), [{ label: 'Datenschutz', href: '/datenschutz.html' }]); render(); });

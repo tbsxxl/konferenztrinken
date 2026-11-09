@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="de" data-drink="off">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="darkreader-lock" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#0a0a10" />
+  <title>Fernseher · Klirr</title>
+  <meta name="description" content="Fernseh-Ansicht für Klirr: Spielstand und Zeichnung groß auf dem Fernseher, ohne geheime Begriffe." />
+  <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <script src="/klirr.js" defer></script>
+  <style>
+    /* Fernseher: immer dunkel, groß, ohne Bedienelemente während des Spiels */
+    :root { --bg: #0a0a10; --cell: #1b1926; --label: #f2f2f7; --secondary: rgba(235, 235, 245, 0.7); --fill: rgba(120, 120, 128, 0.24); --amber: #ffb340; color-scheme: dark; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; background: radial-gradient(120% 70% at 50% -10%, #1d1930, transparent 60%), var(--bg); color: var(--label); font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", Inter, system-ui, sans-serif; overflow: hidden; }
+    .screen { position: fixed; inset: 0; padding: 4vmin 5vmin; display: grid; grid-template-columns: minmax(0, 1fr) clamp(220px, 26vw, 420px); gap: 4vmin; }
+    .main { min-width: 0; display: grid; align-content: center; justify-items: center; text-align: center; gap: 2.4vmin; }
+    .side { display: grid; align-content: center; gap: 1.6vmin; }
+    .eyebrow { color: var(--secondary); font-weight: 500; font-size: clamp(16px, 2.4vmin, 28px); }
+    h1 { margin: 0; font-weight: 600; font-size: clamp(32px, 7vmin, 96px); line-height: 1.05; letter-spacing: -0.01em; }
+    .sub { color: var(--secondary); font-size: clamp(18px, 3vmin, 36px); }
+    .mode { display: inline-flex; align-items: center; gap: 1.2vmin; font-size: clamp(22px, 4vmin, 52px); font-weight: 600; }
+    .mode .kl-ico { width: 1.2em; height: 1.2em; }
+    .timer { font: 600 clamp(80px, 30vmin, 360px)/0.9 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; font-variant-numeric: tabular-nums; }
+    .timer.low { color: #ff6961; }
+    .tbar { width: min(60vw, 900px); height: 1.2vmin; min-height: 8px; border-radius: 99px; background: var(--fill); overflow: hidden; }
+    .tbar i { display: block; height: 100%; background: var(--amber); }
+    .pill { display: inline-block; padding: 0.6vmin 2vmin; border-radius: 99px; background: var(--fill); font-weight: 600; font-size: clamp(16px, 2.6vmin, 30px); }
+    .team { border-radius: 2vmin; padding: 1.6vmin 2vmin; background: var(--cell); position: relative; }
+    .team small { display: flex; align-items: center; gap: 1vmin; color: var(--secondary); font-weight: 600; font-size: clamp(14px, 2.2vmin, 26px); }
+    .team small::before { content: ""; width: 1.4vmin; height: 1.4vmin; min-width: 10px; min-height: 10px; border-radius: 50%; background: var(--c); }
+    .team b { display: block; font: 600 clamp(32px, 7vmin, 88px)/1 -apple-system, "SF Pro Rounded", ui-rounded, Inter, sans-serif; font-variant-numeric: tabular-nums; }
+    .team .bar { height: 0.8vmin; min-height: 5px; border-radius: 99px; background: var(--fill); margin-top: 1vmin; overflow: hidden; }
+    .team .bar i { display: block; height: 100%; background: var(--c); }
+    .team.on::after { content: ""; position: absolute; right: 1.6vmin; top: 1.6vmin; width: 3vmin; height: 3vmin; min-width: 20px; min-height: 20px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3CclipPath id='a'%3E%3Ccircle cx='9.5' cy='13.5' r='7'/%3E%3C/clipPath%3E%3C/defs%3E%3Ccircle cx='9.5' cy='13.5' r='7' fill='%23ffffff' fill-opacity='.35'/%3E%3Ccircle cx='14.5' cy='9.5' r='6' fill='%23ffffff' fill-opacity='.35'/%3E%3Ccircle cx='14.5' cy='9.5' r='6' fill='%23ffb340' clip-path='url(%23a)'/%3E%3C/svg%3E") center / contain no-repeat; }
+    .goal { color: var(--secondary); font-size: clamp(14px, 2vmin, 24px); text-align: right; }
+    .board { width: 100%; height: calc(100vh - 8vmin); display: grid; place-items: center; }
+    .canvaswrap { position: relative; max-width: 100%; max-height: 100%; border-radius: 2vmin; overflow: hidden; background: #fff; }
+    .canvaswrap canvas { display: block; width: 100%; height: 100%; }
+    .corner { position: absolute; right: 1.6vmin; top: 1.2vmin; padding: 0.4vmin 1.2vmin; border-radius: 1vmin; background: rgba(255, 255, 255, 0.85); font: 600 clamp(28px, 6vmin, 72px)/1 -apple-system, ui-rounded, sans-serif; color: #111; font-variant-numeric: tabular-nums; }
+    .words { width: min(60vw, 900px); display: grid; gap: 0.8vmin; text-align: left; }
+    .words div { display: flex; justify-content: space-between; padding: 1vmin 2vmin; border-radius: 1.4vmin; background: var(--cell); font-size: clamp(18px, 3vmin, 34px); }
+    .words .miss { color: var(--secondary); }
+    /* Verbinden */
+    .join { position: fixed; inset: 0; display: grid; place-items: center; padding: 24px; }
+    .join form { width: min(440px, 100%); display: grid; gap: 16px; text-align: center; }
+    .join input { width: 100%; min-height: 72px; border: 0; border-radius: 16px; background: var(--fill); color: var(--label); text-align: center; font: 600 2.6rem/1 -apple-system, ui-rounded, sans-serif; letter-spacing: 0.2em; text-transform: uppercase; }
+    .join button { min-height: 52px; border: 0; border-radius: 14px; background: var(--amber); color: #1a1206; font: 600 1.1rem/1 inherit; font-family: inherit; }
+    .join p { margin: 0; color: var(--secondary); line-height: 1.4; }
+    .status { position: fixed; left: 5vmin; bottom: 3vmin; color: var(--secondary); font-size: clamp(12px, 1.6vmin, 18px); }
+    [hidden] { display: none !important; }
+    @media (orientation: portrait) { .screen { grid-template-columns: 1fr; grid-template-rows: 1fr auto; } .side { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); } .goal { display: none; } }
+  </style>
+</head>
+<body>
+  <div class="join" id="join">
+    <form id="joinForm">
+      <div class="eyebrow">Klirr am Fernseher</div>
+      <h1 style="font-size:2rem">Code eingeben</h1>
+      <input id="code" maxlength="4" autocomplete="off" autocapitalize="characters" aria-label="Code" />
+      <button type="submit">Verbinden</button>
+      <p>Den Code zeigt das Spiel-Handy unter „Fernseher“. Dieses Gerät zeigt nur, was alle sehen dürfen – geheime Begriffe nie.</p>
+      <p id="err" style="color:#ff6961"></p>
+    </form>
+  </div>
+  <div class="screen" id="screen" hidden>
+    <div class="main" id="main"></div>
+    <div class="side" id="side"></div>
+  </div>
+  <div class="status" id="status" hidden></div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const el = (tag, props = {}, ...children) => { const n = Object.assign(document.createElement(tag), props); n.append(...children.filter((c) => c !== null && c !== undefined && c !== false)); return n; };
+  const LEVELS = { 1: 'leicht', 2: 'mittel', 3: 'schwer' };
+  let P = null, deadline = null, ws = null, code = '', tries = 0, wake = null;
+  const id = (() => { try { return localStorage.getItem('tv-id') || (localStorage.setItem('tv-id', crypto.randomUUID?.() || String(Math.random())), localStorage.getItem('tv-id')); } catch { return String(Math.random()); } })();
+
+  function connect() {
+    ws = new WebSocket(`${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/api/room/${code}/ws`);
+    ws.onopen = () => { tries = 0; status('verbunden'); ws.send(JSON.stringify({ t: 'join', name: 'Fernseher', id })); };
+    ws.onmessage = (e) => { try { const m = JSON.parse(e.data); if (m.t === 'state') { P = m.state; deadline = P.left != null ? Date.now() + P.left : null; render(); } } catch {} };
+    ws.onclose = () => { status('getrennt – verbinde neu …'); setTimeout(connect, Math.min(8000, 500 * 2 ** tries++)); };
+  }
+  function status(t) { $('status').hidden = false; $('status').textContent = `Raum ${code} · ${t}`; }
+  $('joinForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const c = $('code').value.trim().toUpperCase();
+    if (!/^[A-Z0-9]{4}$/.test(c)) { $('err').textContent = 'Der Code hat 4 Zeichen'; return; }
+    start(c);
+  });
+  function start(c) {
+    code = c;
+    history.replaceState(null, '', `/tv.html?raum=${c}`);
+    $('join').hidden = true; $('screen').hidden = false;
+    try { navigator.wakeLock?.request('screen').then((w) => { wake = w; }).catch(() => {}); } catch {}
+    render(); connect();
+  }
+
+  const icon = (name) => (window.Klirr ? Klirr.icon(name) : null);
+  function side() {
+    if (!P.teams) return [];
+    return [el('div', { className: 'goal', textContent: `Ziel ${P.goal} Punkte` }),
+      ...P.teams.map((t, i) => el('div', { className: `team${i === P.team && P.phase !== 'end' ? ' on' : ''}`, style: `--c: ${t.color}` },
+        el('small', { textContent: t.name }), el('b', { textContent: t.score }),
+        el('div', { className: 'bar' }, el('i', { style: `width:${Math.min(100, (t.score / P.goal) * 100)}%` }))))];
+  }
+  function main() {
+    if (!P || P.phase === 'lobby') return [el('div', { className: 'eyebrow', textContent: 'Zeig’s!' }), el('h1', { textContent: 'Gleich geht’s los' }), el('div', { className: 'sub', textContent: 'Erklären · Zeichnen · Vormachen' })];
+    const t = P.teams[P.team];
+    if (['intro', 'level', 'ready'].includes(P.phase)) return [
+      el('div', { className: 'eyebrow', textContent: `Zug ${P.turn}` }), el('h1', { textContent: `${t.name} ist dran` }),
+      el('div', { className: 'mode', style: `color:${t.color === '#b85400' ? '#ff9f43' : '#fff'}` }, icon(P.mode), `${P.actor} · ${P.modeLabel}`),
+      P.level ? el('div', { className: 'sub', textContent: `${LEVELS[P.level]} · ${P.level} ${P.level === 1 ? 'Punkt' : 'Punkte'} je Begriff` }) : null,
+      P.everyone ? el('span', { className: 'pill', textContent: 'Alle raten mit' }) : null];
+    if (P.phase === 'play' && P.pad) return [drawing()];
+    if (P.phase === 'play') return [
+      el('div', { className: 'mode' }, icon(P.mode), `${P.actor} · ${P.modeLabel}`),
+      el('div', { className: 'timer', id: 'timer' }), el('div', { className: 'tbar' }, el('i', { id: 'tbar' })),
+      el('div', { className: 'sub', textContent: `${P.got} geschafft` })];
+    if (P.phase === 'last') return [el('h1', { textContent: 'Zeit ist um' }), el('div', { className: 'sub', textContent: `${P.got} geschafft – der letzte Begriff wird noch gewertet` })];
+    if (P.phase === 'after') {
+      const got = P.last.log.filter((x) => x.by !== null).length;
+      return [el('div', { className: 'eyebrow', textContent: P.last.team }), el('h1', { textContent: `${got} ${got === 1 ? 'Begriff' : 'Begriffe'} geschafft` }),
+        el('div', { className: 'words' }, ...P.last.log.slice(-8).map((x) => el('div', { className: x.by === null ? 'miss' : '' }, el('span', { textContent: x.w }), el('span', { textContent: x.by === null ? '–' : `+${P.last.pts}` }))))];
+    }
+    if (P.phase === 'end') { const w = P.teams[P.winner]; return [el('div', { className: 'eyebrow', textContent: 'Spielende' }), el('h1', { textContent: `${w.name} gewinnt` }), el('div', { className: 'sub', textContent: `${w.players.join(', ')} · ${w.score} Punkte` })]; }
+    return [];
+  }
+  // Zeichnung: Striche kommen normiert (0–1000) mit dem Seitenverhältnis des Handys
+  let cv = null;
+  function drawing() {
+    const wrap = el('div', { className: 'board' });
+    const box = el('div', { className: 'canvaswrap' });
+    cv = el('canvas');
+    box.append(cv, el('div', { className: 'corner', id: 'timer' }));
+    wrap.append(box);
+    requestAnimationFrame(() => {
+      const W = wrap.clientWidth, H = wrap.clientHeight, a = P.pad.aspect || 1;
+      const w = Math.min(W, H * a), h = w / a;
+      box.style.width = `${w}px`; box.style.height = `${h}px`;
+      paint();
+    });
+    return wrap;
+  }
+  function paint() {
+    if (!cv || !P?.pad) return;
+    const r = cv.getBoundingClientRect(); const dpr = window.devicePixelRatio || 1;
+    if (!r.width) return;
+    cv.width = r.width * dpr; cv.height = r.height * dpr;
+    const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.lineWidth = Math.max(4, r.width / 140); ctx.strokeStyle = '#111';
+    for (const st of P.pad.strokes) {
+      ctx.beginPath();
+      st.forEach(([x, y], i) => { const px = (x / 1000) * r.width, py = (y / 1000) * r.height; i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); });
+      if (st.length === 1) ctx.lineTo((st[0][0] / 1000) * r.width + 0.1, (st[0][1] / 1000) * r.height);
+      ctx.stroke();
+    }
+  }
+  // Nur neu aufbauen, wenn sich mehr als die Zeichnung geändert hat – sonst nur malen (kein Flackern)
+  let lastKey = '';
+  function render() {
+    const key = JSON.stringify({ ...P, pad: P?.pad ? { a: P.pad.aspect } : null, left: null });
+    if (key === lastKey && P?.pad) { paint(); return; }
+    lastKey = key;
+    cv = null;
+    $('main').replaceChildren(...main().filter(Boolean));
+    $('side').replaceChildren(...(P ? side() : []));
+    tick();
+  }
+  function tick() {
+    const t = $('timer'); if (!t || !deadline || !P) return;
+    const left = Math.max(0, deadline - Date.now());
+    const sec = Math.ceil(left / 1000);
+    t.textContent = sec; t.classList.toggle('low', sec <= 10);
+    const bar = $('tbar'); if (bar) bar.style.width = `${(left / (P.time * 1000)) * 100}%`;
+  }
+  setInterval(tick, 200);
+  window.addEventListener('resize', () => { lastKey = ''; if (P) render(); });
+  window.addEventListener('DOMContentLoaded', () => { if (P) { lastKey = ''; render(); } });
+
+  const q = (new URLSearchParams(location.search).get('raum') || '').toUpperCase();
+  if (/^[A-Z0-9]{4}$/.test(q)) start(q);
+</script>
+</body>
+</html>

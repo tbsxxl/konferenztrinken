@@ -2,7 +2,7 @@
 
 Trinkspiele für deine Runde.
 
-Hub mit Trinkspielen: **Konferenztrinken** (`/konferenz.html`), **Der Dümmste fliegt** (`/dumm.html`), **Imposter** (`/imposter.html`, Wörter in `public/imposter-woerter.js`), **Zeig’s!** (`/zeigs.html`, Erklären/Zeichnen/Vormachen im Team, Begriffe in `public/zeigs-begriffe.js`) und Punktezähler **Wizard** (`/wizard/`) und **Flip 7** (`/flip7/`, beide übernommen aus den gleichnamigen Repos, ohne eigenen Service Worker; gemeinsame Klirr-Schicht `public/klirr-game.css`) sowie **Bundesliga Tic Tac Toe** (`/tictactoe/`, übernommen aus `tbsxxl/bundesliga-tictactoe`; API in `src/tictactoe.js`: `/api/tm`, `/api/names`, `/api/img`). Startseite `/` ist der Hub, das Design liegt gemeinsam in `public/app.css`, die Mitspielerliste gilt für alle Spiele.
+Hub mit Trinkspielen: **Konferenztrinken** (`/konferenz.html`), **Der Dümmste fliegt** (`/dumm.html`), **Imposter** (`/imposter.html`, Wörter in `public/imposter-woerter.js`), **Zeig’s!** (`/zeigs.html`, Erklären/Zeichnen/Vormachen im Team, Begriffe in `public/zeigs-begriffe.js`, Fernseh-Ansicht `/tv.html` über einen Raum) und Punktezähler **Wizard** (`/wizard/`) und **Flip 7** (`/flip7/`, beide übernommen aus den gleichnamigen Repos, ohne eigenen Service Worker; gemeinsame Klirr-Schicht `public/klirr-game.css`) sowie **Bundesliga Tic Tac Toe** (`/tictactoe/`, übernommen aus `tbsxxl/bundesliga-tictactoe`; API in `src/tictactoe.js`: `/api/tm`, `/api/names`, `/api/img`). Startseite `/` ist der Hub, das Design liegt gemeinsam in `public/app.css`, die Mitspielerliste gilt für alle Spiele.
 
 ## Der Dümmste fliegt
 
