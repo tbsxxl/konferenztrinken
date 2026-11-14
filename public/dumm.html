@@ -43,7 +43,8 @@
     .qtimer.low { color: #ff6b6b; }
     .qtext { font-size: 1.45rem; font-weight: 600; line-height: 1.3; margin: 16px 0 4px; letter-spacing: -0.01em; }
     .qanswer { margin-top: 16px; padding: 16px 16px; border-radius: 16px; background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.08); font: 600 1.65rem/1.15 var(--display);  letter-spacing: 0.01em; }
-    .qanswer small { display: block; font: 600 0.75rem/1.2 Inter, system-ui, sans-serif;  color: rgba(255, 255, 255, 0.55); margin-bottom: 4px;  }
+    .qanswer small { display: block; font: 600 0.75rem/1.2 Inter, system-ui, sans-serif;  color: var(--secondary); margin-bottom: 4px;  }
+    .qrange { display: block; margin-top: 6px; font: 600 0.85rem/1.3 Inter, system-ui, sans-serif; color: var(--secondary); }
     .qanswer.timeout small { color: #ff6b6b; }
     .judge { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
     .judge button { min-height: 62px; border: 0; border-radius: 20px; color: #fff; font: 600 1.4rem/1 var(--display);   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2); }
@@ -257,6 +258,7 @@
 
 <script src="/dumm-fragen.js"></script>
 <script src="/dumm-fragen-2.js"></script>
+  <script src="/dumm-fragen-3.js"></script>
 <script>
   const $ = (id) => document.getElementById(id);
   const el = (tag, props = {}, ...children) => { const n = Object.assign(document.createElement(tag), props); n.append(...children.filter((c) => c !== null && c !== undefined && c !== false)); return n; };
@@ -305,6 +307,10 @@
   // Ab Version 2 hat auch der Abstimmungsmodus standardmäßig Leben (vorher: einmal Dümmster = raus)
   if (!settings.sv) { if (settings.voteLives === 1) settings.voteLives = DEFAULTS.voteLives; settings.sv = 2; store.set('dumm-settings', settings); }
   settings.cats = (settings.cats || []).filter((c) => CATS.includes(c));
+  // Neu hinzugekommene Kategorien sind auch bei gespeicherter Auswahl erst einmal an
+  const seen = settings.known || ['Allgemeinwissen', 'Geografie', 'Geschichte', 'Sport', 'Musik', 'Film & Serien', 'Wissenschaft', 'Essen & Trinken', 'Deutschland', 'Tiere', 'Technik', 'Literatur', 'Kunst & Kultur'];
+  const fresh = CATS.filter((c) => !seen.includes(c) && !settings.cats.includes(c));
+  if (fresh.length || !settings.known) { settings.cats = [...settings.cats, ...fresh]; settings.known = CATS; store.set('dumm-settings', settings); }
   if (!settings.cats.length) settings.cats = CATS;
   const LIMITS = { lives: [1, 9], voteLives: [1, 9], lifeLoss: [0, 11], perRound: [1, 4], wrong: [0, 11], right: [0, 5] };
   // „Falsche Antwort“: 1–10 Schlucke, 11 = Ex, 0 = nichts
@@ -733,6 +739,15 @@
     });
   }
 
+  // Schätzfragen gelten als richtig, wenn die Antwort höchstens 5 % daneben liegt
+  function range(q) {
+    if (typeof q.n !== 'number') return '';
+    const small = q.n < 100;
+    const fmt = (x) => x.toLocaleString('de-DE', { maximumFractionDigits: small ? (q.n < 10 ? 2 : 1) : 0 });
+    const lo = small ? q.n * 0.95 : Math.ceil(q.n * 0.95), hi = small ? q.n * 1.05 : Math.floor(q.n * 1.05);
+    return `Richtig von ${fmt(lo)} bis ${fmt(hi)} (±5 %)`;
+  }
+
   // Antworten eines Spielers: diese Runde zuerst, darunter ältere
   function showHistory(name) {
     const mine = (state?.log || []).filter((x) => x.n === name);
@@ -751,7 +766,7 @@
         const q = FRAGEN[x.q];
         group.append(el('div', { className: 'hist-row' + (x.ok ? ' ok' : ' bad') },
           el('span', { className: 'hist-mark', textContent: x.ok ? '✓' : '✗', 'aria-label': x.ok ? 'richtig' : 'falsch' }),
-          el('div', {}, el('div', { textContent: q?.f || '' }), el('small', { textContent: `Antwort: ${q?.a || ''}` }))));
+          el('div', {}, el('div', { textContent: q?.f || '' }), el('small', { textContent: `Antwort: ${q?.a || ''}${q && range(q) ? ' · ' + range(q) : ''}` }))));
       }
     }
     const cancel = el('button', { type: 'button', className: 'kl-sheet-btn cancel', textContent: 'Schließen', onclick: close });
@@ -783,7 +798,7 @@
     const card = el('div', { className: 'qcard surface' },
       el('div', { className: 'qhead' }, el('span', { className: 'qcat', textContent: q.k }), el('span', { className: 'qtimer', id: 'qtimer' })),
       el('div', { className: 'qtext', textContent: q.f }));
-    if (state.revealed) card.append(el('div', { className: 'qanswer' + (state.timedOut ? ' timeout' : '') }, el('small', { textContent: state.timedOut ? 'Zeit um! Richtige Antwort' : 'Richtige Antwort' }), q.a));
+    if (state.revealed) card.append(el('div', { className: 'qanswer' + (state.timedOut ? ' timeout' : '') }, el('small', { textContent: state.timedOut ? 'Zeit um! Richtige Antwort' : 'Richtige Antwort' }), q.a, range(q) ? el('span', { className: 'qrange', textContent: range(q) }) : null));
     parts.push(card);
 
     const v = state.verdict;
