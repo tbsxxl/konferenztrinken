@@ -129,6 +129,15 @@
     .fx { position: fixed; left: 12px; right: 12px; top: calc(12px + env(safe-area-inset-top)); z-index: 40; max-width: 520px; margin: 0 auto; padding: 16px; border-radius: 24px; text-align: center; background: var(--c, #d20515); color: #fff; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45); animation: pop 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
     .fx b { display: block; font: 600 2.1rem/1.05 var(--display);  }
     .room .code, .code-input { text-transform: uppercase; letter-spacing: 0.18em; }
+    button.dp { width: 100%; border: 0; text-align: left; font: inherit; cursor: pointer; }
+    .hist { max-height: 70vh; overflow-y: auto; }
+    .hist-r { padding: 12px 16px 4px; color: var(--secondary); font-size: 0.8rem; font-weight: 600; }
+    .hist-row { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 8px; padding: 8px 16px; text-align: left; }
+    .hist-row small { display: block; color: var(--secondary); margin-top: 2px; }
+    .hist-mark { font-weight: 600; }
+    .hist-row.ok .hist-mark { color: #30d158; }
+    .hist-row.bad .hist-mark { color: #ff6961; }
+    @media (prefers-color-scheme: light) { .hist-row.ok .hist-mark { color: #1a7f37; } .hist-row.bad .hist-mark { color: #c4001a; } }
   </style>
   <link rel="stylesheet" href="/apple.css" />
   <script src="/klirr.js" defer></script>
@@ -247,6 +256,7 @@
 </main>
 
 <script src="/dumm-fragen.js"></script>
+<script src="/dumm-fragen-2.js"></script>
 <script>
   const $ = (id) => document.getElementById(id);
   const el = (tag, props = {}, ...children) => { const n = Object.assign(document.createElement(tag), props); n.append(...children.filter((c) => c !== null && c !== undefined && c !== false)); return n; };
@@ -486,6 +496,7 @@
     if (!fresh.length) { state.asked = state.asked.filter((i) => !pool.includes(i)); fresh = pool; }
     state.q = shuffle(fresh)[0];
     state.asked.push(state.q);
+    store.set('dumm-asked', state.asked.slice(-FRAGEN.length));
     state.revealed = false;
     state.timedOut = false;
     state.verdict = null;
@@ -506,7 +517,7 @@
     state = {
       phase: 'play', mode: settings.mode, cfg: drinkCfg(), code: role === 'host' ? host.code : undefined,
       players: shuffle(names).map((name) => ({ name, lives: settings.mode === 'vote' ? settings.voteLives : settings.lives, sips: 0, ex: 0, out: false, rc: 0, rq: 0 })),
-      turn: 0, round: 1, step: 0, asked: store.get('dumm-asked', []), outOrder: [], votes: {}, voter: 0, final: null, fx: [],
+      turn: 0, round: 1, vr: 1, step: 0, asked: store.get('dumm-asked', []), outOrder: [], votes: {}, voter: 0, final: null, fx: [],
     };
     nextQuestion();
     save();
@@ -534,6 +545,8 @@
     const p = cur();
     const c = state.cfg;
     p.rq++;
+    // Verlauf: wer welche Frage wie beantwortet hat (für den Blick vor dem Abstimmen)
+    state.log = [...(state.log || []).slice(-400), { n: p.name, q: state.q, ok: !!correct, r: state.final ? 'F' : (state.vr || 1) }];
     if (correct) {
       p.rc++;
       if (state.final) state.final.scores[p.name]++;
@@ -549,7 +562,7 @@
     }
     if (state.final) state.final.answered[p.name]++;
     state.step++;
-    store.set('dumm-asked', state.asked.slice(-400));
+    store.set('dumm-asked', state.asked.slice(-FRAGEN.length));
     save();
     renderAny();
   }
@@ -666,6 +679,7 @@
     state.phase = 'play';
     state.turn = nextAliveAfter(state.turn);
     state.round++;
+    state.vr = (state.vr || 1) + 1;
     nextQuestion();
     save();
     renderAny();
@@ -711,10 +725,40 @@
       else if (state.mode === 'classic') meta = `${'♥'.repeat(Math.max(0, p.lives))}${'♡'.repeat(Math.max(0, state.cfg.lives - p.lives))}\n${sl || `${p.rc}/${p.rq} ✓`}`;
       else if (state.final) meta = `Finale: ${state.final.scores[p.name]} ✓${drinkOn() ? ` · ${p.sips} Schl.` : ''}`;
       else meta = `${'♥'.repeat(Math.max(0, p.lives))}${'♡'.repeat(Math.max(0, (state.cfg.voteLives || 1) - p.lives))}\n${p.rc}/${p.rq} ✓${sl ? ` · ${sl}` : ''}`;
-      return el('div', { className: 'dp' + (p.out ? ' out' : '') + (i === now && !p.out ? ' now' : '') + (p.name === me() ? ' me' : ''), style: `--c: ${colorOf(p.name)}` },
+      const card = el('button', { type: 'button', className: 'dp' + (p.out ? ' out' : '') + (i === now && !p.out ? ' now' : '') + (p.name === me() ? ' me' : ''), style: `--c: ${colorOf(p.name)}`, onclick: () => showHistory(p.name) },
         el('span', { className: 'ini', textContent: initial(p.name) }),
         el('div', {}, el('b', { textContent: p.name }), el('div', { className: 'meta', textContent: meta })));
+      card.setAttribute('aria-label', `${p.name}: Antworten ansehen`);
+      return card;
     });
+  }
+
+  // Antworten eines Spielers: diese Runde zuerst, darunter ältere
+  function showHistory(name) {
+    const mine = (state?.log || []).filter((x) => x.n === name);
+    document.querySelector('.kl-sheet-bg')?.remove();
+    const bg = el('div', { className: 'kl-sheet-bg' });
+    const close = () => { bg.classList.remove('is-open'); setTimeout(() => bg.remove(), 250); };
+    const group = el('div', { className: 'kl-sheet-group hist' });
+    const right = mine.filter((x) => x.ok).length;
+    group.append(el('div', { className: 'kl-sheet-title', textContent: mine.length ? `${name} · ${right} von ${mine.length} richtig` : `${name} hat noch keine Frage beantwortet` }));
+    const rank = (r) => (r === 'F' ? Infinity : r);
+    const rounds = [...new Set(mine.map((x) => x.r))].sort((a, b) => rank(b) - rank(a));
+    const cur = state.final ? 'F' : (state.vr || 1);
+    for (const r of rounds) {
+      if (state.mode !== 'classic') group.append(el('div', { className: 'hist-r', textContent: r === cur ? 'Diese Runde' : r === 'F' ? 'Finale' : `Runde ${r}` }));
+      for (const x of mine.filter((m) => m.r === r)) {
+        const q = FRAGEN[x.q];
+        group.append(el('div', { className: 'hist-row' + (x.ok ? ' ok' : ' bad') },
+          el('span', { className: 'hist-mark', textContent: x.ok ? '✓' : '✗', 'aria-label': x.ok ? 'richtig' : 'falsch' }),
+          el('div', {}, el('div', { textContent: q?.f || '' }), el('small', { textContent: `Antwort: ${q?.a || ''}` }))));
+      }
+    }
+    const cancel = el('button', { type: 'button', className: 'kl-sheet-btn cancel', textContent: 'Schließen', onclick: close });
+    bg.append(el('div', { className: 'kl-sheet', role: 'dialog' }, group, cancel));
+    bg.addEventListener('click', (e) => { if (e.target === bg) close(); });
+    document.body.append(bg);
+    requestAnimationFrame(() => bg.classList.add('is-open'));
   }
 
   function roundLabel() {
@@ -793,7 +837,7 @@
           el('p', { textContent: `Gib das Handy an ${voter.name}. Alle anderen schauen weg. (${state.voter + 1} von ${voters.length})` }),
           el('button', { className: 'btn', textContent: `Ich bin ${voter.name}`, onclick: () => { localVoteOpen = true; renderAny(); } }));
       } else {
-        box.append(el('h3', { textContent: 'Wer war der Dümmste?' }), el('p', { textContent: 'Deine Stimme ist geheim' }),
+        box.append(el('h3', { textContent: 'Wer war der Dümmste?' }), el('p', { textContent: 'Deine Stimme ist geheim. Tipp oben auf einen Namen, um seine Antworten zu sehen' }),
           voteGrid(voter.name, (t) => { localVoteOpen = false; castVote(voter.name, t); }));
       }
       return [box];
@@ -801,7 +845,7 @@
     const myName = me();
     const amVoter = voters.some((p) => p.name === myName);
     const myVote = state.votes[myName];
-    box.append(el('h3', { textContent: 'Wer war der Dümmste?' }));
+    box.append(el('h3', { textContent: 'Wer war der Dümmste?' }), el('p', { textContent: 'Tipp oben auf einen Namen, um seine Antworten zu sehen' }));
     if (amVoter && !myVote) {
       box.append(el('p', { textContent: 'Tippe geheim auf eine Person' }), voteGrid(myName, (t) => {
         if (role === 'host') castVote(myName, t);
